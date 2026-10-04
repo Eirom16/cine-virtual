@@ -1,7 +1,8 @@
 # Arquitectura
 
-Estado: arquitectura adoptada para fundaciones; los adapters y la aplicación no
-están implementados. [PRODUCT](PRODUCT.md) delimita v0.1 y [PROTOCOL](PROTOCOL.md)
+Estado: fundaciones conservadas; el Spike A implementa adapters WebSocket,
+RoomService, codec y cliente CLI con FakePlayer. No hay UI ni Player multimedia.
+[PRODUCT](PRODUCT.md) delimita v0.1 y [PROTOCOL](PROTOCOL.md)
 define el contrato normativo de control. [DECISIONS](DECISIONS.md) registra motivos.
 
 ## Separación de responsabilidades
@@ -20,8 +21,12 @@ flowchart TD
 
 Las flechas indican dependencias de código, no el viaje de un mensaje. El runtime
 se compone en la Application; los adapters implementan sus puertos. Se mantiene
-un workspace Rust con una sola biblioteca `cine-core` hasta existir otro módulo
-ejecutable. No se crean crates separados por cada concepto.
+un workspace Rust con `cine-core`, `cine-rooms`, `cine-protocol`, `cine-server` y
+`cine-client`: corresponden a responsabilidades que ya se ejecutan y prueban.
+No se crean crates por conceptos futuros. `cine-rooms` no depende de serde,
+Axum ni Tokio en su API; `cine-protocol` convierte DTOs a sus comandos. El cliente
+compone networking y Application en un runtime experimental, con réplica pura
+separada; no se fija todavía un trait async de Transport para la UI futura.
 
 | Módulo | Responsabilidad | Dependencias permitidas |
 | --- | --- | --- |
@@ -35,7 +40,9 @@ ejecutable. No se crean crates separados por cada concepto.
 | Backend adapter | HTTP/WS, sesiones y límites de frontera | Axum/Tokio candidatos, RoomService y codec |
 
 Prohibido: Domain → Flutter/Axum/Tokio/mpv; SyncEngine → Player concreto;
-Transport → RoomService; UI → adapter multimedia. El servidor decide autoridad;
+Transport genérico del cliente → política de RoomService; UI → adapter multimedia.
+El adapter backend sí compone codec y RoomService, como muestra el diagrama.
+El servidor decide autoridad;
 el cliente decide cómo ejecutar y corregir localmente.
 
 ## Puertos y casos de uso
@@ -46,7 +53,7 @@ loop ni hilo: algunos SDKs exigen hilo principal. Sus retornos confirman dispatc
 el adapter futuro reportará carga/seek completado, buffering, muestras y errores.
 Application no asume que seek devuelve con el frame ya mostrado.
 
-Contratos diseñados, todavía sin traits adicionales:
+Contratos (sin traits async adicionales prematuros):
 
 - `LocalMedia`: resolver un handle del dispositivo, inspeccionar y hashear en
   worker cancelable. En Android/iOS puede ser un URI o recurso con permiso,
@@ -69,8 +76,10 @@ un Player nativo con comandos desde la Application.
 y transición futura única. `sync`: política configurable que devuelve efectos,
 sin ejecutar Player. `replica`: compuerta de secuencia/snapshot/epoch. `media`:
 identidad y descriptor sin rutas. `player`: puerto mínimo. Tests independientes
-usan reloj y Player falsos. No están implementados RoomService, RoomState completo,
-DTOs JSON, generación de IDs, hashing, timers ni scheduler del sistema operativo.
+usan reloj y Player falsos. El Spike A añade RoomState/RoomService completo para
+el subconjunto de control, DTOs validados, UUIDs/tokens, timers Tokio y scheduler
+cliente. SHA-256 se usa para verificadores de tokens/fingerprints de requests,
+no para archivos reales. El Core original permanece intacto.
 
 ## Estado autoritativo de sala
 
@@ -101,7 +110,11 @@ Un cliente lento no cambia el estado global sin decisión del Host.
 
 RoomService procesa mutaciones en serie por sala, valida todo antes de asignar
 secuencia y emite un efecto autoritativo por mutación. Un actor/task por sala es
-suficiente; no hacen falta microservicios. Solo hay una transición pendiente;
+suficiente; no hacen falta microservicios. En este spike un mutex de duración
+corta serializa el store completo y el encolado de efectos, sin await dentro:
+es una implementación simple del orden por sala. Sharding por sala solo si
+una carga medida justifica eliminar esa contención. Solo hay una transición
+pendiente;
 controles nuevos devuelven `CONTROL_PENDING` hasta su vencimiento. El snapshot
 incluye timeline actual y transición pendiente, evitando aplicar anticipadamente
 un Play o Pause todavía futuro. Promover una transición vencida es normalización
@@ -127,8 +140,9 @@ authority_revision y cancela solicitudes antiguas. Ver detalles en PROTOCOL.
 
 ## Backend y persistencia
 
-Servidor único en memoria; Axum/Tokio y WebSocket son la implementación candidata
-del primer spike. RoomStore futuro podría persistir snapshots y deduplicación,
+Servidor único en memoria; Axum/Tokio y WebSocket implementan este spike
+localhost, con colas acotadas de 32 y máximo 256 conexiones/128 salas. RoomStore
+futuro podría persistir snapshots y deduplicación,
 sin filtrar SQL al dominio. PostgreSQL solo cuando haya necesidad de persistencia
 real; Redis solo cuando una carga medida requiera coordinación/cache. Reiniciar
 el servidor pierde salas y tokens: el cliente recibe ROOM_NOT_FOUND y crea/une

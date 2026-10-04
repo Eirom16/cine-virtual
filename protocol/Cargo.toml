@@ -1,0 +1,14 @@
+[package]
+name = "cine-protocol"
+version = "0.1.0-dev"
+edition = "2024"
+rust-version = "1.89"
+publish = false
+
+[dependencies]
+sha2 = "0.10"
+cine-core = { path = "../core" }
+cine-rooms = { path = "../rooms" }
+serde.workspace = true
+serde_json.workspace = true
+uuid.workspace = true

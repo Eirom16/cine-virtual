@@ -42,11 +42,14 @@ usar mediana de sus offsets y mínimo RTT como diagnóstico. Rechazar T4<T1,
 T3<T2, RTT negativo o >2000 ms. RTT asimétrico introduce un error que estas
 ecuaciones no eliminan; no prometer exactitud inferior a la latencia asimétrica.
 
-Application futura estima incertidumbre conservadora: RTT mínimo/2 + dispersión
+Application del spike estima incertidumbre conservadora: RTT mínimo/2 + dispersión
 máxima de offsets seleccionados. Solo marca clock_trusted si ≤100 ms y última
 muestra válida hace ≤15 s. Actualizar cada 5 s; cambio de offset >100 ms obliga
 a snapshot/recalibración; ajustes pequeños se suavizan antes de reprogramar.
-Filtro puro implementado; incertidumbre, antigüedad y suavizado aún diseñados.
+Filtro puro, incertidumbre y antigüedad implementados. El CLI exige ocho muestras
+válidas al conectar/reanudar, más conservador que el mínimo de tres del filtro.
+Suavizado y recuperación automática ante salto de offset siguen pendientes; el
+spike valida relojes monotónicos estables, reconexión explícita y clock_epoch.
 
 ## Playback programado
 
@@ -121,8 +124,10 @@ se ensaya en [core/tests](../core/tests/sync_scenarios.rs).
 ## Recuperación y entrada tardía
 
 Sin conexión se pausa localmente y se cancela todo control pendiente; no puede
-seguir actuando como Host. Transport reintenta con backoff+jitter (0.5–8 s,
+seguir actuando como Host. Transport futuro reintentará con backoff+jitter (0.5–8 s,
 presupuesto máximo de gracia 30 s), pero Application no reenvía PLAY/SEEK pendientes.
+El CLI actual usa `disconnect`/`resume` explícitos; al reanudar recalibra, obtiene
+snapshot, verifica el descriptor sintético y vuelve a Ready antes de reproducir.
 Resume devuelve snapshot completo, permisos actuales, secuencia y transición
 pendiente. Recalibrar reloj, verificar medio vigente, preparar, marcar Ready,
 restaurar modo/posición proyectados. Un snapshot puede estar pausado ahora con

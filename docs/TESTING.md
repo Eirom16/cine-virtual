@@ -2,9 +2,11 @@
 
 ## Ejecutable hoy
 
-`cargo test --workspace --offline` ejecuta escenarios deterministas del Core con
-reloj inyectado, observaciones y Player falso. Sin UI, vídeo, servidor o red real.
-No se duerme en tests: el tiempo avanza con números. `cargo fmt`, Clippy y build
+`cargo test --workspace` ejecuta pruebas deterministas de Core, RoomService, codec
+y réplica con tiempo numérico inyectado, sin sleeps. Además ejecuta dos pruebas
+WebSocket sobre TCP localhost real, con servidor/cliente in-process y timers Tokio.
+Estas últimas esperan notificaciones con timeout y no exigen un Player multimedia.
+`cargo fmt`, Clippy y build
 completan las comprobaciones de Rust. `python3 scripts/check_docs.py` comprueba
 links locales, JSON de ejemplos, capítulos y formato básico de documentación.
 
@@ -22,11 +24,15 @@ links locales, JSON de ejemplos, capítulos y formato básico de documentación.
 | Capacidades Player | Fake player y tolerancia sin rate |
 
 Transferencia Host, autorización, tokens, readiness global y deduplicación de
-requests **no están implementados**, por tanto sus tests de integración quedan
-definidos abajo. SequenceGate no implementa un servidor ni valida permisos.
+requests tienen tests en [rooms/tests](../rooms/tests/service.rs). La réplica y
+scheduler se prueban en [client/tests](../client/tests/replica.rs); codec y ejemplos
+normativos en [protocol/tests](../protocol/tests/codec.rs).
+[server/tests](../server/tests/websocket.rs) comprueba el flujo completo y sender_id
+falsificado sobre conexiones reales. La demo de tres procesos está en
+[scripts/demo_control.py](../scripts/demo_control.py).
 Un test de timeline con Player falso no demuestra precisión de SDK o scheduler.
 
-## Al construir RoomService y protocolo
+## RoomService y protocolo implementados
 
 Fixture sin red: reloj falso, store en memoria y sesiones simuladas; assert de
 estado y efectos. Crear/unirse, límite, roles, claim inválido, Ready viejo,
@@ -37,12 +43,15 @@ Reintentos en nueva conexión no restauran un control antiguo.
 
 Fixtures JSON golden compartidas con cliente futuro: envelope, State con pending,
 ACK/ERROR, unknown version/type, claves duplicadas, límites, signed drift y nulls.
-Decoder debe rechazar input inválido antes de tocar dominio. Un schema o codec
-real se incorporará con el spike WebSocket; ejemplos documentados no son codec.
+Decoder debe rechazar input inválido antes de tocar dominio. El codec serde con
+validación explícita ya existe; los ejemplos JSON de PROTOCOL
+se leen directamente desde el documento y se validan con ese mismo codec.
 
-## Simulación de red y sistema
+## Simulación de red y sistema futura
 
-Harness virtual con cola y reloj: latencia 0–1000 ms, jitter y asimetría, duplicados,
+El Core cubre muestras de reloj con latencia/jitter/asimetría y la réplica cubre
+duplicados/gaps/reconexión. Pendiente harness completo de fallos sobre el adapter:
+cola virtual con reloj para latencia 0–1000 ms, jitter y asimetría, duplicados,
 reordenación, gaps, pérdidas por cierre y reconexión durante pending. WS ordena
 frames en una conexión; pérdidas/reordenación se simulan en el nivel de sesión
 y aplicación. No modelar datagramas como si WS fuera UDP.

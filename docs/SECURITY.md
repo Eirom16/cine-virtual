@@ -1,7 +1,8 @@
 # Seguridad y observabilidad
 
-Estado: requisitos de frontera documentados; esta pasada no construye un servicio
-expuesto. [PROTOCOL](PROTOCOL.md) fija límites y autoridad; validarlos es condición
+Estado: bases documentadas y controles mínimos implementados en Spike A
+localhost. El binario rechaza bind fuera de loopback; no es un servicio público.
+[PROTOCOL](PROTOCOL.md) fija límites y autoridad; validarlos es condición
 para abrir el primer servidor a una red externa.
 
 ## Fronteras mínimas
@@ -39,7 +40,7 @@ en la implementación, no preferencias en texto plano.
 
 ## Logs estructurados
 
-Contrato futuro JSON: `timestamp_utc`, `level`, `event`, `component`,
+Contrato objetivo JSON: `timestamp_utc`, `level`, `event`, `component`,
 `correlation_id` y campos permitidos. IDs de sala/sesión deben seudonimizarse en
 exportaciones. Event IDs pueden correlacionar pedido, aceptación y ejecución;
 un ID interno de trace no sustituye la autorización.
@@ -64,4 +65,14 @@ servidor, valor inicial operativo 7 días configurable, no persistencia de produ
 Métricas de spike: RTT/jitter, p50/p95/p99 de drift, correcciones/minuto, seek
 latency, deadlines perdidos, tiempo de resume, uso CPU/memoria. Evitar labels
 de cardinalidad ilimitada (UUID/usuario) en métricas.
-No hay backend de logs ni dependencia de tracing implementados; esta es su política.
+El spike emite JSON con tracing en stderr: timestamp/level/target y campos event,
+room_id/connection_id, sequence o métricas cuando corresponda. No almacena logs
+en archivos ni añade un backend. La invitación aparece únicamente como salida
+privada explícita de `create` en stdout, para poder copiarla al otro cliente;
+no se registra como log estructurado ni aparece en la demo.
+
+Implementado: tamaño/profundidad/rangos, roles ligados a sesión, tokens y rotación,
+colas 32, 16 miembros, 128 salas, 256 conexiones y dedup 256 por emisor/120 s
+con techo global de 65536 resultados. Rate por conexión 20/s burst 40. Pendiente
+antes de Internet: WSS, origins, límites por origen, pruebas de abuso, controles
+específicos de TIME_PING/telemetría y política de retención de logs.

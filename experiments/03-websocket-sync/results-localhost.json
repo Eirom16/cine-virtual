@@ -1,0 +1,45 @@
+{
+  "scenario": "three_real_processes",
+  "result": "PASS",
+  "authority": "NOT_AUTHORIZED; sequence unchanged",
+  "timings": [
+    {
+      "command": "play 100000",
+      "sequence": 8,
+      "execute_at_ms": 2173,
+      "lateness_a_ms": 2.0,
+      "lateness_b_ms": 1.0,
+      "execution_difference_ms": 1.0
+    },
+    {
+      "command": "pause",
+      "sequence": 9,
+      "execute_at_ms": 2677,
+      "lateness_a_ms": 1.0,
+      "lateness_b_ms": 1.0,
+      "execution_difference_ms": 0.0
+    },
+    {
+      "command": "seek 120000",
+      "sequence": 10,
+      "execute_at_ms": 3180,
+      "lateness_a_ms": 3.0,
+      "lateness_b_ms": 1.0,
+      "execution_difference_ms": 2.0
+    }
+  ],
+  "clock_a": {
+    "offset_ms": 12.0,
+    "rtt_ms": 0.0,
+    "sample_count": 8
+  },
+  "clock_b": {
+    "offset_ms": 720.0,
+    "rtt_ms": 0.0,
+    "sample_count": 8
+  },
+  "resume_position_difference_ms": 2,
+  "final_sequence": 15,
+  "final_position_ms": 121300,
+  "tokens_in_structured_logs": false
+}

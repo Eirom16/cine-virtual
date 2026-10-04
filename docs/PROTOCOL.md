@@ -1,6 +1,7 @@
 # Protocolo de control v1
 
-Estado: especificación diseñada, sin codec ni servidor implementados. Este
+Estado: especificación normativa; codec/servidor implementan el subconjunto de
+[Spike A](../experiments/03-websocket-sync/README.md). Este
 documento es normativo para los spikes. [ARCHITECTURE](ARCHITECTURE.md) describe
 los módulos; [SYNC](SYNC.md) explica el reloj y las correcciones. MAYÚSCULAS
 identifican tipos wire, no funciones de UI.
@@ -390,13 +391,18 @@ válido usa request_event_id=null. Ningún payload de ERROR representa contenido
 
 invite_token y resume_token son secretos independientes aleatorios de ≥256 bits,
 representados base64url, nunca room_id ni hash del vídeo. En memoria servidor
-conserva verificadores criptográficos, con expiración; emisión/rotación futura
-usará biblioteca mantenida, nunca criptografía casera. Resume exige conexión nueva
+conserva verificadores criptográficos, con expiración; emisión/rotación usa
+CSPRNG y biblioteca mantenida, nunca criptografía casera. La cache privada de
+idempotencia conserva temporalmente request/ACK de credenciales durante 120 s
+para responder retries idénticos; no se persiste ni se loguea, y está acotada.
+No confundir esa cache de resultados con el store de verificadores de sesión.
+Resume exige conexión nueva
 con SESSION_HELLO; reemplazar socket anterior es atómico y revoca su autoridad.
 Tokens se transmiten en frames privados sobre WSS, nunca en query de logs.
 
 Límites iniciales diseñados: 20 mensajes/s y burst 40 por sesión; TIME_PING ≤10/s
 en warmup, SYNC_REPORT ≤1/s, create/join ≤5/min por origen. Límite global de
 conexiones configurable. Antes de exposición pública deben implementarse estos
-límites y pruebas de abuso; no hay rate limiter ya construido.
+límites y pruebas de abuso. El spike aplica 20/s con burst 40 por conexión y
+colas acotadas; presupuestos por origen y telemetría específica siguen pendientes.
 Ver [SECURITY](SECURITY.md) para boundary, observabilidad y contenido no confiable.

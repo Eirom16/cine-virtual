@@ -1,0 +1,27 @@
+use tokio::net::TcpListener;
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    tracing_subscriber::fmt()
+        .json()
+        .with_writer(std::io::stderr)
+        .init();
+    let args: Vec<_> = std::env::args().skip(1).collect();
+    let bind = match args.as_slice() {
+        [] => "127.0.0.1:8765",
+        [flag, value] if flag == "--bind" => value,
+        _ => return Err("Usage: cine-server [--bind 127.0.0.1:8765]".into()),
+    };
+    let address: std::net::SocketAddr = bind.parse()?;
+    if !address.ip().is_loopback() {
+        return Err("This spike only listens on loopback; it is not Internet-ready".into());
+    }
+    let listener = TcpListener::bind(address).await?;
+    tracing::info!(event="server_started",bind=%listener.local_addr()?);
+    cine_server::Server::default()
+        .serve(listener, async {
+            let _ = tokio::signal::ctrl_c().await;
+        })
+        .await?;
+    Ok(())
+}

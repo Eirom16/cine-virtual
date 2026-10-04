@@ -1,6 +1,7 @@
 # Experimentos técnicos
 
-Son planes de spikes, no capacidades integradas. Duración acotada, corpus sintético,
+El experimento 03 ya valida control con FakePlayer; los demás siguen como planes.
+Duración acotada, corpus sintético,
 métricas reproducibles y decisión escrita; no promover código experimental al
 producto por inercia. No crear carpetas vacías ni commits de binarios/vídeos.
 
@@ -16,5 +17,6 @@ El experimento 01 es un recorrido vertical mínimo; 02–04 son verificaciones
 que lo apoyan, no prerrequisitos para construir una aplicación completa.
 Formato del resultado futuro: fecha, versión exacta de SDK/toolchain, plataforma/
 dispositivo, instrucciones, corpus/licencia, datos agregados, fallos y recomendación.
-Dejar conclusión y enlaces en el README del spike cuando se ejecute. Hoy ninguno
-contiene una integración multimedia o de red ejecutada.
+Dejar conclusión y enlaces en el README del spike cuando se ejecute. El Spike A
+de 03 contiene integración WebSocket ejecutada y métricas localhost;
+ninguno incorpora multimedia real. Esta tarea no avanza al experimento 01.

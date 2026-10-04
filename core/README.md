@@ -1,7 +1,8 @@
 # cine-core
 
-Biblioteca Rust de fundaciones, std únicamente. `cargo test --workspace --offline`
-desde la raíz. Rust ≥1.85. No es una aplicación ni implementa toda la sala.
+Biblioteca Rust de fundaciones, std únicamente. `cargo test -p cine-core --offline`
+desde la raíz. Rust mínimo declarado 1.85; el workspace completo requiere ≥1.89.
+No es una aplicación ni implementa toda la sala.
 
 | Módulo | Funcionalidad actual |
 | --- | --- |

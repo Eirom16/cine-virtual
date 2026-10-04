@@ -2,7 +2,8 @@
 
 Antes de implementar, leer [PRODUCT](PRODUCT.md), [ARCHITECTURE](ARCHITECTURE.md),
 [PROTOCOL](PROTOCOL.md) y [DECISIONS](DECISIONS.md). El repositorio está en
-fundaciones; no añadir providers, chat o infraestructura fuera del hito vigente.
+fase pre-v0.1 con Spike A; no añadir providers, chat o infraestructura fuera del
+hito vigente.
 La [licencia pendiente](LICENSING.md) debe resolverse antes de aceptar aportes
 públicos bajo términos no definidos. No se introduce CLA/DCO por cuenta del autor.
 
@@ -29,8 +30,11 @@ git diff --check
 git diff
 ```
 
-Rust mínimo 1.85 por edición 2024; std únicamente en esta base. Versiones futuras
-de herramientas se adoptan deliberadamente; Cargo.lock se conserva para workspace.
+Core: Rust mínimo 1.85, std únicamente. Workspace del spike: Rust mínimo
+declarado 1.89 por dependencias y sintaxis del runtime, verificado aquí con 1.99.
+La MSRV mínima todavía no se probó con toolchain propia. Cargo.lock se conserva
+para reproducir versiones; primera descarga requiere red, después puede usarse
+--offline. Tests de integración requieren sockets TCP localhost.
 Python ≥3.10 valida docs. CI futura reproducirá checks del Core en los tres OS
 desktop; builds Android/iOS requieren runners/toolchains propios y pruebas reales.
 No hay CI remota conectada en este entorno ni matriz móvil ya verificada.

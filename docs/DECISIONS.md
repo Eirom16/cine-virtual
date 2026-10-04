@@ -21,13 +21,15 @@ decenas de crates vacíos y traits sin uso.
 **Consequences:** Core testeable sin UI ni runtime. La composición/lifecycle queda
 en Application; una abstracción no elimina diferencias reales de Player.
 
-## ADR-002 — WebSocket de control (Adoptada en diseño)
+## ADR-002 — WebSocket de control (Validada en Spike A localhost)
 
 **Context:** MVP requiere eventos bidireccionales de bajo volumen con autoridad
 central, sin distribución de bytes de vídeo.
 
 **Decision:** WebSocket/JSON v1 en canal de control, WSS fuera de localhost,
-RoomService independiente. Backend Rust/Axum/Tokio candidato del spike.
+RoomService independiente. Backend Rust/Axum/Tokio implementado en Spike A;
+evidencia localhost en
+[experimento 03](../experiments/03-websocket-sync/README.md), sin aprobación Internet.
 
 **Alternatives:** polling, UDP propietario, WebRTC data channel desde el primer día.
 
@@ -61,8 +63,8 @@ UUIDv7 con timestamp; esa diferencia motiva la elección, no una superioridad ge
 **Alternatives:** UUIDv7 (útil para índices futuros), ULID, IDs incrementales públicos.
 
 **Consequences:** no filtrar hora mediante ID; no ordenar IDs ni usarlos como
-contraseñas. Generación se implementará con biblioteca mantenida, no con reloj
-ni PRNG casero. No hay generador todavía en Core.
+contraseñas. Generación en rooms/protocol/adapters con uuid/getrandom, no con reloj
+ni PRNG casero. Core conserva independencia de esa generación.
 
 ## ADR-005 — Hash completo SHA-256 (Adoptada en diseño)
 
@@ -105,7 +107,7 @@ plataformas objetivo; eso no verifica las dependencias de multimedia del proyect
 **Consequences:** código funcional mínimo sin dependencias. Posible traducción de
 API al elegir bridge; no exponer tipos Rust inestables como ABI pública.
 
-## ADR-008 — Servidor único y memoria (Adoptada en diseño)
+## ADR-008 — Servidor único y memoria (Implementada en Spike A)
 
 **Context:** cuentas y persistencia no están dentro del MVP.
 

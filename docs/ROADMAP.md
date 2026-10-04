@@ -1,7 +1,7 @@
 # Roadmap por evidencia
 
-No son fechas ni promesas de distribución. El estado actual es fundaciones,
-anterior a v0.1. [PRODUCT](PRODUCT.md) gobierna alcance, [TESTING](TESTING.md)
+No son fechas ni promesas de distribución. El estado actual incluye Spike A de control validado
+con FakePlayer, anterior a v0.1. [PRODUCT](PRODUCT.md) gobierna alcance, [TESTING](TESTING.md)
 gobierna aceptación. Las cinco plataformas son objetivo; se publica cobertura
 medida por versión, no se declara soporte por heredar un SDK.
 
