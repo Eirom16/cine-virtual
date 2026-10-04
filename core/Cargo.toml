@@ -1,0 +1,9 @@
+[package]
+name = "cine-core"
+version = "0.1.0-dev"
+edition = "2024"
+rust-version = "1.85"
+publish = false
+description = "Deterministic synchronization primitives for Cine Virtual"
+
+[dependencies]

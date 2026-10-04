@@ -1,0 +1,15 @@
+/target/
+**/.dart_tool/
+**/build/
+**/node_modules/
+.env
+.env.*
+!.env.example
+*.log
+*.tmp
+__pycache__/
+.DS_Store
+Thumbs.db
+/.agents/
+/.codex/
+/.aws/
