@@ -4,17 +4,18 @@ Base de un proyecto con vocación open source para ver contenido juntos desde
 Windows, Linux, macOS, Android e iOS. Cada dispositivo conserva su archivo y el
 servidor coordina la sala; el control de reproducción no transporta el vídeo.
 
-**Estado: Spike A de control funcionando, previo al MVP v0.1.** Hay servidor
-WebSocket y clientes CLI con FakePlayer; todavía no hay reproducción multimedia
-real. La licencia está pendiente: ver
+**Estado: Spikes A y B funcionando en Linux, previo al MVP v0.1.** Hay servidor
+WebSocket/clientes CLI con FakePlayer y un adapter libmpv in-process probado de
+forma aislada. Red y vídeo real todavía no están integrados. La licencia está
+pendiente: ver
 [evaluación de licencias](docs/LICENSING.md). No se declara todavía una licencia
 open source definitiva.
 
 | Estado | Alcance real |
 | --- | --- |
 | Implemented | Core determinista, RoomService en memoria, codec v1, autoridad/Ready, controles programados y resume; validación con FakePlayer y WebSocket localhost real. |
-| Planned | Archivos locales reales, metadatos/hash completo, adapter multimedia y validación de plataformas para v0.1. |
-| Experimental | Spike A ejecutable de control; motor multimedia, puente Rust/UI y WebRTC continúan como planes sin integración. |
+| Planned | Integrar control con vídeos locales reales, metadatos/hash completo y validar plataformas para v0.1. |
+| Experimental | Spikes A (control) y B (adapter libmpv Linux, corpus/mediciones); motor definitivo, puente Rust/UI y WebRTC pendientes. |
 
 El objetivo de v0.1 es demostrar dos clientes con el mismo vídeo local,
 Play/Pause/Seek programados y recuperación tras una desconexión temporal.
@@ -48,8 +49,9 @@ core/          biblioteca Rust sin dependencias externas y tests
 rooms/         RoomService y RoomStore, sin WebSocket ni JSON
 protocol/      DTOs wire y codec v1 validado
 server/        ejecutable WebSocket con Axum/Tokio
-experiments/   planes de spikes y resultados del experimento de control
-scripts/       diagnóstico, demo de tres procesos y validación de docs
+adapters/      único Player libmpv experimental, separado de Core
+experiments/   planes, investigación y resultados de control/multimedia
+scripts/       diagnóstico, demos/corpus/mediciones y validación de docs
 ```
 
 Empieza por [PRODUCT](docs/PRODUCT.md), [ARCHITECTURE](docs/ARCHITECTURE.md) y
@@ -61,7 +63,8 @@ Empieza por [PRODUCT](docs/PRODUCT.md), [ARCHITECTURE](docs/ARCHITECTURE.md) y
 Rust ≥1.89 para el workspace del spike (verificado con 1.99), Cargo, rustfmt y
 Clippy; Python ≥3.10. Core conserva su mínimo 1.85 y ninguna dependencia externa.
 Se necesita acceso a crates.io en la primera compilación y TCP localhost en las
-pruebas WebSocket. No se necesita reproductor instalado.
+pruebas WebSocket. Los tests habituales/build no necesitan SDK multimedia
+instalado; ejecutar el Player y tests opt-in sí requiere libmpv.
 
 ```sh
 cargo test --workspace
@@ -79,6 +82,7 @@ cargo build --workspace
 python3 scripts/demo_control.py
 ```
 
-Comandos manuales y evidencia en [Spike A](experiments/03-websocket-sync/README.md).
+Comandos manuales y evidencia en [Spike A](experiments/03-websocket-sync/README.md)
+y [Spike B](experiments/01-player-crossplatform/README.md).
 Consulta [CONTRIBUTING](docs/CONTRIBUTING.md) antes de proponer cambios; la licencia
 sigue pendiente y no se solicitan aportes públicos ni se publica una release.

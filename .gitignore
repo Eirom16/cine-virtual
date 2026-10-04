@@ -14,3 +14,7 @@ Thumbs.db
 /.codex/
 /.aws/
 /.git-local/
+
+# Generated synthetic media and unreviewed experiment runs
+/test-media/
+/experiments/01-player-crossplatform/runs/

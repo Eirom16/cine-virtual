@@ -1,5 +1,5 @@
 [workspace]
-members = ["core", "rooms", "protocol", "server", "client"]
+members = ["core", "rooms", "protocol", "server", "client", "adapters/player-mpv"]
 resolver = "2"
 
 [workspace.dependencies]

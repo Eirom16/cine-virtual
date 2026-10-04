@@ -49,7 +49,7 @@ Hash local no se publica en logs: identifica contenido y puede ser sensible.
 La sala recibe digest para comparar; no contenido. El hash no es credencial,
 no autoriza transferencia y no reemplaza permisos.
 
-## Elección de Player pendiente
+## Elección definitiva de Player pendiente
 
 | Candidato | Qué comprobar en spike |
 | --- | --- |
@@ -73,3 +73,12 @@ de adapters por plataforma; un único SDK no es requisito arquitectónico.
 Licencias de SDKs/codecs dependen del build: [FFmpeg](https://ffmpeg.org/legal.html)
 explica componentes LGPL/GPL. Revisar las opciones efectivamente enlazadas antes
 de distribuir. Ver ADR-006 y [LICENSING](LICENSING.md).
+
+## Evidencia Spike B
+
+[Experimento 01](../experiments/01-player-crossplatform/README.md) implementa un
+adapter libmpv provisional Linux: in-process, load/eventos locales fuera de Player,
+seek dispatch/completion separados, headless y ventana SDK visible. SyncEngine
+aplica rate/seek reales sin red. No se cambia MediaDescriptor ni se implementa
+hashing. Solo Linux tiene build/runtime; Android/iOS y rendering embebido siguen
+pendientes. [ADR-006](DECISIONS.md) conserva el historial y gates de promoción.

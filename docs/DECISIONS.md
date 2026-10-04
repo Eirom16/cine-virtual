@@ -92,6 +92,32 @@ acoplar sincronización al SDK que primero funcione.
 **Consequences:** se difiere binding/rendering; evidencia Android/iOS obligatoria
 antes de promover un motor. Rate es capacidad opcional; hard seek fallback.
 
+### Evidencia adicional — Spike B, 2026-10-04
+
+**Evidence:** comparación primaria de cuatro familias en
+[RESEARCH](../experiments/01-player-crossplatform/RESEARCH.md). Un adapter libmpv
+in-process API 2.5/mpv 0.41.0 decodificó corpus sintético Linux. Headless y ventana
+SDK GPU/Xwayland probados; VAAPI reportada en visible. Seek paused exacto según
+position en MP4, hasta +12 ms en VFR; rate medido, soft/hard correction reales,
+600 s sin reloj acelerado. Métricas y límites en
+[RESULTS](../experiments/01-player-crossplatform/RESULTS.md).
+
+**Decision:** se mantiene PROVISIONAL. La decisión inicial de no elegir motor
+se conserva arriba como historial; ahora libmpv es candidato suficiente para
+continuar al vertical slice **Linux**, no motor universal/definitivo. FFI pequeño
+con libloading evita SDK en link-time del workspace. Un solo owner !Send/!Sync,
+completion por eventos fuera del puerto y ninguna dependencia SDK en Core.
+
+**Remaining risks:** build local con FFmpeg GPL/version3, superficie embebida,
+packaging, URI/lifecycle y audio Android/iOS sin prueba. Position no prueba frame
+presentado; thresholds/rate necesitan tuning. RSS retenido requiere diagnóstico
+adicional; bindings propios requieren auditoría unsafe/ABI. Calidad perceptual de
+audio, hardware variable, corpus HD/4K y entornos sin desktop no están aprobados.
+
+**Next validation:** dos vídeos Linux + canal control de Spike A como slice
+separado, con probe/hash/Ready reales. Validar Android/iOS en dispositivos y un
+build distribuible antes de promover el stack. Flutter/bridge/licencia pendientes.
+
 ## ADR-007 — Rust inicial, UI/puente candidatos (Provisional)
 
 **Context:** necesitamos pruebas independientes hoy y una base portable.

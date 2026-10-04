@@ -76,3 +76,18 @@ Primer gate de integración: dos clientes reales con el mismo archivo, Play/Paus
 Seek, ensayo 10 min, métricas p95, desconexión, copia discrepante y Host inválido.
 Android/iOS deben ensayarse antes de elegir motor/puente, no después de diseñar
 una UI final. Registrar evidencia en experiments sin promocionar el spike a producto.
+
+## Gate aislado de multimedia: Spike B
+
+Antes del recorrido con dos vídeos se ejecutó Core + un adapter in-process Linux,
+sin WebSocket: [experimento 01](../experiments/01-player-crossplatform/README.md).
+Los 62 tests de Spike A se conservan; dos tests nuevos puros validan límites/mapeo
+de errores del adapter, sin SDK. Cuatro tests SDK están ignorados por defecto y
+se ejecutan explícitamente con corpus generado y libmpv: controles/rates/EOF y
+SyncEngine, errores/destroy, reemplazo de medio y 60 ciclos de lifecycle.
+
+Headless decodifica con null outputs; no demuestra ventana/audio. Se ejecutó
+además visible GPU/Xwayland, captura de la ventana sintética, audio aislado y
+600 segundos reales de reproducción. Completion/position reportados no equivalen
+a frame físico ni calidad perceptual. Los resultados machine-readable conservan
+samples y método. No se declaran tests Windows/macOS/Android/iOS ejecutados.

@@ -1,7 +1,8 @@
 # Arquitectura
 
 Estado: fundaciones conservadas; el Spike A implementa adapters WebSocket,
-RoomService, codec y cliente CLI con FakePlayer. No hay UI ni Player multimedia.
+RoomService, codec y cliente CLI con FakePlayer. Spike B añade un Player libmpv
+experimental aislado en Linux; no hay UI ni integración red + vídeo real.
 [PRODUCT](PRODUCT.md) delimita v0.1 y [PROTOCOL](PROTOCOL.md)
 define el contrato normativo de control. [DECISIONS](DECISIONS.md) registra motivos.
 
@@ -22,7 +23,7 @@ flowchart TD
 Las flechas indican dependencias de código, no el viaje de un mensaje. El runtime
 se compone en la Application; los adapters implementan sus puertos. Se mantiene
 un workspace Rust con `cine-core`, `cine-rooms`, `cine-protocol`, `cine-server` y
-`cine-client`: corresponden a responsabilidades que ya se ejecutan y prueban.
+`cine-client`, más `cine-player-mpv` experimental: corresponden a responsabilidades que ya se ejecutan y prueban.
 No se crean crates por conceptos futuros. `cine-rooms` no depende de serde,
 Axum ni Tokio en su API; `cine-protocol` convierte DTOs a sus comandos. El cliente
 compone networking y Application en un runtime experimental, con réplica pura
@@ -50,7 +51,8 @@ el cliente decide cómo ejecutar y corregir localmente.
 `Player` existe en [core/src/player.rs](../core/src/player.rs): play, pause, seek,
 position, duration y rate con detección de capacidad. No impone `Send`, event
 loop ni hilo: algunos SDKs exigen hilo principal. Sus retornos confirman dispatch;
-el adapter futuro reportará carga/seek completado, buffering, muestras y errores.
+el adapter de Spike B reporta carga/seek completado y buffering fuera del puerto.
+Otros adapters futuros deberán mantener esa separación.
 Application no asume que seek devuelve con el frame ya mostrado.
 
 Contratos (sin traits async adicionales prematuros):
@@ -79,7 +81,8 @@ identidad y descriptor sin rutas. `player`: puerto mínimo. Tests independientes
 usan reloj y Player falsos. El Spike A añade RoomState/RoomService completo para
 el subconjunto de control, DTOs validados, UUIDs/tokens, timers Tokio y scheduler
 cliente. SHA-256 se usa para verificadores de tokens/fingerprints de requests,
-no para archivos reales. El Core original permanece intacto.
+no para archivos reales. El comportamiento del Core original se conserva; PlayerError solo añade
+Display/Error de std para propagación tipada en el harness de Spike B.
 
 ## Estado autoritativo de sala
 
@@ -161,3 +164,13 @@ HTTP/HLS/DASH pueden tener timeline live, duraciones variables y contenido
 personalizado: necesitan otra semántica de identidad y capacidades negociadas,
 no se habilitan con un simple valor de enum v1. Federación queda en estudio;
 mantener una autoridad por sala evita fingir un consenso ya resuelto.
+
+## Adapter aislado de Spike B
+
+[adapters/player-mpv](../adapters/player-mpv/README.md) es el único nuevo módulo
+concreto: depende de cine-core y carga libmpv dinámicamente. Application del
+harness tiene un owner y bombea eventos; Player permanece !Send/!Sync por decisión
+del wrapper, sin imponer threading al puerto. Load y eventos no viven en Domain.
+Las mediciones y timers reales quedan en el ejecutable experimental. No se
+modifica Replica/FakePlayer ni se conectan sockets con multimedia en este spike.
+Detalle/evidencia en [experimento 01](../experiments/01-player-crossplatform/README.md).

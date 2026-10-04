@@ -1,0 +1,12 @@
+[package]
+name = "cine-player-mpv"
+version = "0.1.0-dev"
+edition = "2024"
+rust-version = "1.89"
+publish = false
+description = "Experimental in-process libmpv adapter; not a definitive multimedia stack"
+
+[dependencies]
+cine-core = { path = "../../core" }
+libloading = "0.9"
+serde_json.workspace = true

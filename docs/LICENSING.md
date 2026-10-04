@@ -33,3 +33,13 @@ de contribución. Revisar dependencias efectivamente distribuidas, enlazado,
 codecs, stores móviles y obligaciones de avisos/fuente. Los builds de
 [FFmpeg](https://ffmpeg.org/legal.html) pueden cambiar obligaciones según opciones.
 La evaluación técnica móvil y de licencias ocurre antes de seleccionar el SDK.
+
+## Build multimedia de Spike B
+
+[RESEARCH](../experiments/01-player-crossplatform/RESEARCH.md) distingue header
+ISC/API libmpv, engine GPL por defecto, posibilidad LGPL condicionada, plugins y
+dependencias. El paquete local mpv enlaza FFmpeg construido GPL/version3; no se
+aprueba para distribución ni tiendas. libloading 0.9.0 usa ISC; no cambia la
+licencia del engine ni la decisión pendiente de Cine Virtual. Linking, relinking,
+fuente/avisos y términos móviles necesitan revisión del build concreto antes de
+empaquetar. No se crea LICENSE ni se publica una release en este spike.

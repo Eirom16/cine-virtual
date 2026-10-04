@@ -23,3 +23,11 @@ pub trait Player {
     fn supports_playback_rate(&self) -> bool;
     fn set_playback_rate(&mut self, rate: f64) -> Result<(), PlayerError>;
 }
+
+impl std::fmt::Display for PlayerError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}: {}", self.code, self.message)
+    }
+}
+
+impl std::error::Error for PlayerError {}
