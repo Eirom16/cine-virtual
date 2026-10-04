@@ -18,11 +18,11 @@ def main() -> int:
     for name in REQUIRED:
         if not (ROOT / name).is_file():
             errors.append(f"Missing document: {name}")
-    docs = sorted(ROOT.glob("**/*.md"))
+    derived = {"target", "build", ".dart_tool", ".gradle", "ephemeral"}
+    docs = sorted(p for p in ROOT.glob("**/*.md")
+                  if not derived.intersection(p.relative_to(ROOT).parts))
     json_count = 0
     for path in docs:
-        if "target" in path.relative_to(ROOT).parts:
-            continue
         content = path.read_bytes().decode("utf-8")
         if not content.startswith("# "):
             errors.append(f"Missing document title: {path.relative_to(ROOT)}")

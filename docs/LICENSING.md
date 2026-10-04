@@ -43,3 +43,17 @@ aprueba para distribución ni tiendas. libloading 0.9.0 usa ISC; no cambia la
 licencia del engine ni la decisión pendiente de Cine Virtual. Linking, relinking,
 fuente/avisos y términos móviles necesitan revisión del build concreto antes de
 empaquetar. No se crea LICENSE ni se publica una release en este spike.
+
+## Gate móvil/UI — Spike C
+
+La estrategia híbrida investigada usa Media3 Apache-2.0 en Android y recomienda
+AVPlayer nativo en iOS, sin copiar el build mpv/FFmpeg GPL Linux a APK/IPA.
+Flutter BSD-3-Clause y el bridge Rust manual no resuelven licencia del proyecto.
+FRB (MIT) y cbindgen (MPL-2.0) fueron evaluados, no añadidos como dependencias.
+
+**TECHNICAL RISK — LEGAL REVIEW REQUIRED:** distribución GPL/LGPL en App Store,
+linking estático, objetos relinkables, signing/DRM, avisos/fuentes y cierre de
+plugins/codecs necesitan revisión del build concreto y términos de tienda. No se
+afirma compatibilidad/incompatibilidad jurídica universal. Investigación primaria
+y alternativas en [RESEARCH](../experiments/02-rust-ui-bridge/RESEARCH.md).
+No se crea LICENSE ni se publica APK/IPA/release; los builds son locales.

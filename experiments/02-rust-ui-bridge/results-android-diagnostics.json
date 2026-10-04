@@ -1,0 +1,490 @@
+{
+  "notes": [
+    "First attempt: audio enabled, Dart timing, rate check failed; not an audio quality validation.",
+    "Second attempt: video-only native timing; rate passed, fixed-delay lifecycle check raced resume."
+  ],
+  "attempts": [
+    {
+      "player": {
+        "duration_ms": 30000,
+        "decoder": "c2.goldfish.h264.decoder",
+        "rendered_first_frame": true,
+        "load_ms": 6537
+      },
+      "hash": {
+        "state": "complete",
+        "read_bytes": 3308532,
+        "size_bytes": 3308532,
+        "elapsed_ms": 348.73820500000005,
+        "access": "SAF content URI -> duplicated regular FD -> Rust Read",
+        "identity_match": true
+      },
+      "resources": {
+        "pss_before_hash_kib": 226264,
+        "pss_after_hash_and_load_kib": 232874,
+        "threads": 49
+      },
+      "play_pause": {
+        "advance_ms": 647,
+        "pause_advance_ms": 0
+      },
+      "seeks": [
+        {
+          "target_ms": 5000,
+          "ready_after_dispatch_ms": 512.338,
+          "position_ms": 5000,
+          "landing_error_ms": 0
+        },
+        {
+          "target_ms": 10000,
+          "ready_after_dispatch_ms": 600.056,
+          "position_ms": 10000,
+          "landing_error_ms": 0
+        },
+        {
+          "target_ms": 20000,
+          "ready_after_dispatch_ms": 547.662,
+          "position_ms": 20000,
+          "landing_error_ms": 0
+        }
+      ],
+      "rates": [
+        {
+          "requested": 0.98,
+          "reported": 0.9800000190734863,
+          "measured_ratio": 0.5983118172790467
+        },
+        {
+          "requested": 1.0,
+          "reported": 1.0,
+          "measured_ratio": 0.8757977417771232
+        },
+        {
+          "requested": 1.02,
+          "reported": 1.0199999809265137,
+          "measured_ratio": 0.7863501483679525
+        }
+      ],
+      "sync_effects": [
+        {
+          "action": "rate",
+          "value": 0.98,
+          "generation": 3
+        },
+        {
+          "action": "rate",
+          "value": 1.0,
+          "generation": 3
+        },
+        {
+          "action": "seek",
+          "value": 7914.0,
+          "generation": 3
+        }
+      ],
+      "native_after_effects": [
+        {
+          "effects": [
+            {
+              "action": "rate",
+              "value": 0.98,
+              "generation": 3
+            }
+          ],
+          "position_ms": 7278,
+          "reported_rate": 0.9800000190734863
+        },
+        {
+          "effects": [
+            {
+              "action": "rate",
+              "value": 1.0,
+              "generation": 3
+            }
+          ],
+          "position_ms": 7499,
+          "reported_rate": 1.0
+        },
+        {
+          "effects": [
+            {
+              "action": "seek",
+              "value": 7914.0,
+              "generation": 3
+            }
+          ],
+          "position_ms": 7914,
+          "reported_rate": 1.0
+        }
+      ],
+      "lifecycle": {
+        "resets": 2,
+        "clock_trusted": false,
+        "snapshot_required": true,
+        "generation": 5
+      },
+      "resources_after_playback": {
+        "pss_before_hash_kib": 226264,
+        "pss_after_hash_and_load_kib": 235195,
+        "threads": 51
+      },
+      "native_errors": {
+        "invalid_uri_rejected": true,
+        "destroyed_access_rejected": true
+      },
+      "failure": "RATE_NOT_APPLIED",
+      "platform": "android",
+      "api_version": 1,
+      "timestamp": "2026-10-04T22:20:25.883436Z",
+      "versions": {
+        "flutter": "3.47.6",
+        "dart": "3.13.5",
+        "bridge_api": 1,
+        "media3": "1.11.1"
+      },
+      "device": {
+        "android_version": "15",
+        "api": "35",
+        "abi": "x86_64",
+        "emulator": true
+      },
+      "native_player_released_on_exit": true
+    },
+    {
+      "audio": "disabled for emulator video-clock measurement",
+      "player": {
+        "duration_ms": 30000,
+        "decoder": "c2.goldfish.h264.decoder",
+        "rendered_first_frame": true,
+        "load_ms": 2139
+      },
+      "hash": {
+        "state": "complete",
+        "read_bytes": 3308532,
+        "size_bytes": 3308532,
+        "elapsed_ms": 46.237075000000004,
+        "access": "SAF content URI -> duplicated regular FD -> Rust Read",
+        "identity_match": true
+      },
+      "resources": {
+        "pss_before_hash_kib": 221294,
+        "pss_after_hash_and_load_kib": 237437,
+        "threads": 45
+      },
+      "play_pause": {
+        "advance_ms": 1119,
+        "pause_advance_ms": 0
+      },
+      "seeks": [
+        {
+          "target_ms": 5000,
+          "ready_after_dispatch_ms": 164.011,
+          "position_ms": 5000,
+          "landing_error_ms": 0
+        },
+        {
+          "target_ms": 10000,
+          "ready_after_dispatch_ms": 142.772,
+          "position_ms": 10000,
+          "landing_error_ms": 0
+        },
+        {
+          "target_ms": 20000,
+          "ready_after_dispatch_ms": 266.55,
+          "position_ms": 20000,
+          "landing_error_ms": 0
+        }
+      ],
+      "rates": [
+        {
+          "requested": 0.98,
+          "reported": 0.9800000190734863,
+          "measured_ratio": 0.9831599801882119,
+          "elapsed_native_ms": 2019,
+          "playing": true,
+          "buffering": false
+        },
+        {
+          "requested": 1.0,
+          "reported": 1.0,
+          "measured_ratio": 0.9951370468611848,
+          "elapsed_native_ms": 2262,
+          "playing": true,
+          "buffering": false
+        },
+        {
+          "requested": 1.02,
+          "reported": 1.0199999809265137,
+          "measured_ratio": 1.0310804144055254,
+          "elapsed_native_ms": 2027,
+          "playing": true,
+          "buffering": false
+        }
+      ],
+      "sync_effects": [
+        {
+          "action": "rate",
+          "value": 0.98,
+          "generation": 3
+        },
+        {
+          "action": "rate",
+          "value": 1.0,
+          "generation": 3
+        },
+        {
+          "action": "seek",
+          "value": 11105.0,
+          "generation": 3
+        }
+      ],
+      "native_after_effects": [
+        {
+          "effects": [
+            {
+              "action": "rate",
+              "value": 0.98,
+              "generation": 3
+            }
+          ],
+          "position_ms": 8791,
+          "reported_rate": 0.9800000190734863
+        },
+        {
+          "effects": [
+            {
+              "action": "rate",
+              "value": 1.0,
+              "generation": 3
+            }
+          ],
+          "position_ms": 9359,
+          "reported_rate": 1.0
+        },
+        {
+          "effects": [
+            {
+              "action": "seek",
+              "value": 11105.0,
+              "generation": 3
+            }
+          ],
+          "position_ms": 11144,
+          "reported_rate": 1.0
+        }
+      ],
+      "lifecycle": {
+        "resets": 1,
+        "clock_trusted": false,
+        "snapshot_required": true,
+        "generation": 4
+      },
+      "failure": "LIFECYCLE_NOT_RESET",
+      "platform": "android",
+      "api_version": 1,
+      "timestamp": "2026-10-04T22:27:32.760527Z",
+      "versions": {
+        "flutter": "3.47.6",
+        "dart": "3.13.5",
+        "bridge_api": 1,
+        "media3": "1.11.1"
+      },
+      "device": {
+        "android_version": "15",
+        "api": "35",
+        "abi": "x86_64",
+        "emulator": true
+      },
+      "native_player_released_on_exit": true
+    },
+    {
+      "platform": "android",
+      "passed": false,
+      "failure": "ANDROID_SCENARIO_TIMEOUT",
+      "stage": "SAF picker",
+      "environment": "System UI ANR observed after cold emulator startup; no new Player measurements"
+    },
+    {
+      "audio": "enabled; perceptual quality not assessed",
+      "player": {
+        "duration_ms": 30000,
+        "decoder": "OMX.Exynos.avc.dec",
+        "rendered_first_frame": true,
+        "load_ms": 1264
+      },
+      "hash": {
+        "state": "complete",
+        "read_bytes": 3308532,
+        "size_bytes": 3308532,
+        "elapsed_ms": 71.858423,
+        "access": "SAF content URI -> duplicated regular FD -> Rust Read",
+        "identity_match": true
+      },
+      "resources": {
+        "pss_before_hash_kib": 169114,
+        "pss_after_hash_and_load_kib": 175438,
+        "threads": 47
+      },
+      "play_pause": {
+        "advance_ms": 898,
+        "pause_advance_ms": 0
+      },
+      "seeks": [
+        {
+          "target_ms": 5000,
+          "ready_after_dispatch_ms": 190.334,
+          "position_ms": 5000,
+          "landing_error_ms": 0
+        },
+        {
+          "target_ms": 10000,
+          "ready_after_dispatch_ms": 189.942,
+          "position_ms": 10000,
+          "landing_error_ms": 0
+        },
+        {
+          "target_ms": 20000,
+          "ready_after_dispatch_ms": 164.259,
+          "position_ms": 20000,
+          "landing_error_ms": 0
+        }
+      ],
+      "rates": [
+        {
+          "requested": 0.98,
+          "reported": 0.9800000190734863,
+          "measured_ratio": 0.944638403990025,
+          "elapsed_native_ms": 2005,
+          "playing": true,
+          "buffering": false
+        },
+        {
+          "requested": 1.0,
+          "reported": 1.0,
+          "measured_ratio": 0.9646238166417539,
+          "elapsed_native_ms": 2007,
+          "playing": true,
+          "buffering": false
+        },
+        {
+          "requested": 1.02,
+          "reported": 1.0199999809265137,
+          "measured_ratio": 0.9770687936191426,
+          "elapsed_native_ms": 2006,
+          "playing": true,
+          "buffering": false
+        }
+      ],
+      "sync_effects": [
+        {
+          "action": "rate",
+          "value": 0.98,
+          "generation": 3
+        },
+        {
+          "action": "rate",
+          "value": 1.0,
+          "generation": 3
+        },
+        {
+          "action": "seek",
+          "value": 10297.0,
+          "generation": 3
+        }
+      ],
+      "native_after_effects": [
+        {
+          "effects": [
+            {
+              "action": "rate",
+              "value": 0.98,
+              "generation": 3
+            }
+          ],
+          "position_ms": 8246,
+          "reported_rate": 0.9800000190734863
+        },
+        {
+          "effects": [
+            {
+              "action": "rate",
+              "value": 1.0,
+              "generation": 3
+            }
+          ],
+          "position_ms": 8765,
+          "reported_rate": 1.0
+        },
+        {
+          "effects": [
+            {
+              "action": "seek",
+              "value": 10297.0,
+              "generation": 3
+            }
+          ],
+          "position_ms": 10304,
+          "reported_rate": 1.0
+        }
+      ],
+      "lifecycle": {
+        "resets": 2,
+        "clock_trusted": false,
+        "snapshot_required": true,
+        "generation": 5
+      },
+      "resources_after_playback": {
+        "pss_before_hash_kib": 169114,
+        "pss_after_hash_and_load_kib": 135565,
+        "threads": 49
+      },
+      "native_errors": {
+        "invalid_uri_rejected": true,
+        "destroyed_access_rejected": true
+      },
+      "command_roundtrip_ms": {
+        "p50": 0.137,
+        "p95": 0.216,
+        "max": 3.237,
+        "count": 1000
+      },
+      "updates": [
+        {
+          "hz": 2,
+          "count": 4,
+          "elapsed_ms": 2001,
+          "roundtrip_p95_ms": 14.926
+        },
+        {
+          "hz": 10,
+          "count": 20,
+          "elapsed_ms": 2002,
+          "roundtrip_p95_ms": 5.42
+        }
+      ],
+      "bridge_error_test": true,
+      "passed": true,
+      "platform": "android",
+      "api_version": 1,
+      "timestamp": "2026-10-04T23:00:16.851556Z",
+      "versions": {
+        "flutter": "3.47.6",
+        "dart": "3.13.5",
+        "bridge_api": 1,
+        "media3": "1.11.1"
+      },
+      "environment": {
+        "system_ui_wait_dialogs": 0
+      },
+      "device": {
+        "android_version": "9",
+        "api": "28",
+        "abi": "armeabi-v7a",
+        "model": "SM-J701M",
+        "emulator": false
+      },
+      "native_player_released_on_exit": true,
+      "measurement_note": "Physical first methodology: 2-second rate windows immediately after first advancement; superseded by longer stationary measurement, preserved."
+    }
+  ]
+}

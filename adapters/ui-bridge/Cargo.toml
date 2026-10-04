@@ -1,0 +1,18 @@
+[package]
+name = "cine-ui-bridge"
+version = "0.1.0-dev"
+edition = "2024"
+rust-version = "1.89"
+publish = false
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+cine-core = { path = "../../core" }
+cine-local-media = { path = "../local-media" }
+serde.workspace = true
+serde_json.workspace = true
+
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"

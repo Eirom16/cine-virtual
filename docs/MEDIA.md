@@ -113,5 +113,8 @@ duración usable, no seek/buffering y reloj confiable. Buffering/error posterior
 o pérdida de confianza del reloj informa MEDIA_NOT_READY (reason=user para
 reloj); requiere Ready explícito tras recuperarse.
 
-No se implementan URI Android, security-scoped resources Apple, streaming ni
-pipeline P2P. libmpv sigue provisional Linux y móviles sin validar.
+El cliente CLI de este slice no implementa URI Android, recursos Apple,
+streaming ni P2P. Spike C ensaya SAF/FD + Media3 en un prototipo separado:
+[experimento 02](../experiments/02-rust-ui-bridge/README.md). Su build/runtime y
+límites se distinguen por plataforma; no modifica el pipeline de sala Linux.
+Apple sigue como investigación y libmpv continúa provisional Linux.

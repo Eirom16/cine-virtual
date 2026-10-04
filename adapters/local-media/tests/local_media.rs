@@ -142,3 +142,28 @@ fn player_duration_fallback_and_portable_descriptor() {
         MediaError::InvalidMetadata
     );
 }
+
+#[test]
+fn platform_reader_handles_unknown_size_and_read_failure() {
+    use cine_local_media::{MediaError, hash_reader};
+    let a = hash_reader(std::io::Cursor::new(b"abc"), None, |p| {
+        assert_eq!(p.total_bytes, 0);
+        true
+    })
+    .unwrap();
+    assert_eq!(a.size_bytes, 3);
+    assert!(matches!(
+        hash_reader(std::io::Cursor::new(b"abc"), Some(4), |_| true),
+        Err(MediaError::Modified)
+    ));
+    struct Broken;
+    impl std::io::Read for Broken {
+        fn read(&mut self, _: &mut [u8]) -> std::io::Result<usize> {
+            Err(std::io::ErrorKind::PermissionDenied.into())
+        }
+    }
+    assert!(matches!(
+        hash_reader(Broken, None, |_| true),
+        Err(MediaError::ReadFailed)
+    ));
+}

@@ -1,0 +1,42 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:cine_mobile_spike/main.dart';
+import 'package:cine_mobile_spike/bridge.dart';
+
+void main() {
+  test('boundary validates errors and explicit destroy', () {
+    final b = CineBridge();
+    expect(b.call('state')['api_version'], 1);
+    expect(() => b.call('invalid'), throwsA(isA<BridgeFailure>()));
+    b.dispose();
+    b.dispose();
+    expect(() => b.call('state'), throwsA(isA<BridgeFailure>()));
+  });
+  test('suspend and resume invalidate observation generations', () {
+    final b = CineBridge();
+    final before = b.generation;
+    final suspended = b.call('suspend');
+    expect(b.acceptsObservation(before), false);
+    expect(b.acceptsObservation(b.generation), true);
+    expect(suspended['clock_trusted'], false);
+    expect(suspended['snapshot_required'], true);
+    final resumed = b.call('resume');
+    expect(resumed['generation'], 3);
+    expect(resumed['sample']['loaded'], false);
+    b.dispose();
+  });
+  test('async destroy keeps worker join off the UI isolate', () async {
+    final b = CineBridge();
+    await b.disposeAsync();
+    expect(() => b.call('state'), throwsA(isA<BridgeFailure>()));
+  });
+  testWidgets('engineering screen presents Rust state without room policy', (
+    tester,
+  ) async {
+    await tester.pumpWidget(const MaterialApp(home: SpikeScreen()));
+    expect(find.text('Cine Mobile Spike'), findsOneWidget);
+    expect(find.text('Rust: Rust connected'), findsOneWidget);
+    expect(find.text('Play'), findsOneWidget);
+    await tester.pumpWidget(const SizedBox());
+  });
+}

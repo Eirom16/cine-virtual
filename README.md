@@ -4,7 +4,7 @@ Base de un proyecto con vocación open source para ver contenido juntos desde
 Windows, Linux, macOS, Android e iOS. Cada dispositivo conserva su archivo y el
 servidor coordina la sala; el control de reproducción no transporta el vídeo.
 
-**Estado: primer vertical slice Linux, previo al MVP v0.1.** Servidor WebSocket
+**Estado: vertical slice Linux + Spike C móvil/UI, previo al MVP v0.1.** Servidor WebSocket
 y dos clientes CLI integran libmpv in-process, archivo local, metadata, SHA-256
 completo, Ready, controles programados, correcciones y resume con snapshot.
 FakePlayer y los instrumentos anteriores se conservan. La licencia está
@@ -15,14 +15,14 @@ open source definitiva.
 | Estado | Alcance real |
 | --- | --- |
 | Implemented | Core determinista, RoomService en memoria, codec v1, autoridad/Ready, controles programados y resume; FakePlayer y dos libmpv reales sobre WebSocket localhost, archivo/probe/hash locales. |
-| Planned | Validar móviles, UI/bridge, packaging y hardening antes de v0.1. |
-| Experimental | Spikes A/B y vertical slice Linux (libmpv PROVISIONAL, corpus/mediciones); motor definitivo, puente Rust/UI y WebRTC pendientes. |
+| Planned | Completar validación móvil/dispositivos, UI de producto, packaging y hardening antes de v0.1. |
+| Experimental | Spikes A/B, vertical slice Linux (libmpv PROVISIONAL) y Spike C: UI de ingeniería Flutter, C ABI/Rust y candidato Media3; evidencia y límites por plataforma en experimento 02. |
 
 El objetivo de v0.1 es demostrar dos clientes con el mismo vídeo local,
 Play/Pause/Seek programados y recuperación tras una desconexión temporal.
 Chat, distribución P2P, voz/cámara y providers son etapas posteriores, no
 capacidades disponibles. El soporte de las cinco plataformas es un objetivo;
-esta pasada se probó solamente en el entorno Linux disponible.
+la evidencia de cada plataforma se detalla en [Spike C](experiments/02-rust-ui-bridge/RESULTS.md); no existe soporte universal demostrado.
 
 ## Arquitectura
 
@@ -37,8 +37,9 @@ WebSocket adapter → servicio de salas → estado autoritativo
 ```
 
 El Core no depende de Flutter, Axum, Tokio ni de un reproductor concreto.
-Rust es la base inicial del Core. Axum/Tokio se usan en este spike; Flutter sigue
-como candidato. La integración multimedia debe pasar un spike en móvil antes de elegirse.
+Rust es la base inicial del Core. Axum/Tokio sostienen el canal de control; Flutter sigue
+provisional. La estrategia multimedia debe completar validación móvil y
+revisión de distribución antes de fijarse.
 
 ## Organización
 
@@ -50,7 +51,8 @@ core/          biblioteca Rust sin dependencias externas y tests
 rooms/         RoomService y RoomStore, sin WebSocket ni JSON
 protocol/      DTOs wire y codec v1 validado
 server/        ejecutable WebSocket con Axum/Tokio
-adapters/      LocalMedia/probe/hash y Player libmpv experimental, separados de Core
+adapters/      LocalMedia/probe/hash, libmpv y API Application/UI experimental,
+               separados de Core
 experiments/   planes, investigación y resultados de control/multimedia
 scripts/       diagnóstico, demos/corpus/mediciones y validación de docs
 ```
@@ -85,8 +87,9 @@ python3 scripts/demo_control.py
 python3 scripts/demo_real_media.py
 ```
 
-Comandos manuales y evidencia en [Spike A](experiments/03-websocket-sync/README.md)
+Comandos manuales y evidencia en [Spike A](experiments/03-websocket-sync/README.md),
 [Spike B](experiments/01-player-crossplatform/README.md) y
-[vertical slice 1](experiments/06-real-vertical-slice/README.md).
+[vertical slice 1](experiments/06-real-vertical-slice/README.md) y
+[Spike C móvil/UI](experiments/02-rust-ui-bridge/README.md).
 Consulta [CONTRIBUTING](docs/CONTRIBUTING.md) antes de proponer cambios; la licencia
 sigue pendiente y no se solicitan aportes públicos ni se publica una release.

@@ -121,3 +121,29 @@ pausa local y reloj no confiable (invalida Ready), conservando transitorios/fall
 No simula un seek lento ni buffering de red; no introduce framework de fallos.
 Resultados y metodología en
 [vertical slice 1](../experiments/06-real-vertical-slice/RESULTS.md).
+
+## Spike C: UI/ABI y gate móvil
+
+cine-ui-bridge prueba DTO/version/rangos, errores, handles destruidos, capabilities,
+observaciones al SyncEngine original, cancelación/FD y lifecycle que borra reloj,
+Player sample y deadlines. LocalMedia añade lector genérico y read failure; Core,
+codec y RoomService conservan su cobertura. No mocks Android presentados como runtime.
+
+La pantalla Flutter tiene tests de frontera/lifecycle, destroy async y widget.
+Requieren build local del C ABI y CINE_BRIDGE_LIBRARY apuntando al .so de target/debug.
+Runtime SDK Android se ensaya con build NDK/APK y emulador/dispositivo, SAF, hashing por
+FD, Media3/surface, controles y background/resume. Datos/versiones y comandos en
+[experimento 02](../experiments/02-rust-ui-bridge/README.md).
+Tests host y build no sustituyen runtime; iOS sin toolchain está bloqueado.
+
+```sh
+cargo test -p cine-ui-bridge -p cine-local-media
+python3 scripts/demo_mobile_ui.py --platform linux
+python3 scripts/build_mobile_bridge.py --abi x86_64
+python3 scripts/demo_mobile_ui.py --platform android
+python3 scripts/demo_control.py
+python3 scripts/demo_real_media.py --seconds 25
+```
+
+La prueba Linux corta conserva evidencia de 10 min del slice anterior; no sustituye
+su ensayo prolongado. No se modificó profundamente el runtime Player/red Linux.

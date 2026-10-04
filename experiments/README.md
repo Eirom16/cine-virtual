@@ -2,7 +2,7 @@
 
 El experimento 03 valida control con FakePlayer y el 01 valida multimedia aislada
 en Linux (Spike B). El recorrido 06 integra ambos como vertical slice 1,
-no como un nuevo spike aislado. Los demás siguen como planes.
+no como un nuevo spike aislado. El 02 ejecuta Spike C de bridge/UI/móvil; los demás siguen como planes.
 Duración acotada, corpus sintético,
 métricas reproducibles y decisión escrita; no promover código experimental al
 producto por inercia. No crear carpetas vacías ni commits de binarios/vídeos.
@@ -10,7 +10,7 @@ producto por inercia. No crear carpetas vacías ni commits de binarios/vídeos.
 | Orden | Experimento | Pregunta |
 | --- | --- | --- |
 | 1 | [01-player-crossplatform](01-player-crossplatform/README.md) | ¿Player controla vídeo real con precisión? Probado aislado Linux; integración en 06, móvil pendiente. |
-| Apoyo al 1 | [02-rust-ui-bridge](02-rust-ui-bridge/README.md) | ¿Cómo cruzar UI/Rust sin romper threading/lifecycle? |
+| Apoyo al 1 | [02-rust-ui-bridge](02-rust-ui-bridge/README.md) | ¿Cómo cruzar UI/Rust sin romper threading/lifecycle? Spike C con DTO/C ABI, Flutter y candidato Media3. |
 | Apoyo al 1 | [03-websocket-sync](03-websocket-sync/README.md) | ¿Control autoritativo v1, Ready y snapshot funcionan sobre red real? |
 | Apoyo al 1 | [04-clock-sync](04-clock-sync/README.md) | ¿Qué precisión/lead requiere la red y el scheduler real? |
 | Integración A+B | [06-real-vertical-slice](06-real-vertical-slice/README.md) | ¿Dos Player reales, identidad/Ready, red, drift y resume convergen durante 10 min? |

@@ -139,6 +139,28 @@ URI/lifecycle y build/licencias móviles siguen abiertos.
 rendering, rate/seek y packaging/licencias) antes de promover motor o fijar bridge.
 Flutter/bridge/licencia siguen pendientes.
 
+### Evidencia adicional — Spike C móvil/UI
+
+**Evidence:** comparación Android (mpv/Media3/VLC/GStreamer) e iOS
+(mpv/AVPlayer/VLCKit/GStreamer), URI/sandbox, surfaces, rate/seek, threading y
+licencias en [RESEARCH](../experiments/02-rust-ui-bridge/RESEARCH.md).
+Build del bridge Rust para Android x86_64, arm64 y armv7; APK/runtime emulado
+API 35 x86_64 y físico SM-J701M Android 9/API 28 armv7. Runtime y límites registrados
+en [RESULTS](../experiments/02-rust-ui-bridge/RESULTS.md).
+
+**Decision:** estrategia híbrida candidata: desktop libmpv **PROVISIONAL FOR LINUX**,
+Android **Media3 provisional**, iOS **AVPlayer candidate**. Un SDK universal no
+es requisito. Core/Player/SyncEngine/protocolo siguen sin dependencias móviles.
+Las capacidades opcionales se declaran en Application; seek completion no prueba
+frame presentado y hardware no se infiere por disponibilidad de API.
+
+**Remaining risks:** precisión/rate/formatos distintos, recursos URI y permisos,
+recreación y lifecycle completos, codecs y build redistribuible. Build/runtime
+Android no valida Apple ni otros dispositivos/versiones Android. No se probó mpv móvil.
+
+**Next validation:** ampliar físico (formatos/URI/rate/lifecycle) y Mac/Xcode/iPhone para AVPlayer;
+red móvil v1 + suspend/clock/snapshot antes de promover arquitectura definitiva.
+
 ## ADR-007 — Rust inicial, UI/puente candidatos (Provisional)
 
 **Context:** necesitamos pruebas independientes hoy y una base portable.
@@ -153,6 +175,29 @@ plataformas objetivo; eso no verifica las dependencias de multimedia del proyect
 
 **Consequences:** código funcional mínimo sin dependencias. Posible traducción de
 API al elegir bridge; no exponer tipos Rust inestables como ABI pública.
+
+### Evidencia adicional — Spike C
+
+**Evidence:** comparación de Flutter/nativo, FRB/C ABI/canales/API C generada y
+Players Android/iOS en [RESEARCH](../experiments/02-rust-ui-bridge/RESEARCH.md).
+C ABI experimental con DTO v1, handles, buffers caller-owned, validación, hash
+por FD y generation/lifecycle. Flutter Linux y Android físico ejecutaron comandos/snapshots a 2/10 Hz.
+Evidencia Android y sus límites en [RESULTS](../experiments/02-rust-ui-bridge/RESULTS.md).
+
+**Decision:** Flutter **PROVISIONAL**. Bridge elegido para el ensayo: C ABI manual
++ dart:ffi; canales nativos para SAF/Media3/surface. Rust posee Application de
+experimento y SyncEngine; Kotlin posee SDK y permisos; Dart presenta/transporta
+intents/efectos, no decide autoridad ni drift. No es API pública de producto y no
+se expone ningún struct Core como ABI. FRB permanece alternativa si la API crece.
+
+**Remaining risks:** ABI/unsafe manual, consumidor confiable en proceso, polling
+sin stream push, SDK/URI/main thread, lifecycle completo y más dispositivos físicos.
+La calibración/snapshot móvil aislados usan fixtures; no hay red móvil aún.
+Windows/macOS/iOS Flutter sin build/runtime; no soporte universal demostrado.
+
+**Next validation:** completar el gate móvil con dispositivos, integración de
+Application de red v1 y recovery tras suspend, más AVPlayer en Mac/Xcode. Evitar
+UI final/packaging público mientras licencia y estrategia multimedia no se decidan.
 
 ## ADR-008 — Servidor único y memoria (Implementada en Spike A)
 

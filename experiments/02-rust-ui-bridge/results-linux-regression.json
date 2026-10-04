@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "scenario": "real_synchronized_playback",
+  "versions": {
+    "libmpv_api": "2.5",
+    "source_base_commit": "c5d2849",
+    "implementation": "vertical-slice-1",
+    "mpv_package": "mpv 1:0.41.0-6"
+  },
+  "wall_seconds_observed": 25.305,
+  "resume": {
+    "disconnect_server_ms": 26139,
+    "duration_ms": 865.896,
+    "initial_drift_ms": -3460,
+    "convergence_after_response_ms": 70.815,
+    "final_drift_ms": -67,
+    "snapshot_same_sequence": true
+  },
+  "result": "PASS",
+  "recorded_summary": {
+    "drift_p95_a_ms": 98,
+    "drift_p95_b_ms": 110,
+    "pair_aligned_p95_ms": 66,
+    "final_position_difference_ms": 0,
+    "missed_deadlines_over_50ms": 0,
+    "source": "stdout of actual short demo; raw prior 600s evidence preserved"
+  }
+}

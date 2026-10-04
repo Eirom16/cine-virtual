@@ -18,3 +18,11 @@ Thumbs.db
 # Generated synthetic media and unreviewed experiment runs
 /test-media/
 /experiments/01-player-crossplatform/runs/
+
+# Spike C artifacts; SDKs live outside the repository.
+**/.flutter-plugins-dependencies
+**/android/local.properties
+**/android/.gradle/
+**/android/app/src/main/jniLibs/
+**/linux/flutter/ephemeral/
+/experiments/02-rust-ui-bridge/runs/

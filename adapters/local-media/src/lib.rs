@@ -105,42 +105,60 @@ impl LocalHandle {
         self.file
             .seek(SeekFrom::Start(0))
             .map_err(|_| MediaError::ReadFailed)?;
-        let mut buffer = vec![0; CHUNK_BYTES];
-        let mut hash = Sha256::new();
-        let mut read = 0;
+        let identity = hash_reader(&mut self.file, Some(self.stamp.size), &mut progress)?;
+        self.unchanged()?;
+        Ok(identity)
+    }
+}
+/// Shared bounded-memory hashing for a file or a platform-provided reader.
+/// The caller retains the permission/handle and checks source stability separately.
+pub fn hash_reader(
+    mut reader: impl Read,
+    expected_size: Option<u64>,
+    mut progress: impl FnMut(HashProgress) -> bool,
+) -> Result<ContentIdentity, MediaError> {
+    let mut buffer = vec![0; CHUNK_BYTES];
+    let mut hash = Sha256::new();
+    let mut read = 0_u64;
+    let total = expected_size.unwrap_or(0);
+    if !progress(HashProgress {
+        read_bytes: 0,
+        total_bytes: total,
+    }) {
+        return Err(MediaError::Cancelled);
+    }
+    loop {
+        let n = match reader.read(&mut buffer) {
+            Err(e) if e.kind() == std::io::ErrorKind::Interrupted => continue,
+            other => other.map_err(|_| MediaError::ReadFailed)?,
+        };
+        if n == 0 {
+            break;
+        }
+        read = read.checked_add(n as u64).ok_or(MediaError::TooLarge)?;
+        if read > 1_099_511_627_776 {
+            return Err(MediaError::TooLarge);
+        }
+        hash.update(&buffer[..n]);
         if !progress(HashProgress {
-            read_bytes: 0,
-            total_bytes: self.stamp.size,
+            read_bytes: read,
+            total_bytes: total,
         }) {
             return Err(MediaError::Cancelled);
         }
-        loop {
-            let n = self
-                .file
-                .read(&mut buffer)
-                .map_err(|_| MediaError::ReadFailed)?;
-            if n == 0 {
-                break;
-            }
-            read += n as u64;
-            hash.update(&buffer[..n]);
-            if !progress(HashProgress {
-                read_bytes: read,
-                total_bytes: self.stamp.size,
-            }) {
-                return Err(MediaError::Cancelled);
-            }
-        }
-        self.unchanged()?;
-        if read != self.stamp.size {
-            return Err(MediaError::Modified);
-        }
-        Ok(ContentIdentity {
-            size_bytes: read,
-            sha256: hash.finalize().into(),
-        })
     }
+    if expected_size.is_some_and(|expected| expected != read) {
+        return Err(MediaError::Modified);
+    }
+    if read == 0 {
+        return Err(MediaError::Empty);
+    }
+    Ok(ContentIdentity {
+        size_bytes: read,
+        sha256: hash.finalize().into(),
+    })
 }
+
 #[derive(Clone)]
 pub struct Probe {
     pub duration_ms: u64,

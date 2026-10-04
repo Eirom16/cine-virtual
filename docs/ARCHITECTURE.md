@@ -3,7 +3,7 @@
 Estado: fundaciones conservadas; el Spike A implementa adapters WebSocket,
 RoomService, codec y cliente CLI con FakePlayer. Spike B añade un Player libmpv
 experimental Linux. El vertical slice 1 integra red + vídeo real con LocalMedia;
-no hay UI ni validación móvil.
+Spike C añade UI de ingeniería/bridge aislados; no hay UI de producto.
 [PRODUCT](PRODUCT.md) delimita v0.1 y [PROTOCOL](PROTOCOL.md)
 define el contrato normativo de control. [DECISIONS](DECISIONS.md) registra motivos.
 
@@ -203,3 +203,22 @@ timeline. Una muestra >100 ms vieja no alimenta SyncEngine. La política Core y
 sus thresholds no cambian. El servidor, RoomStore y codec no tienen cambios ni
 conocen rutas locales. Evidencia en
 [vertical slice 1](../experiments/06-real-vertical-slice/README.md).
+
+## Frontera móvil/UI de Spike C
+
+[Experimento 02](../experiments/02-rust-ui-bridge/README.md) prueba una Application
+Rust aislada con el SyncEngine original. cine-ui-bridge adapta DTOs JSON v1 a una
+ABI C pequeña; structs Core no se exponen. Flutter presenta snapshots y envía
+intents. Kotlin/main Looper posee Media3, permiso SAF y SurfaceView en PlatformView.
+SDK nativo nunca se envía a Rust ni se marca Send/Sync artificialmente.
+
+C ABI/Flutter no forman parte del cliente CLI Linux ni del servidor. Solo se
+reutiliza hashing sobre Read en LocalMedia; checks de estabilidad de filesystem
+se conservan. Protocolo/RoomService y SyncEngine no cambian. Capabilities de
+Application mínimas: playback_rate/content_uri_input. Android mide seek/READY/
+rendered_first_frame separados; no promete precisión de frame por booleano.
+
+Suspend/resume invalida generation, deadline, hash y clock; requiere recuperación.
+El prototipo usa fixtures de reloj/snapshot offline: falta incorporar el runtime
+de red existente para Ready/resume móviles reales. iOS requiere Mac/Xcode y sigue
+como investigación. Evidencia por plataforma en [RESULTS](../experiments/02-rust-ui-bridge/RESULTS.md).

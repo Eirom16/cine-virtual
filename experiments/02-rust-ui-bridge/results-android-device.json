@@ -1,0 +1,188 @@
+{
+  "audio": "enabled; perceptual quality not assessed",
+  "player": {
+    "duration_ms": 30000,
+    "decoder": "OMX.Exynos.avc.dec",
+    "rendered_first_frame": true,
+    "load_ms": 1232
+  },
+  "hash": {
+    "state": "complete",
+    "read_bytes": 3308532,
+    "size_bytes": 3308532,
+    "elapsed_ms": 72.069462,
+    "access": "SAF content URI -> duplicated regular FD -> Rust Read",
+    "identity_match": true
+  },
+  "resources": {
+    "pss_before_hash_kib": 184231,
+    "pss_after_hash_and_load_kib": 183806,
+    "threads": 48
+  },
+  "play_pause": {
+    "advance_ms": 907,
+    "pause_advance_ms": 0
+  },
+  "seeks": [
+    {
+      "target_ms": 5000,
+      "ready_after_dispatch_ms": 189.692,
+      "position_ms": 5000,
+      "landing_error_ms": 0
+    },
+    {
+      "target_ms": 10000,
+      "ready_after_dispatch_ms": 171.439,
+      "position_ms": 10000,
+      "landing_error_ms": 0
+    },
+    {
+      "target_ms": 20000,
+      "ready_after_dispatch_ms": 181.701,
+      "position_ms": 20000,
+      "landing_error_ms": 0
+    }
+  ],
+  "rate_measurement": {
+    "warmup_after_first_advance_ms": 500,
+    "nominal_window_ms": 5000,
+    "clock": "native monotonic"
+  },
+  "rates": [
+    {
+      "requested": 0.98,
+      "reported": 0.9800000190734863,
+      "measured_ratio": 0.9730323611666001,
+      "elapsed_native_ms": 5006,
+      "playing": true,
+      "buffering": false
+    },
+    {
+      "requested": 1.0,
+      "reported": 1.0,
+      "measured_ratio": 0.9940095846645367,
+      "elapsed_native_ms": 5008,
+      "playing": true,
+      "buffering": false
+    },
+    {
+      "requested": 1.02,
+      "reported": 1.0199999809265137,
+      "measured_ratio": 1.0145795885759936,
+      "elapsed_native_ms": 5007,
+      "playing": true,
+      "buffering": false
+    }
+  ],
+  "sync_effects": [
+    {
+      "action": "rate",
+      "value": 0.98,
+      "generation": 3
+    },
+    {
+      "action": "rate",
+      "value": 1.0,
+      "generation": 3
+    },
+    {
+      "action": "seek",
+      "value": 13796.0,
+      "generation": 3
+    }
+  ],
+  "native_after_effects": [
+    {
+      "effects": [
+        {
+          "action": "rate",
+          "value": 0.98,
+          "generation": 3
+        }
+      ],
+      "position_ms": 11731,
+      "reported_rate": 0.9800000190734863
+    },
+    {
+      "effects": [
+        {
+          "action": "rate",
+          "value": 1.0,
+          "generation": 3
+        }
+      ],
+      "position_ms": 12264,
+      "reported_rate": 1.0
+    },
+    {
+      "effects": [
+        {
+          "action": "seek",
+          "value": 13796.0,
+          "generation": 3
+        }
+      ],
+      "position_ms": 13802,
+      "reported_rate": 1.0
+    }
+  ],
+  "lifecycle": {
+    "native_playing_after_resume": false,
+    "native_rate_after_resume": 1.0,
+    "resets": 2,
+    "clock_trusted": false,
+    "snapshot_required": true,
+    "generation": 5
+  },
+  "resources_after_playback": {
+    "pss_before_hash_kib": 184231,
+    "pss_after_hash_and_load_kib": 167254,
+    "threads": 47
+  },
+  "native_errors": {
+    "invalid_uri_rejected": true,
+    "destroyed_access_rejected": true
+  },
+  "command_roundtrip_ms": {
+    "p50": 0.154,
+    "p95": 0.3,
+    "max": 3.843,
+    "count": 1000
+  },
+  "updates": [
+    {
+      "hz": 2,
+      "count": 4,
+      "elapsed_ms": 2002,
+      "roundtrip_p95_ms": 5.859
+    },
+    {
+      "hz": 10,
+      "count": 20,
+      "elapsed_ms": 2001,
+      "roundtrip_p95_ms": 5.011
+    }
+  ],
+  "bridge_error_test": true,
+  "passed": true,
+  "platform": "android",
+  "api_version": 1,
+  "timestamp": "2026-10-04T23:06:13.840466Z",
+  "versions": {
+    "flutter": "3.47.6",
+    "dart": "3.13.5",
+    "bridge_api": 1,
+    "media3": "1.11.1"
+  },
+  "environment": {
+    "system_ui_wait_dialogs": 0
+  },
+  "device": {
+    "android_version": "9",
+    "api": "28",
+    "abi": "armeabi-v7a",
+    "model": "SM-J701M",
+    "emulator": false
+  },
+  "native_player_released_on_exit": true
+}
