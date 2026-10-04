@@ -66,7 +66,7 @@ UUIDv7 con timestamp; esa diferencia motiva la elección, no una superioridad ge
 contraseñas. Generación en rooms/protocol/adapters con uuid/getrandom, no con reloj
 ni PRNG casero. Core conserva independencia de esa generación.
 
-## ADR-005 — Hash completo SHA-256 (Adoptada en diseño)
+## ADR-005 — Hash completo SHA-256 (Implementada en vertical slice 1)
 
 **Context:** v0.1 exige comprobar exactamente el mismo archivo sin distribuirlo.
 
@@ -76,7 +76,8 @@ de Ready. Fingerprint no habilita reproducción; chunking reservado P2P.
 **Alternatives:** nombre/tamaño, hash parcial, hash perceptual, manifest Merkle.
 
 **Consequences:** espera proporcional al archivo e I/O; identidad fuerte pero no
-prueba de posesión. Core compara digest; hashing aún no implementado.
+prueba de posesión. Core compara digest; cine-local-media implementa streaming
+1 MiB con sha2, progreso/cancelación y verificación de estabilidad del handle.
 
 ## ADR-006 — Multimedia por capacidades (Provisional)
 
@@ -114,9 +115,29 @@ presentado; thresholds/rate necesitan tuning. RSS retenido requiere diagnóstico
 adicional; bindings propios requieren auditoría unsafe/ABI. Calidad perceptual de
 audio, hardware variable, corpus HD/4K y entornos sin desktop no están aprobados.
 
-**Next validation:** dos vídeos Linux + canal control de Spike A como slice
-separado, con probe/hash/Ready reales. Validar Android/iOS en dispositivos y un
-build distribuible antes de promover el stack. Flutter/bridge/licencia pendientes.
+**Next validation (historial Spike B):** integrar dos vídeos Linux + canal control
+de Spike A con probe/hash/Ready reales; ese trabajo se registra a continuación.
+
+### Evidencia adicional — Vertical slice 1
+
+**Evidence:** integración de LocalMedia (ffprobe auxiliar, SHA-256 final), proxy de
+owner, una réplica/scheduler genéricos y WebSocket v1. Dos ejecutables Linux
+headless y prueba prolongada con métricas en
+[RESULTS](../experiments/06-real-vertical-slice/RESULTS.md). Server/rooms/protocol
+no incorporan multimedia ni rutas. No se cambia el puerto o política del Core.
+
+**Decision:** libmpv sigue **PROVISIONAL FOR LINUX**. El thread owner respeta
+!Send/!Sync y usa proxy acotado, eventos de completion y muestras con timestamp.
+Se avanza solo con evidencia Linux; el slice no termina v0.1 ni valida móviles.
+
+**Remaining risks:** software decoding/headless en este recorrido no repite la
+validación visible/audio de Spike B; no prueba frame presentado. RSS retenido,
+C bloqueante, seek con hardware/corpus complejo, filesystem mutable, red WAN,
+URI/lifecycle y build/licencias móviles siguen abiertos.
+
+**Next validation:** gate Android/iOS real (recursos locales, owner/lifecycle,
+rendering, rate/seek y packaging/licencias) antes de promover motor o fijar bridge.
+Flutter/bridge/licencia siguen pendientes.
 
 ## ADR-007 — Rust inicial, UI/puente candidatos (Provisional)
 

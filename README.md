@@ -4,18 +4,19 @@ Base de un proyecto con vocación open source para ver contenido juntos desde
 Windows, Linux, macOS, Android e iOS. Cada dispositivo conserva su archivo y el
 servidor coordina la sala; el control de reproducción no transporta el vídeo.
 
-**Estado: Spikes A y B funcionando en Linux, previo al MVP v0.1.** Hay servidor
-WebSocket/clientes CLI con FakePlayer y un adapter libmpv in-process probado de
-forma aislada. Red y vídeo real todavía no están integrados. La licencia está
+**Estado: primer vertical slice Linux, previo al MVP v0.1.** Servidor WebSocket
+y dos clientes CLI integran libmpv in-process, archivo local, metadata, SHA-256
+completo, Ready, controles programados, correcciones y resume con snapshot.
+FakePlayer y los instrumentos anteriores se conservan. La licencia está
 pendiente: ver
 [evaluación de licencias](docs/LICENSING.md). No se declara todavía una licencia
 open source definitiva.
 
 | Estado | Alcance real |
 | --- | --- |
-| Implemented | Core determinista, RoomService en memoria, codec v1, autoridad/Ready, controles programados y resume; validación con FakePlayer y WebSocket localhost real. |
-| Planned | Integrar control con vídeos locales reales, metadatos/hash completo y validar plataformas para v0.1. |
-| Experimental | Spikes A (control) y B (adapter libmpv Linux, corpus/mediciones); motor definitivo, puente Rust/UI y WebRTC pendientes. |
+| Implemented | Core determinista, RoomService en memoria, codec v1, autoridad/Ready, controles programados y resume; FakePlayer y dos libmpv reales sobre WebSocket localhost, archivo/probe/hash locales. |
+| Planned | Validar móviles, UI/bridge, packaging y hardening antes de v0.1. |
+| Experimental | Spikes A/B y vertical slice Linux (libmpv PROVISIONAL, corpus/mediciones); motor definitivo, puente Rust/UI y WebRTC pendientes. |
 
 El objetivo de v0.1 es demostrar dos clientes con el mismo vídeo local,
 Play/Pause/Seek programados y recuperación tras una desconexión temporal.
@@ -44,12 +45,12 @@ como candidato. La integración multimedia debe pasar un spike en móvil antes d
 ```text
 docs/          producto, arquitectura, protocolo, sincronización, seguridad,
                testing, roadmap, decisiones, contribución y licencias
-client/        CLI experimental, réplica/scheduler y FakePlayer
+client/        CLI experimental, réplica/scheduler genéricos, FakePlayer/proxy real
 core/          biblioteca Rust sin dependencias externas y tests
 rooms/         RoomService y RoomStore, sin WebSocket ni JSON
 protocol/      DTOs wire y codec v1 validado
 server/        ejecutable WebSocket con Axum/Tokio
-adapters/      único Player libmpv experimental, separado de Core
+adapters/      LocalMedia/probe/hash y Player libmpv experimental, separados de Core
 experiments/   planes, investigación y resultados de control/multimedia
 scripts/       diagnóstico, demos/corpus/mediciones y validación de docs
 ```
@@ -80,9 +81,12 @@ Para reproducir el experimento:
 python3 scripts/check_spike_environment.py
 cargo build --workspace
 python3 scripts/demo_control.py
+# Linux: requiere libmpv y ffmpeg/ffprobe, genera corpus si falta, ~10 min reales
+python3 scripts/demo_real_media.py
 ```
 
 Comandos manuales y evidencia en [Spike A](experiments/03-websocket-sync/README.md)
-y [Spike B](experiments/01-player-crossplatform/README.md).
+[Spike B](experiments/01-player-crossplatform/README.md) y
+[vertical slice 1](experiments/06-real-vertical-slice/README.md).
 Consulta [CONTRIBUTING](docs/CONTRIBUTING.md) antes de proponer cambios; la licencia
 sigue pendiente y no se solicitan aportes públicos ni se publica una release.

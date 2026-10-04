@@ -2,7 +2,8 @@
 
 Estado: fundaciones conservadas; el Spike A implementa adapters WebSocket,
 RoomService, codec y cliente CLI con FakePlayer. Spike B añade un Player libmpv
-experimental aislado en Linux; no hay UI ni integración red + vídeo real.
+experimental Linux. El vertical slice 1 integra red + vídeo real con LocalMedia;
+no hay UI ni validación móvil.
 [PRODUCT](PRODUCT.md) delimita v0.1 y [PROTOCOL](PROTOCOL.md)
 define el contrato normativo de control. [DECISIONS](DECISIONS.md) registra motivos.
 
@@ -23,7 +24,8 @@ flowchart TD
 Las flechas indican dependencias de código, no el viaje de un mensaje. El runtime
 se compone en la Application; los adapters implementan sus puertos. Se mantiene
 un workspace Rust con `cine-core`, `cine-rooms`, `cine-protocol`, `cine-server` y
-`cine-client`, más `cine-player-mpv` experimental: corresponden a responsabilidades que ya se ejecutan y prueban.
+`cine-client`, más `cine-player-mpv` experimental y `cine-local-media`:
+corresponden a responsabilidades que ya se ejecutan y prueban.
 No se crean crates por conceptos futuros. `cine-rooms` no depende de serde,
 Axum ni Tokio en su API; `cine-protocol` convierte DTOs a sus comandos. El cliente
 compone networking y Application en un runtime experimental, con réplica pura
@@ -35,6 +37,7 @@ separada; no se fija todavía un trait async de Transport para la UI futura.
 | Application cliente | Casos de uso, lifecycle, timers, estado observable y coordinación | Core, puertos, codec; composición de adapters |
 | Domain/Core | Identidad de contenido, timeline, orden y decisiones de sync | Biblioteca estándar; ninguna UI/runtime/red |
 | Player adapter | Decodificación, superficies, seek, rate, muestras y errores | SDK elegido y puertos; nunca reglas de sala |
+| LocalMedia adapter | Handle privado, probe acotado, hashing streaming y descriptor portable | Filesystem/probe/SHA-256 y Core; nunca RoomService |
 | Networking adapter | Conexión, TLS, heartbeat, envío y recepción | Runtime/transporte y codec; nunca permisos de sala |
 | Codec protocolo | JSON, validación de DTOs, conversión a dominio | Tipos de dominio; no reproductor |
 | RoomService servidor | Autorización, readiness, comandos, secuencia y snapshots | Dominio, reloj, store; no sockets |
@@ -81,7 +84,8 @@ identidad y descriptor sin rutas. `player`: puerto mínimo. Tests independientes
 usan reloj y Player falsos. El Spike A añade RoomState/RoomService completo para
 el subconjunto de control, DTOs validados, UUIDs/tokens, timers Tokio y scheduler
 cliente. SHA-256 se usa para verificadores de tokens/fingerprints de requests,
-no para archivos reales. El comportamiento del Core original se conserva; PlayerError solo añade
+y el vertical slice añade hashing de archivos en cine-local-media. El comportamiento
+del Core original se conserva; PlayerError solo añade
 Display/Error de std para propagación tipada en el harness de Spike B.
 
 ## Estado autoritativo de sala
@@ -171,6 +175,31 @@ mantener una autoridad por sala evita fingir un consenso ya resuelto.
 concreto: depende de cine-core y carga libmpv dinámicamente. Application del
 harness tiene un owner y bombea eventos; Player permanece !Send/!Sync por decisión
 del wrapper, sin imponer threading al puerto. Load y eventos no viven en Domain.
-Las mediciones y timers reales quedan en el ejecutable experimental. No se
-modifica Replica/FakePlayer ni se conectan sockets con multimedia en este spike.
+Las mediciones y timers reales quedan en el ejecutable experimental. En el
+Spike B no se modificó Replica/FakePlayer ni se conectaron sockets con
+multimedia; la integración posterior se describe abajo.
 Detalle/evidencia en [experimento 01](../experiments/01-player-crossplatform/README.md).
+
+## Composición del vertical slice 1
+
+`cine-client` selecciona `--player fake|mpv` (fake por defecto). `Replica<P>` usa
+`ApplicationPlayer: Player`: tick para reloj falso, vista con readiness/seek/
+buffering y timestamp de muestra, marca de medición y capacidad asíncrona. Ese
+contrato local de Application no añade SDK, Send/Sync o eventos al puerto del Core.
+Una sola réplica, scheduler y SyncEngine sirven a ambos backends.
+
+MpvPlayer permanece !Send/!Sync: un thread `cine-mpv-owner` lo crea, carga,
+consulta/polleea y destruye. Un proxy Send-safe comunica comandos por cola
+acotada a 32 y publica muestras bajo mutex. Load/probe/hash se esperan en
+spawn_blocking sin retener el mutex de sesión; el loop WS usa el proxy, nunca
+el SDK. Comandos de control esperan confirmación de dispatch por RPC; seek
+completion se observa después, no mediante un sleep arbitrario. El owner se
+une al destruir la última referencia. Timeouts de RPC no interrumpen una llamada
+C bloqueada: sigue siendo un riesgo de lifecycle, no un sandbox del decoder.
+
+Los snapshots periódicos conservan la corrección suave y el Player actual;
+solo media/autoridad nueva, recuperación o transición a Ready reconcilian la
+timeline. Una muestra >100 ms vieja no alimenta SyncEngine. La política Core y
+sus thresholds no cambian. El servidor, RoomStore y codec no tienen cambios ni
+conocen rutas locales. Evidencia en
+[vertical slice 1](../experiments/06-real-vertical-slice/README.md).

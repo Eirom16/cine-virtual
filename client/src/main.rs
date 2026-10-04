@@ -15,6 +15,17 @@ async fn command(client: &mut Client, parts: &[&str]) -> Result<Value, ClientErr
             client.join(room.parse()?, epoch.parse()?, token).await?;
             Ok(json!({"event":"joined"}))
         }
+        ["media"] => Ok(client.media_summary()),
+        ["hash-status"] => Ok(client.hash_status()),
+        ["player-state"] | ["sync-state"] => Ok(client.sync_summary()),
+        ["fault", kind] => {
+            client.fault(kind, 0)?;
+            Ok(json!({"event":"fault_applied"}))
+        }
+        ["fault", kind, value] => {
+            client.fault(kind, value.parse()?)?;
+            Ok(json!({"event":"fault_applied"}))
+        }
         ["media-demo"] => {
             client.media_demo().await?;
             Ok(json!({"event":"media_selected"}))
@@ -76,6 +87,7 @@ async fn command(client: &mut Client, parts: &[&str]) -> Result<Value, ClientErr
         ["quit"] => Ok(json!({"event":"quit"})),
         _ => Err(concat!(
             "Commands: create | join <room> <epoch> <invite> | media-demo | ready | ",
+            "select <path> | media | hash-status | player-state | sync-state | ",
             "play [ms] | pause | seek <ms> | state | sync | disconnect | resume | leave | quit"
         )
         .into()),
@@ -90,18 +102,22 @@ async fn main() -> Result<(), ClientError> {
         .init();
     let mut url = "ws://127.0.0.1:8765".to_owned();
     let mut name = "Participant".to_owned();
+    let mut backend = "fake".to_owned();
+    let mut visible = false;
     let args: Vec<_> = std::env::args().skip(1).collect();
     if args.len() % 2 != 0 {
-        return Err("Usage: cine-client [--server ws://127.0.0.1:8765] [--name Host]".into());
+        return Err("Usage: cine-client [--server ws://127.0.0.1:8765] [--name Host] [--player fake|mpv] [--visible true|false]".into());
     }
     for pair in args.chunks(2) {
         match pair[0].as_str() {
             "--server" => url = pair[1].clone(),
             "--name" => name = pair[1].clone(),
+            "--player" => backend = pair[1].clone(),
+            "--visible" => visible = pair[1].parse()?,
             _ => return Err("Unknown argument".into()),
         }
     }
-    let mut client = Client::connect(&url, &name).await?;
+    let mut client = Client::connect_with_player(&url, &name, &backend, visible).await?;
     println!(
         "{}",
         json!({"event":"cli_connected","clock":client.clock()})
@@ -109,7 +125,12 @@ async fn main() -> Result<(), ClientError> {
     let mut lines = BufReader::new(tokio::io::stdin()).lines();
     while let Some(line) = lines.next_line().await? {
         let parts: Vec<_> = line.split_whitespace().collect();
-        match command(&mut client, &parts).await {
+        let result = if let Some(path) = line.strip_prefix("select ") {
+            client.select(std::path::Path::new(path)).await.map(|_|json!({"event":"media_selected","media":client.media_summary(),"hash":client.hash_status()}))
+        } else {
+            command(&mut client, &parts).await
+        };
+        match result {
             Ok(value) => println!("{value}"),
             Err(error) => println!(
                 "{}",

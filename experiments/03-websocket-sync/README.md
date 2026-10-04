@@ -168,7 +168,7 @@ de memoria y política de cache al preparar exposición pública.
 
 Decisiones afectadas: ADR-001 conservada y ejercitada; ADR-002 validada solo para
 control localhost; ADR-003/004 ejercitadas; ADR-008 implementada en memoria.
-ADR-005 sigue pendiente de hashing de archivos; ADR-006/007 multimedia/UI/bridge
+Al cerrar Spike A, ADR-005 seguía pendiente de hashing de archivos; ADR-006/007 multimedia/UI/bridge
 siguen provisionales; ADR-009 licencia sigue pendiente. No se cambió la semántica
 v1; se aclaró la excepción de cache de resultados respecto al store de verificadores.
 
@@ -192,3 +192,11 @@ RTT filtrado A/B: 0.0/0.0 ms; offset A/B:
 Diferencia de posición tras resume: 2 ms. Secuencia final compartida:
 15; ambos pausados en 121300 ms. Participant rechazado sin incremento
 de secuencia; no tokens/hash/payloads en logs estructurados. Resultado: **PASS**.
+
+## Integración posterior: vertical slice 1
+
+Este documento conserva la evidencia histórica del spike aislado. El recorrido
+posterior de red + dos Player reales + LocalMedia/probe/hash/Ready se registra en
+[06-real-vertical-slice](../06-real-vertical-slice/README.md), sin declarar v0.1
+terminado ni promover libmpv fuera de su condición provisional Linux. ADR-005
+ahora registra hashing real; móviles, UI/bridge y licencia siguen pendientes.

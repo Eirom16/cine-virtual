@@ -127,7 +127,8 @@ Sin conexión se pausa localmente y se cancela todo control pendiente; no puede
 seguir actuando como Host. Transport futuro reintentará con backoff+jitter (0.5–8 s,
 presupuesto máximo de gracia 30 s), pero Application no reenvía PLAY/SEEK pendientes.
 El CLI actual usa `disconnect`/`resume` explícitos; al reanudar recalibra, obtiene
-snapshot, verifica el descriptor sintético y vuelve a Ready antes de reproducir.
+snapshot, revalida el handle/digest retenidos (o descriptor sintético con fake)
+y vuelve a Ready antes de reproducir.
 Resume devuelve snapshot completo, permisos actuales, secuencia y transición
 pendiente. Recalibrar reloj, verificar medio vigente, preparar, marcar Ready,
 restaurar modo/posición proyectados. Un snapshot puede estar pausado ahora con
@@ -138,3 +139,32 @@ hereda permisos. Un nuevo epoch exige limpiar réplica completa y tokens; no
 aceptar un evento arbitrario para sustituir la sala. La incorporación tardía usa
 el mismo proceso que resume y no rebobina al grupo. No se reproduce un backlog
 de controles pasados: el snapshot autoritativo resuelve el estado.
+
+## Ejecución con libmpv en el vertical slice
+
+Se conserva lead 500 ms y todos los defaults del Core. El owner de mpv publica
+posición y timestamp monotónico juntos cada ~5 ms. La réplica observa cada
+500 ms, compara con target proyectado al timestamp de esa muestra y descarta
+antigüedad >100 ms. Los logs conservan edad y confianza; no tratan una muestra
+vieja como tomada al terminar el RPC.
+
+Play pausado admite seek previo mientras hay margen; el deadline sigue siendo
+el único inicio autoritativo. Si el decoder no termina, el Play espera completion
+real y converge al target vivo mediante SyncEngine. Pause despacha al deadline,
+congela y reconcilia posición. Seek conserva playing/paused, usa SDK events de
+completion y luego restaura el modo. No se afirma precisión del frame mostrado.
+
+Mediciones distintas: scheduler alcanzó deadline; owner despachó comando C;
+SDK informó playing/paused/seek_completed; posición avanzó o quedó estable.
+Una segunda pause interna después de seek no cuenta como nuevo deadline perdido.
+El seek de preparación puede dar un drift grande antes del futuro Play: se
+conserva ese dato como transitorio y no se redefine el timeline para ocultarlo.
+Snapshots de 5 s no hacen seek/reset de rate en un Player ya preparado.
+Application evita seeks redundantes al reconciliar/preparar si distancia ≤35 ms;
+es una tolerancia local de dispatch, no un cambio del deadband de Core. No
+garantiza exactitud de una posición arbitraria menor que un frame. Ese margen
+y el polling 5 ms/10 ms necesitan validación con corpus más exigente/móvil.
+
+La demo incluye desconexión con pausa local, ocho muestras nuevas de reloj,
+snapshot, nueva verificación/Ready y seek asíncrono de incorporación. No replay
+de controles antiguos. Saltos de offset/backoff automático/red WAN siguen pendientes.

@@ -33,10 +33,11 @@ no coinciden aunque el vídeo visible sea igual; esto es deliberado en v0.1.
 | Fingerprint parcial | Rápido como prechequeo | Puede omitir diferencias y aceptar falso positivo | No autoriza Ready |
 | Hash por chunks/Merkle | Verificación de descarga/reanudación por partes | Manifest y protocolos adicionales | Reservado P2P |
 
-Implementación futura: biblioteca SHA-256 mantenida, lectura streaming por bloques
-de 1 MiB, memoria O(1), worker fuera del hilo UI, progreso y cancelación. Límite
-inicial 1 TiB/7 días de duración, configurable pero anunciado en sesión. No hay
-hashing de archivos implementado: Core compara identidades ya calculadas.
+Implementado en el vertical slice 1: sha2/RustCrypto, lectura streaming por bloques
+de 1 MiB, memoria O(1), worker fuera del runtime de red, progreso y cancelación
+por callback local. Límite inicial 1 TiB/7 días de duración, fijo en v1 y
+anunciado en sesión. Core compara identidades calculadas fuera de él; no depende
+del filesystem.
 No escribir una implementación propia de SHA-256 para ahorrar una dependencia.
 
 Verificar tamaño/identidad del handle antes y después de leer; fallo o modificación
@@ -82,3 +83,35 @@ seek dispatch/completion separados, headless y ventana SDK visible. SyncEngine
 aplica rate/seek reales sin red. No se cambia MediaDescriptor ni se implementa
 hashing. Solo Linux tiene build/runtime; Android/iOS y rendering embebido siguen
 pendientes. [ADR-006](DECISIONS.md) conserva el historial y gates de promoción.
+
+## LocalMedia real del vertical slice
+
+[cine-local-media](../adapters/local-media/README.md) abre un archivo regular no
+vacío (≤1 TiB), retiene FD/handle y ruta canónica solo en el dispositivo, lee
+bloques de 1 MiB y produce tamaño+SHA-256 final. No usa cache de identidad por
+path/mtime. Dentro de la sesión se retienen el digest realmente calculado y el
+handle; Ready/resume vuelven a comprobar estabilidad del handle y pathname.
+Se detectan tamaño/mtime y, en Unix, device/inode/ctime antes/después de leer y
+antes de declarar Ready. No prueba inmutabilidad: cambios posteriores a Ready
+no tienen watcher automático y un filesystem mutable conserva TOCTOU, incluido
+el momento en que mpv abre por pathname. Rehash explícito mediante select si cambia.
+
+ffprobe es inspector auxiliar detrás del adapter: solo duración/format/codecs,
+JSON ≤64 KiB, timeout 10 s con kill/reap, stderr descartado y sin shell. Si falta
+o falla, se admite metadata mínima de libmpv después de FILE_LOADED +
+PLAYBACK_RESTART; duración positiva acotada es obligatoria, MIME/codecs son
+opcionales. Si existe probe, ambas duraciones deben diferir ≤1000 ms. Título se
+omite para no enviar el nombre del archivo. El proceso ffprobe no reproduce:
+libmpv sigue in-process.
+
+Host select prepara localmente y envía MEDIA_SELECT_REQUEST. Participant select
+prepara su copia sin cambiar la selección de sala. Ready envía su propia
+MEDIA_METADATA; el servidor verifica, emite MEDIA_VERIFIED y recién entonces
+admite MEDIA_READY. MEDIA_VERIFIED nunca se inventa como comando de cliente.
+Readiness requiere hash final, revisión vigente, Player cargado/no-error,
+duración usable, no seek/buffering y reloj confiable. Buffering/error posterior
+o pérdida de confianza del reloj informa MEDIA_NOT_READY (reason=user para
+reloj); requiere Ready explícito tras recuperarse.
+
+No se implementan URI Android, security-scoped resources Apple, streaming ni
+pipeline P2P. libmpv sigue provisional Linux y móviles sin validar.

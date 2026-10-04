@@ -1,0 +1,11 @@
+[package]
+name = "cine-local-media"
+version = "0.1.0-dev"
+edition = "2024"
+rust-version = "1.89"
+publish = false
+
+[dependencies]
+cine-core = { path = "../../core" }
+sha2 = "0.10"
+serde_json.workspace = true

@@ -91,3 +91,33 @@ además visible GPU/Xwayland, captura de la ventana sintética, audio aislado y
 600 segundos reales de reproducción. Completion/position reportados no equivalen
 a frame físico ni calidad perceptual. Los resultados machine-readable conservan
 samples y método. No se declaran tests Windows/macOS/Android/iOS ejecutados.
+
+## Vertical slice 1: pruebas de integración real
+
+LocalMedia tiene tests sin SDK: vector SHA-256 conocido, mismo/distinto contenido,
+progreso/cancelación, modificación durante lectura, reemplazo de pathname,
+metadata inválida y descriptor mínimo. Application valida Ready con Player aún
+cargando/error/buffering/seek/duración inválida. La réplica genérica cubre selección
+fake/unknown y snapshots periódicos que no resetean rate/posición.
+
+Dos tests SDK adicionales son opt-in: el proxy con owner usa el mismo scheduler
++ SyncEngine sobre vídeo real, y cinco ciclos create/load/destroy verifican
+threads/FDs y registran RSS. Ejecutar sin concurrencia para recursos comparables:
+
+```sh
+python3 scripts/generate_test_media.py
+cargo test -p cine-player-mpv --test real_player -- --ignored --test-threads=1 --nocapture
+cargo test -p cine-client --test replica -- --ignored --test-threads=1 --nocapture
+python3 scripts/demo_control.py
+python3 scripts/demo_real_media.py
+python3 scripts/demo_real_media.py --seconds 25 --faults
+```
+
+La demo real usa servidor y dos clientes **en procesos distintos**, mpv headless
+con decoding real, hash de corpus, copia discrepante, Participant no autorizado,
+Play/Pause/Seek pausado y durante reproducción, disconnect/resume/snapshot y
+~600 s de tiempo real. La ejecución corta añade seek local pequeño/grande,
+pausa local y reloj no confiable (invalida Ready), conservando transitorios/fallos de la meta p95.
+No simula un seek lento ni buffering de red; no introduce framework de fallos.
+Resultados y metodología en
+[vertical slice 1](../experiments/06-real-vertical-slice/RESULTS.md).

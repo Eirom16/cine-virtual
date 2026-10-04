@@ -14,7 +14,7 @@ libmpv/libVLC/GStreamer/players nativos, licencias y gate previo al código est�
 El plan original de este experimento era dos clientes con vídeo local. Spike A
 validó primero el control con FakePlayer; Spike B aísla multimedia real + Core.
 El recorrido con dos vídeos/red queda para el **siguiente vertical slice**, junto
-con metadatos, hashing y Ready reales. No se ha ejecutado aquí ese recorrido.
+con metadatos, hashing y Ready reales. Ese recorrido no se ejecutó en Spike B; se integró después en 06.
 
 ## Implementación y arquitectura
 
@@ -150,3 +150,11 @@ Vertical slice Linux con control autoritativo existente + dos Player reales,
 load/probe/hash completo/Ready, scheduled controls y resume. Mantener otro gate
 obligatorio para dispositivos Android/iOS y packaging/licencias antes de promover
 un stack multimedia definitivo. Este spike no termina v0.1.
+
+## Integración posterior: vertical slice 1
+
+Este documento conserva la evidencia histórica del spike aislado. El recorrido
+posterior de red + dos Player reales + LocalMedia/probe/hash/Ready se registra en
+[06-real-vertical-slice](../06-real-vertical-slice/README.md), sin declarar v0.1
+terminado ni promover libmpv fuera de su condición provisional Linux. ADR-005
+ahora registra hashing real; móviles, UI/bridge y licencia siguen pendientes.

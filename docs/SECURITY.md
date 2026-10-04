@@ -76,3 +76,17 @@ colas 32, 16 miembros, 128 salas, 256 conexiones y dedup 256 por emisor/120 s
 con techo global de 65536 resultados. Rate por conexión 20/s burst 40. Pendiente
 antes de Internet: WSS, origins, límites por origen, pruebas de abuso, controles
 específicos de TIME_PING/telemetría y política de retención de logs.
+
+## Frontera LocalMedia del slice Linux
+
+El adapter no envía rutas/URI/bytes y omite títulos personales. Solo el descriptor
+portable y digest necesario para comparar viajan por el canal de control; nunca
+el digest en logs. Hash/probe/load viven fuera de Core/rooms/server. ffprobe tiene
+salida acotada y timeout con reap; se ejecuta sin shell. El owner libmpv es un
+thread, **no aislamiento de seguridad**: una falla o bloqueo del SDK afecta al
+proceso cliente. No se aprueba distribución pública con estos límites locales.
+
+Logs añadidos: hash_progress (bytes), player_dispatch/player_event (sequence,
+deadline, posición/latencia), sync_sample (timestamp/edad/drift/confianza),
+player_resources (RSS/threads/FDs). La demo exporta solo campos seleccionados,
+sin credenciales/digests/rutas; no exporta envelopes ni stdout de create/join.

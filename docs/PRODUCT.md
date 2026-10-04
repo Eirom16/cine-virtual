@@ -70,12 +70,14 @@ clock sync, detección/corrección de drift, snapshot y reconexión básica. Tra
 Host explícitamente es una operación mínima de recuperación; moderación avanzada
 queda fuera. Servidor único con memoria y ejecución self-hostable sencilla.
 
-Se considera alcanzado al demostrar dos o más clientes reales con archivo
+El núcleo tecnológico se considera demostrado al usar dos o más clientes reales con archivo
 idéntico, impedir Ready/control inválido y recuperar una desconexión breve. La
 meta provisional de medición es p95 de drift absoluto ≤150 ms tras estabilizar
 durante una prueba de 10 minutos; debe publicarse entorno, RTT y capacidades de
 seek. Los umbrales y la meta se revisan con evidencia, no constituyen una promesa.
 No declarar compatibilidad de una plataforma sin ejecutar el spike en ella.
+El recorrido Linux es un gate técnico mínimo; no declara v0.1 terminada. Quedan
+validación móvil, UI/bridge, packaging y hardening antes de esa promoción.
 
 Fuera: cuentas, amigos, perfiles, chat/GIFs/reacciones, voz/cámara/screen sharing,
 P2P de archivos, HTTP/HLS/DASH reales, Jellyfin/Plex, plugins, nube/CDN, biblioteca,

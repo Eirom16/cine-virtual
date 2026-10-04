@@ -101,6 +101,8 @@ name = "cine-client"
 version = "0.1.0-dev"
 dependencies = [
  "cine-core",
+ "cine-local-media",
+ "cine-player-mpv",
  "cine-protocol",
  "cine-rooms",
  "futures-util",
@@ -115,6 +117,15 @@ dependencies = [
 [[package]]
 name = "cine-core"
 version = "0.1.0-dev"
+
+[[package]]
+name = "cine-local-media"
+version = "0.1.0-dev"
+dependencies = [
+ "cine-core",
+ "serde_json",
+ "sha2",
+]
 
 [[package]]
 name = "cine-player-mpv"

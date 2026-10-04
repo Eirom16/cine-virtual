@@ -1,8 +1,10 @@
-use crate::fake_player::FakePlayer;
+use crate::{
+    fake_player::FakePlayer,
+    player_backend::{ApplicationPlayer, ControlMark},
+};
 use cine_core::{
     clock::{ClockEstimate, ClockFilter, ClockSample},
     playback::PlaybackStatus,
-    player::Player,
     replica::{Delivery, SequenceGate},
     sync::{Correction, Observation, SyncConfig, SyncEngine},
 };
@@ -19,10 +21,10 @@ pub struct Execution {
     pub position_ms: u64,
     pub playing: bool,
 }
-pub struct Replica {
+pub struct Replica<P: ApplicationPlayer = FakePlayer> {
     pub state: Option<RoomState>,
     pub member_id: Option<Uuid>,
-    pub player: FakePlayer,
+    pub player: P,
     pub connected: bool,
     pub clock_epoch: Option<Uuid>,
     pub executions: VecDeque<Execution>,
@@ -34,13 +36,20 @@ pub struct Replica {
     recovering: bool,
     executed: Option<(Uuid, u64, u64, u64)>,
     sync: SyncEngine,
+    desired_playing: Option<bool>,
+    pub clock_blocked_until: u64,
 }
-impl Default for Replica {
+impl Default for Replica<FakePlayer> {
     fn default() -> Self {
+        Self::with_player(FakePlayer::default())
+    }
+}
+impl<P: ApplicationPlayer> Replica<P> {
+    pub fn with_player(player: P) -> Self {
         Self {
             state: None,
             member_id: None,
-            player: FakePlayer::default(),
+            player,
             connected: false,
             clock_epoch: None,
             executions: VecDeque::new(),
@@ -52,10 +61,10 @@ impl Default for Replica {
             recovering: true,
             executed: None,
             sync: SyncEngine::new(SyncConfig::default()).unwrap(),
+            desired_playing: None,
+            clock_blocked_until: 0,
         }
     }
-}
-impl Replica {
     pub fn estimate(&self) -> Option<ClockEstimate> {
         self.filter.estimate()
     }
@@ -73,7 +82,8 @@ impl Replica {
         )
     }
     pub fn trusted(&self, now: u64) -> bool {
-        self.uncertainty().is_some_and(|v| v <= 100.0)
+        now >= self.clock_blocked_until
+            && self.uncertainty().is_some_and(|v| v <= 100.0)
             && now.saturating_sub(self.last_sample) <= 15_000
     }
     pub fn start_connection(&mut self) {
@@ -118,6 +128,8 @@ impl Replica {
         })
     }
     pub fn install(&mut self, state: RoomState, snapshot: bool, now: u64) -> Delivery {
+        let was_prepared = self.prepared();
+        let was_recovering = self.recovering;
         let epoch = state.room_epoch.to_string();
         if self.gate.is_none() && snapshot {
             self.gate = Some(SequenceGate::new(epoch.clone()));
@@ -142,19 +154,30 @@ impl Replica {
                 self.executed = None;
                 self.sync.reset();
             }
-            self.player.set_time(now);
-            let _ = self.player.set_playback_rate(1.0);
-            if self.prepared() && self.trusted(now) {
+            self.player.tick(now);
+            if self.prepared() && self.trusted(now) && (changed || was_recovering || !was_prepared)
+            {
                 let s = self.state.as_ref().unwrap();
                 if let Some(p) = &s.playback {
-                    self.apply_timeline(p.timeline_at(self.server_now(now).unwrap()), now);
+                    let server_now = self.server_now(now).unwrap();
+                    let timeline = p.timeline_at(server_now);
+                    self.player.mark(ControlMark {
+                        sequence: s.sequence,
+                        offset_ms: self.estimate().map_or(0.0, |e| e.offset_ms),
+                        target_ms: timeline.position_at(server_now as i64),
+                        reason: "snapshot",
+                        ..Default::default()
+                    });
+                    self.apply_timeline(timeline, now);
                 }
-            } else {
+            } else if !self.prepared() {
                 let _ = self.player.pause();
+                self.desired_playing = None;
             }
+            self.prepare_pending(now);
         } else if matches!(result, Delivery::NeedSnapshot | Delivery::WrongEpoch) {
             self.recovering = true;
-            self.player.set_time(now);
+            self.player.tick(now);
             let _ = self.player.pause();
             let _ = self.player.set_playback_rate(1.0);
             self.executed = None;
@@ -163,17 +186,71 @@ impl Replica {
         result
     }
     fn apply_timeline(&mut self, timeline: cine_core::playback::Timeline, now: u64) {
-        self.player.set_time(now);
-        self.player.duration_ms = timeline.duration_ms;
+        self.player.tick(now);
+        self.player.configure_duration(timeline.duration_ms);
         let _ = self.player.set_playback_rate(1.0);
         let target = timeline.position_at(self.server_now(now).unwrap_or(0) as i64);
-        let _ = self.player.seek(target);
-        if timeline.status == PlaybackStatus::Playing && target < timeline.duration_ms {
-            let _ = self.player.play();
-        } else {
+        let playing = timeline.status == PlaybackStatus::Playing && target < timeline.duration_ms;
+        if !playing {
             let _ = self.player.pause();
         }
+        if !self.player.view().seeking
+            && (!self.player.asynchronous()
+                || self.player.position().unwrap_or(0).abs_diff(target) > 35)
+            && self.player.seek(target).is_err()
+        {
+            self.sync.reset();
+            return;
+        }
+        self.desired_playing = Some(playing);
+        self.finish_seek();
     }
+    fn finish_seek(&mut self) {
+        if !self.player.view().seeking
+            && let Some(playing) = self.desired_playing.take()
+        {
+            if playing {
+                let _ = self.player.play();
+            } else {
+                let _ = self.player.pause();
+            }
+        }
+    }
+    pub fn prepare_pending(&mut self, now: u64) {
+        self.player.tick(now);
+        if !self.connected || self.recovering || !self.prepared() || !self.trusted(now) {
+            self.desired_playing = None;
+            return;
+        }
+        self.finish_seek();
+        if let Some(p) = self
+            .state
+            .as_ref()
+            .and_then(|s| s.playback.as_ref())
+            .and_then(|p| p.pending.as_ref())
+            && self.player.asynchronous()
+            && p.execute_at_ms > self.server_now(now).unwrap_or(0) + 50
+            && p.timeline_after.status == PlaybackStatus::Playing
+            && !self.player.view().playing
+            && !self.player.view().seeking
+            && self
+                .player
+                .position()
+                .unwrap_or(0)
+                .abs_diff(p.timeline_after.position_ms)
+                > 35
+        {
+            self.player.mark(ControlMark {
+                sequence: p.sequence,
+                deadline_server_ms: p.execute_at_ms,
+                offset_ms: self.estimate().map_or(0.0, |e| e.offset_ms),
+                target_ms: p.timeline_after.position_ms,
+                reason: "prepare",
+            });
+            let _ = self.player.seek(p.timeline_after.position_ms);
+        }
+    }
+
     pub fn deadline_local_ms(&self, now: u64) -> Option<f64> {
         if !self.connected || self.recovering || !self.prepared() || !self.trusted(now) {
             return None;
@@ -204,6 +281,13 @@ impl Replica {
             p.authority_revision,
             p.sequence,
         );
+        self.player.mark(ControlMark {
+            sequence: p.sequence,
+            deadline_server_ms: p.execute_at_ms,
+            offset_ms: self.estimate()?.offset_ms,
+            target_ms: p.timeline_after.position_ms,
+            reason: "scheduled",
+        });
         self.apply_timeline(p.timeline_after, now);
         self.sync.reset();
         self.executed = Some(key);
@@ -214,7 +298,7 @@ impl Replica {
             actual_server_ms: actual,
             lateness_ms: actual - p.execute_at_ms as f64,
             position_ms: self.player.position().unwrap(),
-            playing: self.player.playing,
+            playing: self.player.view().playing,
         };
         if self.executions.len() == 64 {
             self.executions.pop_front();
@@ -223,7 +307,7 @@ impl Replica {
         Some(record)
     }
     pub fn correct_drift(&mut self, now: u64) -> Correction {
-        self.player.set_time(now);
+        self.player.tick(now);
         if !self.connected || self.recovering || !self.prepared() || !self.trusted(now) {
             let _ = self.player.set_playback_rate(1.0);
             let _ = self.player.pause();
@@ -232,16 +316,34 @@ impl Replica {
         let Some(p) = self.state.as_ref().and_then(|s| s.playback.as_ref()) else {
             return Correction::None;
         };
-        let timeline = p.timeline_at(self.server_now(now).unwrap());
+        let view = self.player.view();
+        let sample_time = if self.player.asynchronous() {
+            view.sampled_at_ms
+        } else {
+            now
+        };
+        if now.saturating_sub(sample_time) > 100 {
+            return Correction::None;
+        }
+        let timeline = p.timeline_at(self.server_now(sample_time).unwrap());
+        if view.seeking || !view.ready {
+            return Correction::None;
+        }
         let correction = self.sync.observe(Observation {
-            target_ms: timeline.position_at(self.server_now(now).unwrap() as i64),
-            actual_ms: self.player.position().unwrap(),
+            target_ms: timeline.position_at(self.server_now(sample_time).unwrap() as i64),
+            actual_ms: view.position_ms,
             now_ms: now,
-            playing: timeline.status == PlaybackStatus::Playing,
-            buffering: false,
+            playing: timeline.status == PlaybackStatus::Playing && view.playing,
+            buffering: view.buffering,
             clock_trusted: true,
-            supports_rate: true,
+            supports_rate: self.player.supports_playback_rate(),
             nominal_rate: 1.0,
+        });
+        self.player.mark(ControlMark {
+            sequence: self.state.as_ref().map_or(0, |s| s.sequence),
+            target_ms: timeline.position_at(self.server_now(sample_time).unwrap() as i64),
+            reason: "correction",
+            ..Default::default()
         });
         match correction {
             Correction::None => {}
@@ -249,7 +351,11 @@ impl Replica {
                 let _ = self.player.set_playback_rate(rate);
             }
             Correction::Seek(pos) => {
-                let _ = self.player.seek(pos);
+                if self.player.seek(pos).is_ok() {
+                    self.desired_playing = Some(timeline.status == PlaybackStatus::Playing);
+                } else {
+                    self.sync.reset();
+                }
             }
         }
         correction
@@ -257,17 +363,34 @@ impl Replica {
     pub fn disconnect(&mut self, now: u64) {
         self.connected = false;
         self.recovering = true;
-        self.player.set_time(now);
+        self.player.tick(now);
+        self.player.mark(ControlMark {
+            sequence: self.state.as_ref().map_or(0, |s| s.sequence),
+            reason: "disconnect",
+            ..Default::default()
+        });
         let _ = self.player.pause();
         let _ = self.player.set_playback_rate(1.0);
         self.executed = None;
+        self.desired_playing = None;
         self.sync.reset();
         if let Some(g) = &mut self.gate {
             g.disconnected();
         }
     }
+    pub fn target_position(&self, now: u64) -> Option<u64> {
+        let t = self.server_now(now)?;
+        Some(
+            self.state
+                .as_ref()?
+                .playback
+                .as_ref()?
+                .timeline_at(t)
+                .position_at(t as i64),
+        )
+    }
     pub fn clear_room(&mut self, now: u64) {
-        self.player.set_time(now);
+        self.player.tick(now);
         let _ = self.player.pause();
         let _ = self.player.set_playback_rate(1.0);
         self.state = None;
@@ -275,6 +398,7 @@ impl Replica {
         self.gate = None;
         self.recovering = true;
         self.executed = None;
+        self.desired_playing = None;
         self.sync.reset();
     }
 }

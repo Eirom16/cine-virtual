@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "platform": "Linux",
+  "candidate": "libmpv provisional",
+  "sdk_tests_passed": 4,
+  "command": "cargo test -p cine-player-mpv --test real_player -- --ignored --test-threads=1 --nocapture",
+  "sdk_lifecycle": {
+    "cycles": 60,
+    "elapsed_ms": 17984,
+    "before": {
+      "cpu_ticks": 170,
+      "open_fds": 4,
+      "rss_kib": 34248,
+      "threads": 2
+    },
+    "after": {
+      "cpu_ticks": 1764,
+      "open_fds": 4,
+      "rss_kib": 119384,
+      "threads": 2
+    },
+    "checkpoints": [
+      {
+        "cpu_ticks": 689,
+        "open_fds": 4,
+        "rss_kib": 160084,
+        "threads": 2
+      },
+      {
+        "cpu_ticks": 1229,
+        "open_fds": 4,
+        "rss_kib": 160092,
+        "threads": 2
+      },
+      {
+        "cpu_ticks": 1763,
+        "open_fds": 4,
+        "rss_kib": 164100,
+        "threads": 2
+      }
+    ]
+  },
+  "owner_proxy_lifecycle": {
+    "after": {
+      "cpu_ticks": 148,
+      "open_fds": 4,
+      "rss_kib": 78472,
+      "threads": 2
+    },
+    "before": {
+      "cpu_ticks": 51,
+      "open_fds": 4,
+      "rss_kib": 33704,
+      "threads": 2
+    },
+    "checkpoints": [
+      {
+        "cpu_ticks": 69,
+        "open_fds": 4,
+        "rss_kib": 45204,
+        "threads": 2
+      },
+      {
+        "cpu_ticks": 89,
+        "open_fds": 4,
+        "rss_kib": 55664,
+        "threads": 2
+      },
+      {
+        "cpu_ticks": 108,
+        "open_fds": 4,
+        "rss_kib": 66768,
+        "threads": 2
+      },
+      {
+        "cpu_ticks": 128,
+        "open_fds": 4,
+        "rss_kib": 77572,
+        "threads": 2
+      },
+      {
+        "cpu_ticks": 148,
+        "open_fds": 4,
+        "rss_kib": 78472,
+        "threads": 2
+      }
+    ],
+    "cycles": 5
+  },
+  "owner_sdk_tests_passed": 2,
+  "owner_command": "cargo test -p cine-client --test replica -- --ignored --test-threads=1 --nocapture"
+}

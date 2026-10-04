@@ -59,7 +59,7 @@ fn timeline(status: PlaybackStatus, position: u64, anchor: i64) -> Timeline {
         duration_ms: 300_000,
     }
 }
-fn clock(r: &mut Replica) {
+fn clock<P: cine_client::player_backend::ApplicationPlayer>(r: &mut Replica<P>) {
     r.start_connection();
     r.set_clock_epoch(r.clock_epoch.unwrap_or_else(Uuid::new_v4));
     for t in 0..8 {
@@ -215,4 +215,142 @@ fn fake_player_projects_rate_pause_and_seek_with_injected_time() {
     p.seek(120_000).unwrap();
     assert_eq!(p.position().unwrap(), 120_000);
     assert!(p.seek(300_001).is_err());
+}
+
+#[test]
+fn backend_selection_and_shared_replica_use_the_player_port() {
+    use cine_client::player_backend::{ApplicationPlayer, BackendPlayer};
+    let player = BackendPlayer::new("fake", std::time::Instant::now(), false).unwrap();
+    assert!(BackendPlayer::new("unknown", std::time::Instant::now(), false).is_err());
+    let s = state();
+    let mut r = Replica::with_player(player);
+    clock(&mut r);
+    r.member_id = Some(s.host_id);
+    r.install(s.clone(), true, 10);
+    r.install(
+        scheduled(&s, 2, PlaybackStatus::Playing, 100000, 1000),
+        false,
+        20,
+    );
+    r.execute_due(900).unwrap();
+    assert!(r.player.view().playing);
+    assert_eq!(r.player.position().unwrap(), 100000);
+}
+#[test]
+fn periodic_snapshot_preserves_soft_correction_and_current_player_position() {
+    let mut s = state();
+    s.playback.as_mut().unwrap().current = timeline(PlaybackStatus::Playing, 100000, 100);
+    let mut r = replica(&s);
+    r.player.set_time(200);
+    r.player.seek(100320).unwrap();
+    r.player.set_playback_rate(0.98).unwrap();
+    let position = r.player.position().unwrap();
+    r.install(s, true, 200);
+    assert_eq!(r.player.rate, 0.98);
+    assert_eq!(r.player.position().unwrap(), position);
+}
+
+#[test]
+#[ignore = "requires libmpv and generated normal.mp4"]
+fn real_owner_proxy_shared_scheduler_and_sync_correction() {
+    use cine_client::player_backend::{ApplicationPlayer, BackendPlayer};
+    use cine_core::sync::Correction;
+    use std::time::{Duration, Instant};
+    let boot = Instant::now();
+    let player = BackendPlayer::new("mpv", boot, false).unwrap();
+    let path =
+        std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../test-media/normal.mp4");
+    let d = player.real().unwrap().load(path).unwrap();
+    assert_eq!(d, 30000);
+    let mut s = state();
+    s.media.as_mut().unwrap().descriptor.duration_ms = d;
+    s.playback.as_mut().unwrap().current.duration_ms = d;
+    let mut r = Replica::with_player(player);
+    clock(&mut r);
+    r.member_id = Some(s.host_id);
+    let now = || boot.elapsed().as_millis() as u64;
+    r.install(s.clone(), true, now());
+    let deadline = now() + 100 + 200;
+    let mut next = scheduled(&s, 2, PlaybackStatus::Playing, 5000, deadline);
+    next.playback
+        .as_mut()
+        .unwrap()
+        .pending
+        .as_mut()
+        .unwrap()
+        .timeline_after
+        .duration_ms = d;
+    r.install(next, false, now());
+    let end = Instant::now() + Duration::from_secs(3);
+    while Instant::now() < end {
+        r.prepare_pending(now());
+        r.execute_due(now());
+        if r.player.view().playing
+            && !r.player.view().seeking
+            && r.player.position().unwrap() > 5000
+        {
+            break;
+        }
+        std::thread::sleep(Duration::from_millis(10));
+    }
+    assert!(r.player.view().playing);
+    r.player.seek(r.player.position().unwrap() + 800).unwrap();
+    let mut corrected = false;
+    let end = Instant::now() + Duration::from_secs(5);
+    while Instant::now() < end {
+        std::thread::sleep(Duration::from_millis(100));
+        r.prepare_pending(now());
+        if matches!(r.correct_drift(now()), Correction::Seek(_)) {
+            corrected = true;
+        }
+        if corrected
+            && !r.player.view().seeking
+            && r.player
+                .position()
+                .unwrap()
+                .abs_diff(r.target_position(now()).unwrap())
+                < 120
+        {
+            break;
+        }
+    }
+    assert!(corrected);
+    assert!(
+        r.player
+            .position()
+            .unwrap()
+            .abs_diff(r.target_position(now()).unwrap())
+            < 120
+    );
+}
+
+#[test]
+#[ignore = "requires libmpv and generated normal.mp4"]
+fn real_owner_repeated_creation_load_destroy_releases_resources() {
+    use cine_client::player_backend::RealPlayer;
+    use std::time::Instant;
+    let path =
+        std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../test-media/normal.mp4");
+    {
+        let p = RealPlayer::new(Instant::now(), false).unwrap();
+        p.load(path.clone()).unwrap();
+    }
+    let before = cine_player_mpv::measurements::resources();
+    let mut checkpoints = vec![];
+    for _ in 0..5 {
+        let p = RealPlayer::new(Instant::now(), false).unwrap();
+        p.load(path.clone()).unwrap();
+        drop(p);
+        checkpoints.push(cine_player_mpv::measurements::resources());
+    }
+    let after = cine_player_mpv::measurements::resources();
+    #[cfg(target_os = "linux")]
+    {
+        assert!(after["threads"].as_u64().unwrap() <= before["threads"].as_u64().unwrap() + 1);
+        assert!(after["open_fds"].as_u64().unwrap() <= before["open_fds"].as_u64().unwrap() + 1);
+    }
+    println!(
+        "owner_lifecycle={}",
+        serde_json::json!({"cycles":5,"before":before,"after":after,"checkpoints":checkpoints})
+    );
 }

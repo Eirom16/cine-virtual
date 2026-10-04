@@ -1,13 +1,19 @@
-use crate::replica::{Execution, Replica};
+use crate::{
+    player_backend::{ApplicationPlayer, BackendPlayer, PlayerView},
+    replica::{Execution, Replica},
+};
+use cine_core::player::Player;
 use cine_core::replica::Delivery;
 use cine_core::{
     clock::ClockSample,
     media::{ContentIdentity, MediaDescriptor, SourceType},
 };
+use cine_local_media::LocalMedia;
 use cine_protocol::{MAX_MESSAGE_BYTES, MediaDto, WireMessage, decode, encode, state_from_message};
 use cine_rooms::model::RoomState;
 use futures_util::{SinkExt, StreamExt};
 use serde_json::{Value, json};
+use std::path::Path;
 use std::{
     collections::HashMap,
     sync::{Arc, Mutex},
@@ -29,7 +35,11 @@ struct Request {
     reply: oneshot::Sender<WireMessage>,
 }
 struct Session {
-    replica: Replica,
+    replica: Replica<BackendPlayer>,
+    local: Option<LocalMedia>,
+    local_descriptor: Option<MediaDescriptor>,
+    hash_status: Value,
+    announced_failure: bool,
     credentials: Option<Value>,
 }
 pub struct Client {
@@ -50,12 +60,26 @@ impl Drop for Client {
 }
 impl Client {
     pub async fn connect(url: &str, name: &str) -> Result<Self, ClientError> {
+        Self::connect_with_player(url, name, "fake", false).await
+    }
+    pub async fn connect_with_player(
+        url: &str,
+        name: &str,
+        backend: &str,
+        visible: bool,
+    ) -> Result<Self, ClientError> {
+        let boot = Instant::now();
+        let player = BackendPlayer::new(backend, boot, visible)?;
         let mut client = Self {
             url: url.into(),
             name: name.into(),
-            boot: Instant::now(),
+            boot,
             session: Arc::new(Mutex::new(Session {
-                replica: Replica::default(),
+                replica: Replica::with_player(player),
+                local: None,
+                local_descriptor: None,
+                hash_status: json!({"status":"idle"}),
+                announced_failure: false,
                 credentials: None,
             })),
             notify: Arc::new(Notify::new()),
@@ -116,6 +140,7 @@ impl Client {
             let mut sync_reply: Option<(Uuid, oneshot::Sender<WireMessage>)> = None;
             let mut warmup = time::interval(Duration::from_millis(100));
             let mut sync_tick = time::interval(Duration::from_millis(500));
+            let mut player_tick = time::interval(Duration::from_millis(10));
             let mut negotiated = false;
             let mut gap_requested = false;
             let mut last_ping = 0u64;
@@ -133,12 +158,32 @@ impl Client {
                             actual_server_ms=r.actual_server_ms,lateness_ms=r.lateness_ms,position_ms=r.position_ms,playing=r.playing);}
                         notify.notify_waiters();
                     },
+                    _=player_tick.tick()=>{
+                        shared.lock().unwrap().replica.prepare_pending(now());
+                    },
                     _=sync_tick.tick()=>{
                         let correction=shared.lock().unwrap().replica.correct_drift(now());
                         match correction {
                             cine_core::sync::Correction::None=>{},
                             cine_core::sync::Correction::SetRate(rate)=>tracing::info!(event="sync_correction",kind="rate",rate),
                             cine_core::sync::Correction::Seek(position_ms)=>tracing::info!(event="sync_correction",kind="seek",position_ms),
+                        }
+                        let status={let s=shared.lock().unwrap();let r=&s.replica;let view=r.player.view();
+                            if r.player.asynchronous() && r.connected && r.state.is_some(){
+                                let target=r.target_position(view.sampled_at_ms);
+                                tracing::info!(event="sync_sample",at_ms=now(),sample_at_ms=view.sampled_at_ms,sample_age_ms=now().saturating_sub(view.sampled_at_ms),ready=view.ready,server_ms=r.server_now(view.sampled_at_ms),sequence=r.state.as_ref().map(|s|s.sequence),
+                                    position_ms=view.position_ms,target_ms=target,drift_ms=target.map(|t|view.position_ms as i64-t as i64),
+                                    playing=view.playing,seeking=view.seeking,buffering=view.buffering,clock_trusted=r.trusted(now()),rate=view.rate,
+                                    correction=match correction {cine_core::sync::Correction::None=>"none",cine_core::sync::Correction::SetRate(1.0)=>"restore",cine_core::sync::Correction::SetRate(_)=>"rate",cine_core::sync::Correction::Seek(_)=>"seek"});
+                            }
+                            let ready_member=r.member_id.is_some_and(|id|r.state.as_ref().is_some_and(|st|st.members.iter().any(|m|m.member_id==id && m.ready)));
+                            (view.failed,view.buffering,ready_member && !r.trusted(now()))};
+                        let report={let mut s=shared.lock().unwrap();let failing=status.0||status.1||status.2;
+                            if failing && !s.announced_failure {s.announced_failure=true;s.replica.state.as_ref().and_then(|st|st.media.as_ref().map(|m|(st.room_id,st.room_epoch,m.media_revision,s.replica.member_id)))}else{if !failing{s.announced_failure=false;}None}};
+                        if let Some((room,epoch,revision,member))=report {
+                            let message=WireMessage{protocol_version:1,event_id:Uuid::new_v4(),kind:"MEDIA_NOT_READY".into(),room_id:Some(room),room_epoch:Some(epoch),sender_id:member.map(|v|v.to_string()),sequence:None,sent_at_ms:now(),
+                                payload:json!({"media_revision":revision,"reason":if status.0 {"player_error"}else if status.1 {"buffering"}else{"user"}})};
+                            if ws.send(Message::Text(encode(&message).unwrap().into())).await.is_err(){break;}
                         }
                         notify.notify_waiters();
                     },
@@ -246,10 +291,10 @@ impl Client {
             .cloned()
             .collect()
     }
-    pub fn player(&self) -> crate::fake_player::FakePlayer {
-        let mut p = self.session.lock().unwrap().replica.player.clone();
-        p.set_time(self.now());
-        p
+    pub fn player(&self) -> PlayerView {
+        let mut s = self.session.lock().unwrap();
+        s.replica.player.tick(self.now());
+        s.replica.player.view()
     }
     pub fn clock(&self) -> Option<(f64, f64, usize)> {
         let s = self.session.lock().unwrap();
@@ -366,29 +411,125 @@ impl Client {
             "previous_media_revision":s.media.as_ref().map_or(0,|m|m.media_revision),"descriptor":descriptor})).await?;
         require_ack(&r)
     }
-    pub async fn ready(&self) -> Result<(), ClientError> {
-        let s = self.state().ok_or("No room")?;
-        let m = s.media.ok_or("No media")?;
-        if m.descriptor.identity != demo_media().identity {
-            return Err("Selected identity differs from local synthetic content".into());
+    pub async fn select(&self, path: &Path) -> Result<(), ClientError> {
+        if let Some(m) = self.state().and_then(|s| s.media) {
+            require_ack(
+                &self
+                    .request(
+                        "MEDIA_NOT_READY",
+                        json!({"media_revision":m.media_revision,"reason":"loading"}),
+                    )
+                    .await?,
+            )?;
         }
-        let uncertainty = {
-            let session = self.session.lock().unwrap();
-            if !session.replica.trusted(self.now()) {
-                return Err("Clock not trusted".into());
+        {
+            let mut s = self.session.lock().unwrap();
+            s.local = None;
+            s.local_descriptor = None;
+            s.hash_status = json!({"status":"hashing"});
+        }
+        let shared = self.session.clone();
+        let path = path.to_path_buf();
+        let inspected=tokio::task::spawn_blocking(move||LocalMedia::inspect(&path,|p|{
+            shared.lock().unwrap().hash_status=json!({"status":"hashing","read_bytes":p.read_bytes,"total_bytes":p.total_bytes});
+            tracing::info!(event="hash_progress",read_bytes=p.read_bytes,total_bytes=p.total_bytes);true
+        })).await?;
+        let local = match inspected {
+            Ok(m) => m,
+            Err(e) => {
+                self.session.lock().unwrap().hash_status =
+                    json!({"status":"error","code":e.to_string()});
+                return Err(e.into());
             }
-            session.replica.uncertainty().unwrap().ceil() as u64
         };
-        let r=self.request("MEDIA_METADATA",json!({"media_revision":m.media_revision,"identity":cine_protocol::IdentityDto::from(&m.descriptor.identity),
-            "duration_ms":m.descriptor.duration_ms,"mime":m.descriptor.mime,"codecs":m.descriptor.codecs})).await?;
+        self.session.lock().unwrap().hash_status = json!({"status":"complete","size_bytes":local.identity.size_bytes,"hash_ms":local.hash_ms});
+        let real = self.session.lock().unwrap().replica.player.real();
+        let duration = if let Some(real) = real {
+            let path = local.handle.path().to_owned();
+            tokio::task::spawn_blocking(move || real.load(path)).await??
+        } else {
+            let duration = local.probe.as_ref().ok_or("INVALID_METADATA")?.duration_ms;
+            self.session
+                .lock()
+                .unwrap()
+                .replica
+                .player
+                .configure_duration(duration);
+            duration
+        };
+        let descriptor = local.descriptor(Uuid::new_v4().to_string(), duration)?;
+        let size = local.identity.size_bytes;
+        let hash_ms = local.hash_ms;
+        {
+            let mut s = self.session.lock().unwrap();
+            s.hash_status = json!({"status":"complete","size_bytes":size,"hash_ms":hash_ms});
+            s.local = Some(local);
+            s.local_descriptor = Some(descriptor.clone());
+        }
+        let state = self.state().ok_or("No room")?;
+        if self.session.lock().unwrap().replica.member_id == Some(state.host_id) {
+            require_ack(&self.request("MEDIA_SELECT_REQUEST",json!({"expected_sequence":state.sequence,"authority_revision":state.authority_revision,
+                "previous_media_revision":state.media.as_ref().map_or(0,|m|m.media_revision),"descriptor":MediaDto::from(&descriptor)})).await?)?;
+        }
+        Ok(())
+    }
+    pub fn hash_status(&self) -> Value {
+        self.session.lock().unwrap().hash_status.clone()
+    }
+    pub fn media_summary(&self) -> Value {
+        let s = self.session.lock().unwrap();
+        let local = s.local_descriptor.as_ref();
+        let selected = s.replica.state.as_ref().and_then(|st| st.media.as_ref());
+        json!({"local_loaded":s.replica.player.view().ready,"duration_ms":local.map(|m|m.duration_ms),"size_bytes":local.map(|m|m.identity.size_bytes),
+            "codecs":local.map(|m|&m.codecs),"mime":local.and_then(|m|m.mime.as_ref()),"media_revision":selected.map(|m|m.media_revision),
+            "identity_match":local.zip(selected).map(|(a,b)|a.identity.matches(&b.descriptor.identity))})
+    }
+    pub fn sync_summary(&self) -> Value {
+        let s = self.session.lock().unwrap();
+        let r = &s.replica;
+        let p = r.player.view();
+        let sample = if r.player.asynchronous() {
+            p.sampled_at_ms
+        } else {
+            self.now()
+        };
+        let target = r.target_position(sample);
+        json!({"at_ms":self.now(),"server_ms":r.server_now(sample),"sample_age_ms":self.now().saturating_sub(sample),"ready":p.ready,"position_ms":p.position_ms,"target_ms":target,"drift_ms":target.map(|t|p.position_ms as i64-t as i64),"playing":p.playing,"seeking":p.seeking,"buffering":p.buffering,"clock_trusted":r.trusted(self.now()),"uncertainty_ms":r.uncertainty(),"rate":p.rate})
+    }
+    pub async fn ready(&self) -> Result<(), ClientError> {
+        let state = self.state().ok_or("No room")?;
+        let selected = state.media.ok_or("No media")?;
+        let (descriptor, uncertainty) = {
+            let s = self.session.lock().unwrap();
+            validate_ready_player(&s.replica.player.view())?;
+            if !s.replica.trusted(self.now()) {
+                return Err("CLOCK_UNCERTAIN".into());
+            }
+            let descriptor = if let Some(local) = &s.local {
+                local.handle.unchanged()?;
+                s.local_descriptor.clone().ok_or("MEDIA_NOT_READY")?
+            } else if s.replica.player.real().is_none() {
+                demo_media()
+            } else {
+                return Err("MEDIA_NOT_READY".into());
+            };
+            (descriptor, s.replica.uncertainty().unwrap().ceil() as u64)
+        };
+        let r=self.request("MEDIA_METADATA",json!({"media_revision":selected.media_revision,"identity":cine_protocol::IdentityDto::from(&descriptor.identity),
+            "duration_ms":descriptor.duration_ms,"mime":descriptor.mime,"codecs":descriptor.codecs})).await?;
         require_ack(&r)?;
-        let r = self
-            .request(
-                "MEDIA_READY",
-                json!({"media_revision":m.media_revision,"clock_uncertainty_ms":uncertainty}),
-            )
-            .await?;
+        let r=self.request("MEDIA_READY",json!({"media_revision":selected.media_revision,"clock_uncertainty_ms":uncertainty})).await?;
         require_ack(&r)
+    }
+    pub fn fault(&self, kind: &str, value: u64) -> Result<(), ClientError> {
+        let mut s = self.session.lock().unwrap();
+        match kind {
+            "pause" => s.replica.player.pause()?,
+            "clock" => s.replica.clock_blocked_until = self.now() + value,
+            "seek" => s.replica.player.seek(value)?,
+            _ => return Err("Unknown fault".into()),
+        };
+        Ok(())
     }
     pub async fn control(
         &self,
@@ -467,8 +608,8 @@ impl Client {
         let p = self.player();
         json!({"connected":self.connected(),"room_id":s.as_ref().map(|s|s.room_id),"sequence":s.as_ref().map(|s|s.sequence),
             "host_id":s.as_ref().map(|s|s.host_id),"members":s.as_ref().map(|s|s.members.iter().map(|m|json!({"member_id":m.member_id,"connected":m.connected,"ready":m.ready})).collect::<Vec<_>>()),
-            "playing":p.playing,"position_ms":cine_core::player::Player::position(&p).ok(),"rate":p.rate,
-            "clock":self.clock().map(|(rtt,offset,count)|json!({"rtt_ms":rtt,"offset_ms":offset,"sample_count":count}))})
+            "playing":p.playing,"position_ms":cine_core::player::Player::position(&p).ok(),"rate":p.rate,"player_ready":p.ready,"seeking":p.seeking,
+            "clock":self.clock().map(|(rtt,offset,count)|json!({"rtt_ms":rtt,"offset_ms":offset,"sample_count":count,"uncertainty_ms":self.session.lock().unwrap().replica.uncertainty()}))})
     }
 }
 pub fn require_ack(reply: &WireMessage) -> Result<(), ClientError> {
@@ -494,5 +635,53 @@ pub fn demo_media() -> MediaDescriptor {
         },
         mime: Some("video/mp4".into()),
         codecs: vec!["synthetic".into()],
+    }
+}
+
+fn validate_ready_player(p: &PlayerView) -> Result<(), ClientError> {
+    if !p.ready || p.failed || p.buffering || p.seeking || p.duration_ms == 0 {
+        Err("MEDIA_NOT_READY".into())
+    } else {
+        Ok(())
+    }
+}
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn ready_requires_loaded_usable_stable_player() {
+        let valid = PlayerView {
+            ready: true,
+            duration_ms: 30000,
+            ..Default::default()
+        };
+        assert!(validate_ready_player(&valid).is_ok());
+        for invalid in [
+            PlayerView {
+                ready: false,
+                ..valid.clone()
+            },
+            PlayerView {
+                seeking: true,
+                ..valid.clone()
+            },
+            PlayerView {
+                buffering: true,
+                ..valid.clone()
+            },
+            PlayerView {
+                failed: true,
+                ..valid.clone()
+            },
+            PlayerView {
+                duration_ms: 0,
+                ..valid.clone()
+            },
+        ] {
+            assert_eq!(
+                validate_ready_player(&invalid).unwrap_err().to_string(),
+                "MEDIA_NOT_READY"
+            );
+        }
     }
 }
