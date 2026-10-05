@@ -35,6 +35,8 @@ pub struct HashProgress {
 }
 #[derive(Clone, PartialEq, Eq)]
 struct Stamp {
+    #[cfg(windows)]
+    windows: WindowsStamp,
     size: u64,
     modified: Option<SystemTime>,
     #[cfg(unix)]
@@ -45,10 +47,16 @@ struct Stamp {
     changed: (i64, i64),
 }
 impl Stamp {
-    fn from(m: &Metadata) -> Self {
+    fn read(file: &File) -> Result<Self, MediaError> {
+        let m = file.metadata().map_err(|_| MediaError::ReadFailed)?;
+        Self::from_metadata(&m, file)
+    }
+    fn from_metadata(m: &Metadata, _file: &File) -> Result<Self, MediaError> {
         #[cfg(unix)]
         use std::os::unix::fs::MetadataExt;
-        Self {
+        Ok(Self {
+            #[cfg(windows)]
+            windows: WindowsStamp::read(_file)?,
             size: m.len(),
             modified: m.modified().ok(),
             #[cfg(unix)]
@@ -57,7 +65,49 @@ impl Stamp {
             inode: m.ino(),
             #[cfg(unix)]
             changed: (m.ctime(), m.ctime_nsec()),
+        })
+    }
+}
+#[cfg(windows)]
+#[derive(Clone, PartialEq, Eq)]
+struct WindowsStamp {
+    volume: u64,
+    id: [u8; 16],
+    changed: i64,
+}
+#[cfg(windows)]
+impl WindowsStamp {
+    fn read(file: &File) -> Result<Self, MediaError> {
+        use std::os::windows::io::AsRawHandle;
+        use windows_sys::Win32::Storage::FileSystem::{
+            FILE_BASIC_INFO, FILE_ID_INFO, FileBasicInfo, FileIdInfo, GetFileInformationByHandleEx,
+        };
+        let mut basic = FILE_BASIC_INFO::default();
+        let mut id = FILE_ID_INFO::default();
+        // The borrowed file keeps the HANDLE alive; both output buffers have the
+        // exact SDK layout and size. This observes metadata, not content identity.
+        let ok = unsafe {
+            GetFileInformationByHandleEx(
+                file.as_raw_handle(),
+                FileBasicInfo,
+                (&mut basic as *mut FILE_BASIC_INFO).cast(),
+                std::mem::size_of::<FILE_BASIC_INFO>() as u32,
+            ) != 0
+                && GetFileInformationByHandleEx(
+                    file.as_raw_handle(),
+                    FileIdInfo,
+                    (&mut id as *mut FILE_ID_INFO).cast(),
+                    std::mem::size_of::<FILE_ID_INFO>() as u32,
+                ) != 0
+        };
+        if !ok {
+            return Err(MediaError::ReadFailed);
         }
+        Ok(Self {
+            volume: id.VolumeSerialNumber,
+            id: id.FileId.Identifier,
+            changed: basic.ChangeTime,
+        })
     }
 }
 pub struct LocalHandle {
@@ -81,17 +131,16 @@ impl LocalHandle {
         }
         Ok(Self {
             path,
+            stamp: Stamp::read(&file)?,
             file,
-            stamp: Stamp::from(&m),
         })
     }
     pub fn path(&self) -> &Path {
         &self.path
     }
     pub fn unchanged(&self) -> Result<(), MediaError> {
-        let file = self.file.metadata().map_err(|_| MediaError::ReadFailed)?;
-        let path = self.path.metadata().map_err(|_| MediaError::Modified)?;
-        if Stamp::from(&file) != self.stamp || Stamp::from(&path) != self.stamp {
+        let path = File::open(&self.path).map_err(|_| MediaError::Modified)?;
+        if Stamp::read(&self.file)? != self.stamp || Stamp::read(&path)? != self.stamp {
             Err(MediaError::Modified)
         } else {
             Ok(())

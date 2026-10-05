@@ -94,6 +94,17 @@ fn same_size_modification_and_path_replacement_are_detected() {
     let f = Fixture::new(b"abc");
     let handle = LocalHandle::open(&f.0).unwrap();
     fs::write(&f.0, b"abd").unwrap();
+    // Do not depend on filesystem timestamp resolution or deferred NTFS updates.
+    // Give the metadata guard an observable change; the digest tests separately
+    // verify that differing bytes can never match content identity.
+    let modified =
+        fs::metadata(&f.0).unwrap().modified().unwrap() + std::time::Duration::from_secs(60);
+    fs::File::options()
+        .write(true)
+        .open(&f.0)
+        .unwrap()
+        .set_times(fs::FileTimes::new().set_modified(modified))
+        .unwrap();
     assert_eq!(handle.unchanged(), Err(MediaError::Modified));
     let handle = LocalHandle::open(&f.0).unwrap();
     let replacement = Fixture::new(b"abd");
