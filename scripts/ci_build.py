@@ -193,9 +193,11 @@ def package(args):
             architectures = capture('lipo', '-archs', str(binary))
             if architectures != expected:
                 raise SystemExit('macOS component architecture differs from runner: ' + binary.name + ':' + architectures)
+    source_status = capture('git', 'status', '--porcelain')
     metadata = {
         'schema_version': 1, 'commit': commit,
-        'working_tree_dirty': bool(capture('git', 'status', '--porcelain')),
+        'working_tree_dirty': bool(source_status),
+        'source_status': source_status.splitlines(),
         'platform': args.platform,
         'architecture': args.arch, 'variant': args.variant if args.platform == 'ios' else None,
         'build_mode': mode, 'rust_build_mode': 'release',
