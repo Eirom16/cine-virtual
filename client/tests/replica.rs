@@ -261,7 +261,8 @@ fn real_owner_proxy_shared_scheduler_and_sync_correction() {
     let path =
         std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../test-media/normal.mp4");
     let d = player.real().unwrap().load(path).unwrap();
-    assert_eq!(d, 30000);
+    // Container/AAC rounding differs across FFmpeg versions; retain real duration.
+    assert!(d.abs_diff(30000) <= 50);
     let mut s = state();
     s.media.as_mut().unwrap().descriptor.duration_ms = d;
     s.playback.as_mut().unwrap().current.duration_ms = d;
