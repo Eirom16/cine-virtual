@@ -57,3 +57,10 @@ plugins/codecs necesitan revisión del build concreto y términos de tienda. No 
 afirma compatibilidad/incompatibilidad jurídica universal. Investigación primaria
 y alternativas en [RESEARCH](../experiments/02-rust-ui-bridge/RESEARCH.md).
 No se crea LICENSE ni se publica APK/IPA/release; los builds son locales.
+
+## CI experimental
+
+[CI](CI.md) prepara artifacts de Actions, sin releases ni stores. No se bundlean
+libmpv/FFmpeg. Compilar un artifact no aprueba su redistribución; la licencia
+del proyecto y los avisos de componentes siguen pendientes. Esta pasada no
+publicó artifacts remotamente ni añadió una licencia.

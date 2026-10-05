@@ -1,0 +1,135 @@
+{
+  "schema_version": 1,
+  "status": "LOCAL_VERIFICATION_PASS",
+  "timestamp_utc": "2026-10-05T15:43:24.656577+00:00",
+  "github_execution": "NOT EXECUTED ON GITHUB",
+  "baseline_commit": "3ffe5df",
+  "remote_configured": false,
+  "push_performed": false,
+  "baseline": {
+    "rust_passed": 90,
+    "sdk_ignored_by_default": 6,
+    "flutter_passed": 5,
+    "cargo_build": "PASS",
+    "flutter_analyze": "PASS"
+  },
+  "checks": {
+    "fmt": "PASS",
+    "clippy": "PASS",
+    "rust_tests": {
+      "passed": 90,
+      "failed": 0,
+      "ignored": 6
+    },
+    "rust_build": "PASS",
+    "sdk_opt_in": {
+      "passed": 6,
+      "failed": 0
+    },
+    "flutter_analyze": "PASS",
+    "flutter_tests": {
+      "passed": 6,
+      "failed": 0
+    },
+    "ci_script_tests": {
+      "passed": 3,
+      "failed": 0
+    },
+    "yaml_structure": "PASS",
+    "actionlint": "PASS v1.7.12 (shellcheck not installed)",
+    "docs": "PASS: 35 Markdown, 4 JSON examples",
+    "git_diff_check": "PASS",
+    "flutter_fresh_git_sdk_bootstrap": "PASS: fixed cold bootstrap parser; exact pinned SDK verified",
+    "fakeplayer_demo": "PASS",
+    "linux_real_smoke_25s": "PASS",
+    "linux_flutter_bridge_smoke": "PASS"
+  },
+  "builds": {
+    "linux": {
+      "rust_workspace_release": "PASS",
+      "flutter_linux_release": "PASS",
+      "packaging": "PASS",
+      "bundled_c_abi_create_destroy": "PASS"
+    },
+    "android": {
+      "rust_bridge_release_abis": [
+        "arm64-v8a",
+        "armeabi-v7a",
+        "x86_64"
+      ],
+      "flutter_debug_apk_abis": [
+        "arm64-v8a",
+        "armeabi-v7a",
+        "x86_64"
+      ],
+      "requested_native_libraries_verified": true,
+      "physical_runtime_this_pass": "NOT TESTED: no authorized device connected",
+      "previous_android_runtime": "Physical Android 9 armv7 evidence remains in experiments 02/07"
+    },
+    "windows": "NOT TESTED: Windows runner required",
+    "macos": "NOT TESTED: macOS/Xcode runner required",
+    "ios": "NOT TESTED: macOS/Xcode required; Player runtime NOT IMPLEMENTED"
+  },
+  "local_artifacts": [
+    {
+      "name": "cine-virtual-android-arm64-v8a-3ffe5df",
+      "size_bytes": 46528110,
+      "sha256": "3ccd87bb9950854379f7dc446bd0304e13ff916890400dd59acbb09f65548e9d",
+      "architecture": "arm64-v8a",
+      "platform": "android",
+      "build_mode": "debug",
+      "source_commit": "3ffe5df5fe91218ebbd3a22df795529d41614157",
+      "working_tree_dirty": true,
+      "checksum_verified": true
+    },
+    {
+      "name": "cine-virtual-android-armeabi-v7a-3ffe5df",
+      "size_bytes": 40874750,
+      "sha256": "3acb4a3caa74fef62c0698f35267116b73524f6135d46a9f26885789eb0fc1c1",
+      "architecture": "armeabi-v7a",
+      "platform": "android",
+      "build_mode": "debug",
+      "source_commit": "3ffe5df5fe91218ebbd3a22df795529d41614157",
+      "working_tree_dirty": true,
+      "checksum_verified": true
+    },
+    {
+      "name": "cine-virtual-android-x86_64-3ffe5df",
+      "size_bytes": 42874348,
+      "sha256": "0240aef03c375d54d54e8ccc8c3b24d099c4ad72d3db11fcba9bde41cf90c758",
+      "architecture": "x86_64",
+      "platform": "android",
+      "build_mode": "debug",
+      "source_commit": "3ffe5df5fe91218ebbd3a22df795529d41614157",
+      "working_tree_dirty": true,
+      "checksum_verified": true
+    },
+    {
+      "name": "cine-virtual-linux-x64-3ffe5df",
+      "size_bytes": 12540797,
+      "sha256": "1001c81cdc8544b5647f7ae2d598e2f990dbff1c47c845d28fc6b73e514a061f",
+      "architecture": "x64",
+      "platform": "linux",
+      "build_mode": "release",
+      "source_commit": "3ffe5df5fe91218ebbd3a22df795529d41614157",
+      "working_tree_dirty": true,
+      "checksum_verified": true
+    }
+  ],
+  "corrections": [
+    "Flutter library resolution now platform-specific; iOS process/static linkage prepared, not executed",
+    "Flutter cold bootstrap progress precedes JSON: parser fixed and clean clone rerun passed",
+    "Generated scaffolds preserved Android/Linux metadata and original pubspec.lock",
+    "Parallel initial rustup installs collided locally; new pinned toolchain repaired, targets installed sequentially, all builds rerun",
+    "Documentation validator excludes generated CI caches and packages"
+  ],
+  "untouched": [
+    "SyncEngine thresholds",
+    "Android hard-seek behavior",
+    "Media3 timing",
+    "room protocol",
+    "Core dependencies",
+    "license decision"
+  ],
+  "publication": "NONE"
+}

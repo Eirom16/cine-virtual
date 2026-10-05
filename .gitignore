@@ -26,3 +26,9 @@ Thumbs.db
 **/android/app/src/main/jniLibs/
 **/linux/flutter/ephemeral/
 /experiments/02-rust-ui-bridge/runs/
+
+# CI packaging and generated platform libraries.
+/.ci-cache/
+/dist/
+**/windows/flutter/ephemeral/
+**/ios/Rust/

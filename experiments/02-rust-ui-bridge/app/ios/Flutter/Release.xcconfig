@@ -1,0 +1,8 @@
+#include "Generated.xcconfig"
+
+// ARM device/simulator jobs only; no universal iOS claim.
+ARCHS = arm64
+// CI compile-only bridge: force-load exported C ABI into the process.
+OTHER_LDFLAGS = $(inherited) -force_load "$(PROJECT_DIR)/Rust/libcine_ui_bridge.a" -Wl,-exported_symbol,_cine_bridge_create -Wl,-exported_symbol,_cine_bridge_call -Wl,-exported_symbol,_cine_bridge_destroy -Wl,-exported_symbol,_cine_bridge_hash_fd
+CODE_SIGNING_ALLOWED = NO
+CODE_SIGNING_REQUIRED = NO

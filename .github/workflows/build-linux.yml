@@ -1,0 +1,54 @@
+name: Build linux
+on:
+  workflow_call:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: build-linux-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+env:
+  PUB_CACHE: ${{ github.workspace }}/.ci-cache/pub
+  CARGO_INCREMENTAL: '0'
+defaults:
+  run:
+    shell: bash
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Ubuntu SDK/tool dependencies (headless only)
+        run: sudo apt-get update && sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev libstdc++-12-dev libmpv2 ffmpeg
+      - uses: ./.github/actions/setup
+      - id: rust
+        name: Compile Rust (linux)
+        run: python scripts/ci_build.py rust --platform linux --arch x64
+      - id: flutter
+        name: Build Flutter (linux)
+        run: python scripts/ci_build.py flutter --platform linux --arch x64
+      - name: Real libmpv headless SDK tests (no visual/audio validation)
+        run: |
+          python scripts/generate_test_media.py
+          cargo test -p cine-player-mpv --test real_player --locked -- --ignored --test-threads=1
+          cargo test -p cine-client --test replica --locked -- --ignored --test-threads=1
+      - id: package
+        name: Assemble experimental artifact and SHA-256
+        run: python scripts/ci_build.py package --platform linux --arch x64
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: ${{ steps.package.outputs.artifact_name }}
+          path: ${{ steps.package.outputs.artifact_path }}
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 0
+      - name: Actual per-stage outcomes
+        if: always()
+        run: >-
+          python scripts/ci_build.py summary --platform linux --arch x64
+          --rust-outcome '${{ steps.rust.outcome }}'
+          --flutter-outcome '${{ steps.flutter.outcome }}'
+          --package-outcome '${{ steps.package.outcome }}'

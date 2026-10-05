@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:cine_mobile_spike/main.dart';
 import 'package:cine_mobile_spike/bridge.dart';
+import 'package:cine_mobile_spike/unsupported_player.dart';
 
 void main() {
   test('boundary validates errors and explicit destroy', () {
@@ -65,6 +66,16 @@ void main() {
     expect(find.text('Cine Mobile Spike'), findsOneWidget);
     expect(find.text('Rust: Rust connected'), findsOneWidget);
     expect(find.text('Play'), findsOneWidget);
+    await tester.pumpWidget(const SizedBox());
+  });
+  testWidgets('compile-only iOS screen cannot advertise playback', (
+    tester,
+  ) async {
+    await tester.pumpWidget(const MaterialApp(home: UnsupportedPlayerScreen()));
+    expect(find.text('IOS PLAYER RUNTIME NOT IMPLEMENTED'), findsOneWidget);
+    expect(find.text('Play'), findsNothing);
+    expect(find.text('Pause'), findsNothing);
+    expect(find.text('Seek'), findsNothing);
     await tester.pumpWidget(const SizedBox());
   });
 }

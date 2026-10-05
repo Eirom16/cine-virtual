@@ -7,10 +7,15 @@ import 'package:flutter/services.dart';
 
 import 'bridge.dart';
 import 'room.dart';
+import 'unsupported_player.dart';
 
 void main() => runApp(
-  const MaterialApp(
-    home: bool.fromEnvironment('ROOM_MODE') ? RoomScreen() : SpikeScreen(),
+  MaterialApp(
+    home: Platform.isIOS
+        ? const UnsupportedPlayerScreen()
+        : const bool.fromEnvironment('ROOM_MODE')
+        ? const RoomScreen()
+        : const SpikeScreen(),
   ),
 );
 

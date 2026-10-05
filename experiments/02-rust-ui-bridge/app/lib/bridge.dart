@@ -5,6 +5,22 @@ import 'dart:isolate';
 
 import 'package:ffi/ffi.dart';
 
+DynamicLibrary _openLibrary(String path) =>
+    Platform.isIOS && path == '<process>'
+    ? DynamicLibrary.process()
+    : DynamicLibrary.open(path);
+
+String _defaultLibraryPath() {
+  if (Platform.isAndroid) return 'libcine_ui_bridge.so';
+  if (Platform.isIOS) return '<process>';
+  final directory = File(Platform.resolvedExecutable).parent.path;
+  if (Platform.isWindows) return '$directory/cine_ui_bridge.dll';
+  if (Platform.isMacOS) {
+    return '$directory/../Frameworks/libcine_ui_bridge.dylib';
+  }
+  return '$directory/lib/libcine_ui_bridge.so';
+}
+
 typedef _CreateC = Uint64 Function();
 typedef _Create = int Function();
 typedef _DestroyC = Int32 Function(Uint64);
@@ -41,12 +57,10 @@ class CineBridge {
   CineBridge({String? libraryPath}) {
     openedPath =
         libraryPath ??
-        (Platform.isAndroid
-            ? 'libcine_ui_bridge.so'
-            : Platform.environment['CINE_BRIDGE_LIBRARY'] ??
-                  'libcine_ui_bridge.so');
+        Platform.environment['CINE_BRIDGE_LIBRARY'] ??
+        _defaultLibraryPath();
     try {
-      library = DynamicLibrary.open(openedPath);
+      library = _openLibrary(openedPath);
       _call = library.lookupFunction<_CallC, _Call>('cine_bridge_call');
       _destroy = library.lookupFunction<_DestroyC, _Destroy>(
         'cine_bridge_destroy',
@@ -126,7 +140,7 @@ class CineBridge {
     final id = handle;
     final path = openedPath;
     await Isolate.run(() {
-      DynamicLibrary.open(path)
+      _openLibrary(path)
           .lookupFunction<_DestroyC, _Destroy>('cine_bridge_destroy')(id);
     });
   }

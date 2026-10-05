@@ -1,0 +1,47 @@
+name: Build windows
+on:
+  workflow_call:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: build-windows-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+env:
+  PUB_CACHE: ${{ github.workspace }}/.ci-cache/pub
+  CARGO_INCREMENTAL: '0'
+defaults:
+  run:
+    shell: bash
+jobs:
+  build:
+    runs-on: windows-2025
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+      - id: rust
+        name: Compile Rust (windows)
+        run: python scripts/ci_build.py rust --platform windows --arch x64
+      - id: flutter
+        name: Build Flutter (windows)
+        run: python scripts/ci_build.py flutter --platform windows --arch x64
+      - id: package
+        name: Assemble experimental artifact and SHA-256
+        run: python scripts/ci_build.py package --platform windows --arch x64
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: ${{ steps.package.outputs.artifact_name }}
+          path: ${{ steps.package.outputs.artifact_path }}
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 0
+      - name: Actual per-stage outcomes
+        if: always()
+        run: >-
+          python scripts/ci_build.py summary --platform windows --arch x64
+          --rust-outcome '${{ steps.rust.outcome }}'
+          --flutter-outcome '${{ steps.flutter.outcome }}'
+          --package-outcome '${{ steps.package.outcome }}'

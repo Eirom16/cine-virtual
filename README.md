@@ -61,9 +61,16 @@ Empieza por [PRODUCT](docs/PRODUCT.md), [ARCHITECTURE](docs/ARCHITECTURE.md) y
 [PROTOCOL](docs/PROTOCOL.md). [SYNC](docs/SYNC.md) precisa el modelo temporal;
 [DECISIONS](docs/DECISIONS.md) registra las elecciones y su estado.
 
+## CI y portabilidad
+
+Workflows GitHub Actions implementados para Linux, Windows, macOS, Android e iOS
+unsigned; todavía no ejecutados en GitHub. Builds no equivalen a runtime ni
+aprueban releases. Herramientas, artifacts y límites en [CI](docs/CI.md).
+
 ## Validación local
 
-Rust ≥1.89 para el workspace del spike (verificado con 1.99), Cargo, rustfmt y
+rust-toolchain.toml fija Rust 1.99.0 para CI/local; el workspace conserva su mínimo
+1.89. Cargo, rustfmt y
 Clippy; Python ≥3.10. Core conserva su mínimo 1.85 y ninguna dependencia externa.
 Se necesita acceso a crates.io en la primera compilación y TCP localhost en las
 pruebas WebSocket. Los tests habituales/build no necesitan SDK multimedia

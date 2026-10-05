@@ -18,7 +18,7 @@ def main() -> int:
     for name in REQUIRED:
         if not (ROOT / name).is_file():
             errors.append(f"Missing document: {name}")
-    derived = {"target", "build", ".dart_tool", ".gradle", "ephemeral"}
+    derived = {"target", "build", ".dart_tool", ".gradle", "ephemeral", ".ci-cache", "dist"}
     docs = sorted(p for p in ROOT.glob("**/*.md")
                   if not derived.intersection(p.relative_to(ROOT).parts))
     json_count = 0

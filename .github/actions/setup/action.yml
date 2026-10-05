@@ -1,0 +1,33 @@
+name: Pinned Cine Virtual toolchains
+description: Rust, Python and Flutter; caches contain dependencies, not build outputs
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+      with:
+        python-version: '3.12'
+    - name: Rust 1.99.0
+      shell: bash
+      run: rustup toolchain install 1.99.0 --profile minimal --component rustfmt --component clippy
+    - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: |
+          ~/.cargo/registry/index
+          ~/.cargo/registry/cache
+          ~/.cargo/registry/src
+          ~/.cargo/git/db
+        key: cargo-${{ runner.os }}-${{ runner.arch }}-1.99.0-${{ hashFiles('Cargo.lock') }}
+    - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: .ci-cache/flutter
+        key: flutter-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('.github/ci/toolchains.json') }}
+    - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: .ci-cache/pub
+        key: pub-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('.github/ci/toolchains.json', 'experiments/02-rust-ui-bridge/app/pubspec.lock') }}
+    - name: Verify pinned Flutter SDK
+      shell: bash
+      run: python scripts/ci_setup.py flutter
+    - name: CI validator dependency
+      shell: bash
+      run: python -m pip install -r .github/ci/requirements.txt

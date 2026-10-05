@@ -21,7 +21,7 @@ def main():
         raise SystemExit('Required Android NDK 28.2 toolchain missing')
     env = os.environ.copy()
     env['CARGO_TARGET_'+target.upper().replace('-', '_')+'_LINKER'] = str(ndk/compiler)
-    subprocess.run(['cargo', 'build', '-p', 'cine-ui-bridge', '--release', '--target', target], cwd=ROOT, env=env, check=True)
+    subprocess.run(['cargo', 'build', '-p', 'cine-ui-bridge', '--release', '--locked', '--target', target], cwd=ROOT, env=env, check=True)
     out = ROOT/'experiments/02-rust-ui-bridge/app/android/app/src/main/jniLibs'/args.abi
     out.mkdir(parents=True, exist_ok=True)
     shutil.copyfile(ROOT/'target'/target/'release/libcine_ui_bridge.so', out/'libcine_ui_bridge.so')

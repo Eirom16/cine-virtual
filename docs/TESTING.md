@@ -170,3 +170,10 @@ Ausencia de ADB, conectividad o fallo de SDK produce bloqueo/fallo, no métricas
 inventadas. UI/ABI Linux y Player Android aislado se conservan con demo_mobile_ui;
 FakePlayer y dos libmpv con demo_control/demo_real_media. Android build/install
 no equivale a runtime cruzado; verificar resultados físicos antes de promover gates.
+
+## CI de portabilidad
+
+[CI](CI.md) automatiza checks base y builds por plataforma; distingue build,
+linking y runtime. SDK headless Linux es opt-in y no valida display/audio físico.
+No teléfono físico ni pruebas de diez minutos en cada push. Apple device/simulator
+son compilaciones unsigned, con Player explícitamente no implementado.

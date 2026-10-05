@@ -258,3 +258,19 @@ si se prioriza adopción permisiva. No aplicar modelo mixto sin revisión explí
 **Consequences:** no publicación/release bajo licencia open source hasta elegir
 y aplicar textos/headers/manifest. Esta es la única decisión inmediata de política
 que requiere al titular; tecnología y tuning se resuelven con experimentos.
+
+## ADR-010 — CI de compilación multiplataforma (Implementada, GitHub pendiente)
+
+**Context:** runtime Linux/Android ya tiene evidencia; falta descubrir blockers
+Windows/macOS/iOS sin convertir build en soporte/runtime ni preparar una release.
+
+**Decision:** un gate base y cinco workflows reutilizables/manuales con herramientas
+y Actions fijadas, artifact/checksum/metadata y permisos read-only. iOS enlaza
+bridge estático y compila device/simulator sin firma; Player Unsupported explícito.
+
+**Alternatives:** YAML único con matrices grandes, cinco workflows automáticos
+duplicados, publicación/signing inmediata. Se prefieren etapas diagnosticables.
+
+**Consequences:** primeros runners pueden fallar; no continue-on-error, no secrets,
+no push ni stores. Core/protocolo/SyncEngine y stacks provisionales no cambian.
+Build/runtime y evidencia local/remota se separan en [CI](CI.md).

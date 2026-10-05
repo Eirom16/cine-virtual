@@ -1,0 +1,7 @@
+#include "../../Flutter/Flutter-Debug.xcconfig"
+#include "Warnings.xcconfig"
+
+// Build one native architecture per runner; no universal-binary claim.
+ARCHS = $(NATIVE_ARCH_ACTUAL)
+CODE_SIGNING_ALLOWED = NO
+CODE_SIGNING_REQUIRED = NO
