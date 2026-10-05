@@ -24,6 +24,29 @@ class CiTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             setup.parse_machine_version('Download failed; no machine version')
 
+    def test_simulator_keeps_c_abi_in_process_executable(self):
+        args = type('Args', (), dict(platform='ios', arch='arm64', variant='simulator'))()
+        symbols = '\n'.join('_'+name for name in [
+            'cine_bridge_create', 'cine_bridge_call', 'cine_bridge_destroy', 'cine_bridge_hash_fd'])
+        with patch.object(ci, 'run') as run, patch.object(ci, 'capture', return_value=symbols):
+            ci.flutter_build(args)
+        build = run.call_args_list[1]
+        self.assertIn('--simulator', build.args)
+        self.assertIn('--no-codesign', build.args)
+        self.assertEqual(build.kwargs['env']['FLUTTER_XCODE_ENABLE_DEBUG_DYLIB'], 'NO')
+        with patch.object(ci, 'run'), patch.object(ci, 'capture', return_value='no bridge symbols'):
+            with self.assertRaisesRegex(SystemExit, 'Missing linked iOS C ABI'):
+                ci.flutter_build(args)
+
+    def test_macos_explicit_architecture_does_not_use_arm64e(self):
+        with tempfile.TemporaryDirectory() as directory:
+            with patch.object(ci, 'APP', Path(directory)), patch.object(ci.shutil, 'copy2'):
+                for arch, expected in [('arm64', 'arm64'), ('x64', 'x86_64')]:
+                    args = type('Args', (), dict(platform='macos', arch=arch, variant='device'))()
+                    with patch.object(ci, 'run') as run:
+                        ci.flutter_build(args)
+                    self.assertEqual(run.call_args.kwargs['env']['FLUTTER_XCODE_ARCHS'], expected)
+
     def test_archive_integrity_and_contents(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

@@ -68,7 +68,12 @@ def flutter_build(args):
         command = ['flutter', 'build', 'ios', mode, '--no-codesign', '--no-pub']
         if args.variant == 'simulator':
             command.append('--simulator')
-        run(*command, cwd=APP)
+        env = os.environ.copy()
+        if args.variant == 'simulator':
+            # The C ABI is looked up in the process. Xcode's preview debug dylib
+            # layout moves code out of Runner; keep the bridge in the executable.
+            env['FLUTTER_XCODE_ENABLE_DEBUG_DYLIB'] = 'NO'
+        run(*command, cwd=APP, env=env)
         binary = APP / ('build/ios/iphoneos/Runner.app/Runner' if args.variant == 'device'
                         else 'build/ios/iphonesimulator/Runner.app/Runner')
         symbols = capture('nm', '-g', str(binary))
@@ -82,7 +87,12 @@ def flutter_build(args):
         run('flutter', 'build', 'apk', '--debug', '--no-pub', '--target-platform=' + target,
             '--dart-define=ROOM_MODE=true', cwd=APP)
     else:
-        run('flutter', 'build', args.platform, '--release', '--no-pub', cwd=APP)
+        env = os.environ.copy()
+        if args.platform == 'macos':
+            # Native Apple Silicon hardware may report arm64e; Flutter/Rust ship
+            # arm64 here. Pass an explicit Xcode setting, keep lipo validation.
+            env['FLUTTER_XCODE_ARCHS'] = {'arm64': 'arm64', 'x64': 'x86_64'}[args.arch]
+        run('flutter', 'build', args.platform, '--release', '--no-pub', cwd=APP, env=env)
         if args.platform == 'linux':
             dest = APP / 'build/linux/x64/release/bundle/lib'
         elif args.platform == 'windows':

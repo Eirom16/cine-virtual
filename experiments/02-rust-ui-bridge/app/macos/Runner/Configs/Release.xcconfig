@@ -1,7 +1,7 @@
 #include "../../Flutter/Flutter-Release.xcconfig"
 #include "Warnings.xcconfig"
 
-// Build one native architecture per runner; no universal-binary claim.
-ARCHS = $(NATIVE_ARCH_ACTUAL)
+// Standard SDK slices locally; CI passes explicit arm64/x86_64 via Flutter.
+ARCHS = $(ARCHS_STANDARD)
 CODE_SIGNING_ALLOWED = NO
 CODE_SIGNING_REQUIRED = NO
