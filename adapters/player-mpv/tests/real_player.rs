@@ -18,7 +18,8 @@ fn create() -> MpvPlayer {
 fn decode_seek_play_pause_rate_eof() {
     let mut player = create();
     let result = measurements::automatic(&mut player, &corpus("normal.mp4"), false).unwrap();
-    assert_eq!(result["duration_ms"], 30_000);
+    // AAC priming/container rounding varies across FFmpeg versions (Ubuntu: +21 ms).
+    assert!(result["duration_ms"].as_u64().unwrap().abs_diff(30_000) <= 50);
     assert!(result["position_sampling"]["count"].as_u64().unwrap() > 20);
     assert_eq!(result["position_sampling"]["backsteps"], 0);
     for seek in result["seek"].as_array().unwrap() {
@@ -109,7 +110,10 @@ fn typed_errors_and_destroy() {
     }
     measurements::load_ready(&mut player, &corpus("normal.mp4")).unwrap();
     assert_eq!(
-        player.seek_to(30_001).unwrap_err().code,
+        player
+            .seek_to(player.duration().unwrap() + 1)
+            .unwrap_err()
+            .code,
         ErrorCode::SeekOutOfRange
     );
     assert_eq!(
@@ -148,7 +152,8 @@ fn replacement_load_preserves_new_generation() {
     measurements::load_ready(&mut player, &corpus("normal.mp4")).unwrap();
     player.play().unwrap();
     measurements::load_ready(&mut player, &corpus("long-duration.mp4")).unwrap();
-    assert_eq!(player.duration().unwrap(), 620_000);
+    // Allow one 15 fps frame plus AAC container rounding, not playback drift.
+    assert!(player.duration().unwrap().abs_diff(620_000) <= 90);
     assert_eq!(player.state(), State::Ready);
     assert!(player.paused().unwrap());
     assert!(player.position().unwrap() < 100);
