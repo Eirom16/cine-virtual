@@ -472,6 +472,7 @@ mod tests {
         }));
         let mut host = Client::connect(&url, "host").await.unwrap();
         let invitation = host.create().await.unwrap();
+        let joined_sequence = host.state().unwrap().sequence + 1;
         let n = Network::new(Instant::now(), 1, true).unwrap();
         n.enqueue(
             Intent::Connect {
@@ -495,6 +496,10 @@ mod tests {
         )
         .unwrap();
         assert!(done(&n, "join").await["error"].is_null());
+        // ACK on the participant socket does not deliver MEMBER_JOINED to the
+        // host synchronously. Observe the authoritative mutation before control.
+        host.wait_state(joined_sequence).await.unwrap();
+        assert_eq!(host.state().unwrap().members.len(), 2);
         host.media_demo().await.unwrap();
         let descriptor = host.state().unwrap().media.unwrap().descriptor;
         n.enqueue(Intent::Attach, 1, Some(descriptor.clone()))
