@@ -117,6 +117,31 @@ def make_archive(stage, archive):
     archive.with_name('CHECKSUMS.txt').write_text(f'{digest}  {archive.name}\n', encoding='utf-8')
 
 
+def ensure_unsigned_ios(source, variant):
+    """Remove only simulator linker ad-hoc signatures; never create a signature."""
+    def inspect():
+        return subprocess.run(['codesign', '-dv', '--verbose=2', str(source)],
+                              capture_output=True, text=True)
+    result = inspect()
+    removed = False
+    if result.returncode == 0:
+        lines = result.stderr.splitlines()
+        # ARM simulator linkers can insert an ad-hoc signature even with Xcode
+        # signing disabled. Developer/vendor certificate signatures are rejected.
+        if (variant != 'simulator' or 'Signature=adhoc' not in lines
+                or any(line.startswith('Authority=') for line in lines)
+                or any(line.startswith('TeamIdentifier=') and line != 'TeamIdentifier=not set'
+                       for line in lines)):
+            raise SystemExit('Unexpected certificate/device signature; refusing unsigned artifact')
+        print('Removing automatic simulator ad-hoc signature; no signing performed.')
+        run('codesign', '--remove-signature', str(source))
+        removed = True
+        result = inspect()
+    if result.returncode == 0 or 'code object is not signed at all' not in result.stderr:
+        raise SystemExit('iOS application unsigned verification failed')
+    return removed
+
+
 def package(args):
     commit = capture('git', 'rev-parse', 'HEAD')
     suffix = '-unsigned' if args.platform == 'ios' else ''
@@ -128,6 +153,7 @@ def package(args):
         shutil.rmtree(out)
     stage.mkdir(parents=True)
     mode = 'release'
+    simulator_signature_removed = False
     if args.platform in ['linux', 'windows', 'macos']:
         executables = ['cine-server', 'cine-client', 'cine-player-spike']
         binary_dir = stage / 'cli'
@@ -155,9 +181,7 @@ def package(args):
         mode = 'release' if args.variant == 'device' else 'debug'
         source = APP / ('build/ios/iphoneos/Runner.app' if args.variant == 'device'
                         else 'build/ios/iphonesimulator/Runner.app')
-        # Must be unsigned; do not silently accept automatic/ad-hoc signing.
-        if subprocess.run(['codesign', '-dv', str(source)], capture_output=True).returncode == 0:
-            raise SystemExit('Unexpected signed iOS product; refusing unsigned artifact label')
+        simulator_signature_removed = ensure_unsigned_ios(source, args.variant)
         shutil.copytree(source, stage / 'Runner.app', symlinks=True)
         shutil.copy2(APP / 'ios/Rust/libcine_ui_bridge.a', stage)
     if args.platform == 'macos':
@@ -191,7 +215,8 @@ def package(args):
     if args.platform in ['ios', 'macos']:
         metadata['xcode_version'] = capture('xcodebuild', '-version')
     if args.platform == 'ios':
-        metadata.update(signed=False, rust_target=APPLE_TARGETS[args.variant], format='compiled .app; no IPA')
+        metadata.update(signed=False, rust_target=APPLE_TARGETS[args.variant], format='compiled .app; no IPA',
+                        simulator_linker_signature_removed=simulator_signature_removed)
     if args.platform == 'android':
         metadata.update(java_version=subprocess.check_output(['java', '-version'], text=True, stderr=subprocess.STDOUT).strip(),
                         android_api=CONFIG['android_api'], android_ndk=CONFIG['android_ndk'],

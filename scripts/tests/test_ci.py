@@ -47,6 +47,26 @@ class CiTests(unittest.TestCase):
                         ci.flutter_build(args)
                     self.assertEqual(run.call_args.kwargs['env']['FLUTTER_XCODE_ARCHS'], expected)
 
+    def test_simulator_removes_only_automatic_adhoc_signature_and_rechecks(self):
+        from types import SimpleNamespace
+        adhoc = SimpleNamespace(returncode=0, stderr='Signature=adhoc\nTeamIdentifier=not set\n')
+        unsigned = SimpleNamespace(returncode=1, stderr='app: code object is not signed at all')
+        with patch.object(ci.subprocess, 'run', side_effect=[adhoc, unsigned]), patch.object(ci, 'run') as run:
+            self.assertTrue(ci.ensure_unsigned_ios(Path('Runner.app'), 'simulator'))
+            run.assert_called_once_with('codesign', '--remove-signature', 'Runner.app')
+        with patch.object(ci.subprocess, 'run', return_value=unsigned), patch.object(ci, 'run') as run:
+            self.assertFalse(ci.ensure_unsigned_ios(Path('Runner.app'), 'device'))
+            run.assert_not_called()
+        for variant, signature in [('device', adhoc), ('simulator', SimpleNamespace(
+                returncode=0, stderr='Signature=adhoc\nAuthority=Developer\nTeamIdentifier=TEAM\n'))]:
+            with patch.object(ci.subprocess, 'run', return_value=signature), patch.object(ci, 'run') as run:
+                with self.assertRaises(SystemExit):
+                    ci.ensure_unsigned_ios(Path('Runner.app'), variant)
+                run.assert_not_called()
+        with patch.object(ci.subprocess, 'run', return_value=adhoc), patch.object(ci, 'run'):
+            with self.assertRaisesRegex(SystemExit, 'unsigned verification failed'):
+                ci.ensure_unsigned_ios(Path('Runner.app'), 'simulator')
+
     def test_archive_integrity_and_contents(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
