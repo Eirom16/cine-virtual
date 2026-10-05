@@ -354,3 +354,43 @@ fn real_owner_repeated_creation_load_destroy_releases_resources() {
         serde_json::json!({"cycles":5,"before":before,"after":after,"checkpoints":checkpoints})
     );
 }
+
+#[test]
+fn suspension_invalidates_clock_and_deadlines_until_new_samples_and_snapshot() {
+    let mut replica = cine_client::replica::Replica::default();
+    replica.start_connection();
+    for _ in 0..8 {
+        replica.sample(
+            cine_core::clock::ClockSample {
+                t1: 0,
+                t2: 10,
+                t3: 10,
+                t4: 0,
+            },
+            0,
+        );
+    }
+    assert!(replica.trusted(0));
+    let clock_generation = replica.clock_generation();
+    replica.suspend(0);
+    assert!(replica.clock_generation() > clock_generation);
+    assert!(replica.suspended());
+    assert!(replica.local_reverification_required);
+    assert!(replica.snapshot_required());
+    assert!(!replica.trusted(0));
+    assert_eq!(replica.samples, 0);
+    assert!(replica.deadline_local_ms(0).is_none());
+    replica.start_connection();
+    assert!(!replica.trusted(0));
+    assert!(!replica.suspended());
+    replica.sample(
+        cine_core::clock::ClockSample {
+            t1: 10,
+            t2: 10,
+            t3: 10,
+            t4: 0,
+        },
+        0,
+    );
+    assert_eq!(replica.clock_diagnostics()["discarded"], 1);
+}

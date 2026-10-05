@@ -7,14 +7,24 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .with_writer(std::io::stderr)
         .init();
     let args: Vec<_> = std::env::args().skip(1).collect();
-    let bind = match args.as_slice() {
+    let allow_lan = args.iter().any(|s| s == "--allow-lan");
+    let filtered: Vec<_> = args.iter().filter(|s| *s != "--allow-lan").collect();
+    let bind = match filtered.as_slice() {
         [] => "127.0.0.1:8765",
-        [flag, value] if flag == "--bind" => value,
-        _ => return Err("Usage: cine-server [--bind 127.0.0.1:8765]".into()),
+        [flag, value] if *flag == "--bind" => value,
+        _ => return Err("Usage: cine-server [--bind ADDRESS] [--allow-lan]".into()),
     };
     let address: std::net::SocketAddr = bind.parse()?;
-    if !address.ip().is_loopback() {
-        return Err("This spike only listens on loopback; it is not Internet-ready".into());
+    if !address.ip().is_loopback() && !allow_lan {
+        return Err(
+            "Non-loopback bind requires --allow-lan; controlled LAN experiment only".into(),
+        );
+    }
+    if allow_lan {
+        tracing::warn!(
+            event = "experimental_lan_enabled",
+            warning = "Unencrypted ws, controlled LAN only; not Internet-ready"
+        );
     }
     let listener = TcpListener::bind(address).await?;
     tracing::info!(event="server_started",bind=%listener.local_addr()?);

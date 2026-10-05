@@ -25,3 +25,11 @@ de 03 contiene integración WebSocket ejecutada y métricas localhost;
 Spike B añadió después el experimento 01 con libmpv real aislado + Core en Linux.
 El recorrido 06 combina ambos con dos vídeos reales Linux y evidencia guardada;
 no se validó móvil. Esa documentación conserva límites y resultados sin promover v0.1.
+
+## Vertical slice 2
+
+[07-linux-android-room](07-linux-android-room/README.md) integra Application de
+red Rust compartida con Flutter/Media3 Android y CLI/libmpv Linux. Gate físico
+por Wi-Fi/LAN, identidad/Ready, controles, background y resume. Resultados
+aprobados/fallidos se distinguen en su evidencia; no convierte los candidatos
+provisionales en stack definitivo ni declara v0.1 completa.

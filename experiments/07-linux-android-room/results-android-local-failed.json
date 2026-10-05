@@ -1,0 +1,22 @@
+{
+  "platform": "android",
+  "passed": false,
+  "failure": "PLAYER_RELEASE_NOT_OBSERVED",
+  "versions": {
+    "flutter": "3.47.6",
+    "dart": "3.13.5",
+    "bridge_api": 1,
+    "media3": "1.11.1"
+  },
+  "environment": {
+    "system_ui_wait_dialogs": 0
+  },
+  "device": {
+    "android_version": "9",
+    "api": "28",
+    "abi": "armeabi-v7a",
+    "model": "SM-J701M",
+    "emulator": false
+  },
+  "native_player_released_on_exit": false
+}

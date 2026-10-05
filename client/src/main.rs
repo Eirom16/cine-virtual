@@ -104,20 +104,22 @@ async fn main() -> Result<(), ClientError> {
     let mut name = "Participant".to_owned();
     let mut backend = "fake".to_owned();
     let mut visible = false;
+    let mut allow_lan = false;
     let args: Vec<_> = std::env::args().skip(1).collect();
     if args.len() % 2 != 0 {
-        return Err("Usage: cine-client [--server ws://127.0.0.1:8765] [--name Host] [--player fake|mpv] [--visible true|false]".into());
+        return Err("Usage: cine-client [--server ws://127.0.0.1:8765] [--name Host] [--player fake|mpv] [--visible true|false] [--allow-lan true|false]".into());
     }
     for pair in args.chunks(2) {
         match pair[0].as_str() {
             "--server" => url = pair[1].clone(),
             "--name" => name = pair[1].clone(),
             "--player" => backend = pair[1].clone(),
+            "--allow-lan" => allow_lan = pair[1].parse()?,
             "--visible" => visible = pair[1].parse()?,
             _ => return Err("Unknown argument".into()),
         }
     }
-    let mut client = Client::connect_with_player(&url, &name, &backend, visible).await?;
+    let mut client = Client::connect_configured(&url, &name, &backend, visible, allow_lan).await?;
     println!(
         "{}",
         json!({"event":"cli_connected","clock":client.clock()})

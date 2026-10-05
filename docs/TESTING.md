@@ -147,3 +147,26 @@ python3 scripts/demo_real_media.py --seconds 25
 
 La prueba Linux corta conserva evidencia de 10 min del slice anterior; no sustituye
 su ensayo prolongado. No se modificó profundamente el runtime Player/red Linux.
+
+## Vertical slice 2 — Application compartida y dispositivo físico
+
+Tests nuevos usan Client<MobilePlayer> y el **WebSocket real**, con vistas SDK
+falsas únicamente en tests host. Cubren Ready sin load, autoridad Participant
+sin cambio de secuencia, invalidación suspend, clock/snapshot foreground, resume,
+claim mismatch, cola acotada/generation y cancelación/join durante connect.
+Frontera C ABI y Flutter añaden DTO UUID inválido, prohibición de fixtures en modo
+sala, generaciones viejas y acceso después de destroy. No se presentan fixtures
+SDK como runtime Android. La política del Core no cambia.
+
+```sh
+cargo test --workspace
+python3 scripts/demo_cross_platform.py --seconds 30
+python3 scripts/demo_cross_platform.py
+```
+
+La segunda demo requiere Android físico y Wi-Fi/LAN, sin adb reverse; ~600 s de
+reloj real y evidencia en [experimento 07](../experiments/07-linux-android-room/README.md).
+Ausencia de ADB, conectividad o fallo de SDK produce bloqueo/fallo, no métricas
+inventadas. UI/ABI Linux y Player Android aislado se conservan con demo_mobile_ui;
+FakePlayer y dos libmpv con demo_control/demo_real_media. Android build/install
+no equivale a runtime cruzado; verificar resultados físicos antes de promover gates.

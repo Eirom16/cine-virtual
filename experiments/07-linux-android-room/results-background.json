@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "executed": true,
+  "recovery": {
+    "foreground_ms": 2059.953197996947,
+    "foreground_post_ready_convergence_ms": 0.027522000891622156,
+    "foreground_initial_drift_ms": -31,
+    "network_resume_ms": 13310.063960998377,
+    "network_post_ready_convergence_ms": 16557.981801001006,
+    "same_member_after_resume": true
+  },
+  "background_markers_count": 2
+}

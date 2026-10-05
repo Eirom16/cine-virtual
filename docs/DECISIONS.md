@@ -161,6 +161,18 @@ Android no valida Apple ni otros dispositivos/versiones Android. No se probó mp
 **Next validation:** ampliar físico (formatos/URI/rate/lifecycle) y Mac/Xcode/iPhone para AVPlayer;
 red móvil v1 + suspend/clock/snapshot antes de promover arquitectura definitiva.
 
+### Evidencia adicional — Vertical slice 2
+
+**Evidence:** regresiones Linux/libmpv y Android físico/Media3 aislado pasan; el
+runtime Rust compartido se compila para armv7 y ejecuta controles/clock reales
+por Wi-Fi durante 600,08 s. p95 Linux 36 ms, Android 514 ms y diferencia 462 ms;
+75 hard seeks Android, gate de precisión fallido. Evidencia completa en
+[RESULTS](../experiments/07-linux-android-room/RESULTS.md).
+
+**Decision:** libmpv y Media3 conservan sus estados provisionales; Core y parámetros
+SyncEngine no cambian. SDK dispatch, completion READY y frame presentado siguen
+siendo observaciones distintas. iOS permanece fuera del gate Linux/Android.
+
 ## ADR-007 — Rust inicial, UI/puente candidatos (Provisional)
 
 **Context:** necesitamos pruebas independientes hoy y una base portable.
@@ -192,12 +204,31 @@ se expone ningún struct Core como ABI. FRB permanece alternativa si la API crec
 
 **Remaining risks:** ABI/unsafe manual, consumidor confiable en proceso, polling
 sin stream push, SDK/URI/main thread, lifecycle completo y más dispositivos físicos.
-La calibración/snapshot móvil aislados usan fixtures; no hay red móvil aún.
+La calibración/snapshot del Spike C aislado usan fixtures; ese experimento
+no incluye red móvil.
 Windows/macOS/iOS Flutter sin build/runtime; no soporte universal demostrado.
 
 **Next validation:** completar el gate móvil con dispositivos, integración de
 Application de red v1 y recovery tras suspend, más AVPlayer en Mac/Xcode. Evitar
 UI final/packaging público mientras licencia y estrategia multimedia no se decidan.
+
+### Evidencia adicional — Application móvil de red
+
+**Evidence:** Client<P> reutiliza el canal v1, clock, réplica, scheduler y SyncEngine
+sin otro cliente Dart/algoritmo Kotlin. Tests con WebSocket real y SDK fixture
+cubren autoridad, Ready, generaciones, suspend/foreground y resume. JNI de driver
+nativo armv7 compilado; runtime físico cruzado, SAF/hash, Ready y
+background/WS resume ejecutados en
+[experimento 07](../experiments/07-linux-android-room/README.md).
+
+**Decision:** C ABI manual + dart:ffi se conserva. Kotlin/main Looper posee
+SDK/SAF; Rust tiene un owner de red con cola acotada y cancelación/join. UI consulta
+estado a 2 Hz; driver SDK a 50 Hz no publica UI a esa frecuencia. No se expone ABI
+Rust ni se fuerza Send/Sync al Player/SDK. Flutter continúa PROVISIONAL.
+
+**Remaining risks:** gate de precisión Android fallido, hard seeks repetidos,
+recreación exhaustiva de Activity, múltiples dispositivos y WAN/TLS. Recorrido
+funcional no equivale a precisión aprobada ni a stack definitivo.
 
 ## ADR-008 — Servidor único y memoria (Implementada en Spike A)
 

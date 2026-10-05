@@ -38,6 +38,10 @@ pub struct Replica<P: ApplicationPlayer = FakePlayer> {
     sync: SyncEngine,
     desired_playing: Option<bool>,
     pub clock_blocked_until: u64,
+    suspended: bool,
+    pub local_reverification_required: bool,
+    discarded_samples: usize,
+    clock_generation: u64,
 }
 impl Default for Replica<FakePlayer> {
     fn default() -> Self {
@@ -63,7 +67,14 @@ impl<P: ApplicationPlayer> Replica<P> {
             sync: SyncEngine::new(SyncConfig::default()).unwrap(),
             desired_playing: None,
             clock_blocked_until: 0,
+            suspended: false,
+            local_reverification_required: false,
+            discarded_samples: 0,
+            clock_generation: 0,
         }
+    }
+    pub fn clock_generation(&self) -> u64 {
+        self.clock_generation
     }
     pub fn estimate(&self) -> Option<ClockEstimate> {
         self.filter.estimate()
@@ -82,14 +93,34 @@ impl<P: ApplicationPlayer> Replica<P> {
         )
     }
     pub fn trusted(&self, now: u64) -> bool {
-        now >= self.clock_blocked_until
+        !self.suspended
+            && now >= self.clock_blocked_until
             && self.uncertainty().is_some_and(|v| v <= 100.0)
             && now.saturating_sub(self.last_sample) <= 15_000
     }
-    pub fn start_connection(&mut self) {
+    pub fn snapshot_required(&self) -> bool {
+        self.recovering || self.state.is_none()
+    }
+    pub fn suspended(&self) -> bool {
+        self.suspended
+    }
+    pub fn suspend(&mut self, now: u64) {
+        self.disconnect(now);
+        self.connected = true;
+        self.clock_generation += 1;
+        self.suspended = true;
+        self.local_reverification_required = true;
         self.filter = ClockFilter::default();
         self.estimates.clear();
         self.samples = 0;
+    }
+    pub fn start_connection(&mut self) {
+        self.clock_generation += 1;
+        self.suspended = false;
+        self.filter = ClockFilter::default();
+        self.estimates.clear();
+        self.samples = 0;
+        self.discarded_samples = 0;
         self.connected = true;
         self.recovering = true;
     }
@@ -104,6 +135,7 @@ impl<P: ApplicationPlayer> Replica<P> {
     }
     pub fn sample(&mut self, sample: ClockSample, now: u64) -> bool {
         let Some(estimate) = sample.estimate() else {
+            self.discarded_samples += 1;
             return false;
         };
         self.filter.push(sample);
@@ -115,17 +147,30 @@ impl<P: ApplicationPlayer> Replica<P> {
         self.last_sample = now;
         true
     }
+    pub fn clock_diagnostics(&self) -> serde_json::Value {
+        let min = self
+            .estimates
+            .iter()
+            .map(|e| e.rtt_ms)
+            .fold(f64::INFINITY, f64::min);
+        let max = self.estimates.iter().map(|e| e.rtt_ms).fold(0.0, f64::max);
+        serde_json::json!({"accepted":self.samples,"discarded":self.discarded_samples,"rtt_jitter_range_ms":if min.is_finite(){max-min}else{0.0}})
+    }
     pub fn server_now(&self, now: u64) -> Option<u64> {
         Some((now as f64 + self.estimate()?.offset_ms).max(0.0).round() as u64)
     }
+    pub fn effective_ready(&self) -> bool {
+        self.connected && !self.recovering && !self.suspended && self.prepared()
+    }
     fn prepared(&self) -> bool {
-        self.member_id.is_some_and(|id| {
-            self.state.as_ref().is_some_and(|s| {
-                s.members
-                    .iter()
-                    .any(|m| m.member_id == id && m.connected && m.ready)
+        !self.local_reverification_required
+            && self.member_id.is_some_and(|id| {
+                self.state.as_ref().is_some_and(|s| {
+                    s.members
+                        .iter()
+                        .any(|m| m.member_id == id && m.connected && m.ready)
+                })
             })
-        })
     }
     pub fn install(&mut self, state: RoomState, snapshot: bool, now: u64) -> Delivery {
         let was_prepared = self.prepared();
@@ -343,6 +388,7 @@ impl<P: ApplicationPlayer> Replica<P> {
             sequence: self.state.as_ref().map_or(0, |s| s.sequence),
             target_ms: timeline.position_at(self.server_now(sample_time).unwrap() as i64),
             reason: "correction",
+            offset_ms: self.estimate().map_or(0.0, |e| e.offset_ms),
             ..Default::default()
         });
         match correction {

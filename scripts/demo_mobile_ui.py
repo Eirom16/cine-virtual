@@ -131,8 +131,11 @@ def main():
                             system_ui_waits += 1
                         else:
                             choices = [n for n in nodes if n.get('text') == 'cine-spike.mp4']
+                        if not choices and not system_anr and any(n.get('resource-id')=='com.android.documentsui:id/dir_list' for n in nodes):
+                            device('shell','input','swipe','300','900','300','250','300')
+                            continue
                         if not choices:
-                            choices = [n for n in nodes if n.get('text') in ['Downloads', 'Download', 'Descargas']]
+                            choices = [n for n in nodes if n.get('text') in ['Downloads', 'Download', 'Descargas'] and n.get('resource-id')!='android:id/title']
                         if not choices:
                             choices = [n for n in nodes if n.get('content-desc') in ['Show roots', 'Open navigation drawer', 'Mostrar raíces', 'Abrir panel de navegación']]
                         if choices:
@@ -155,6 +158,8 @@ def main():
                                'emulator': online[0].startswith('emulator-')}
             value['versions']['media3'] = '1.11.1'
             device('shell', 'input', 'keyevent', 'KEYCODE_BACK')
+            time.sleep(.5)
+            device('shell', 'input', 'keyevent', 'KEYCODE_BACK')
             released = False
             for _ in range(20):
                 logs = device('logcat', '-d', '-T', since, '-s', 'CineSpike:I', '*:S')
@@ -165,7 +170,7 @@ def main():
             value['native_player_released_on_exit'] = released
             if not released:
                 value['passed'] = False
-                value['failure'] = 'PLAYER_RELEASE_NOT_OBSERVED'
+                value.setdefault('failure', 'PLAYER_RELEASE_NOT_OBSERVED')
         finally:
             device('shell', 'am', 'force-stop', PACKAGE)
             device('shell', 'rm', '/sdcard/cine-ui.xml', '/sdcard/Download/cine-spike.mp4', check=False)

@@ -11,8 +11,17 @@ crate-type = ["cdylib", "rlib"]
 [dependencies]
 cine-core = { path = "../../core" }
 cine-local-media = { path = "../local-media" }
+cine-client = { path = "../../client" }
+tokio.workspace = true
+uuid.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 
 [target.'cfg(unix)'.dependencies]
 libc = "0.2"
+
+[target.'cfg(target_os = "android")'.dependencies]
+jni = "0.21"
+
+[dev-dependencies]
+cine-server = { path = "../../server" }

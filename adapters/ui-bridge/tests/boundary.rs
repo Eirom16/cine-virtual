@@ -196,3 +196,32 @@ fn cancellation_intent_is_safe_without_worker() {
     let r = simple(&mut app, 1, "suspend", 0);
     assert_eq!(r.effects.len(), 1);
 }
+
+#[test]
+fn network_boundary_rejects_invalid_intents_and_offline_control_in_network_mode() {
+    let mut app = Application::default();
+    let invalid = serde_json::json!({"api_version":1,"generation":1,"command":{"type":"network","payload":{"action":"join","room_id":"invalid","room_epoch":"invalid","invite_token":"test"}}});
+    assert_eq!(
+        app.dispatch(invalid.to_string().as_bytes(), 0)
+            .error
+            .unwrap()
+            .code,
+        "INVALID_DTO"
+    );
+    let state = serde_json::json!({"api_version":1,"generation":1,"command":{"type":"network","payload":{"action":"ready"}}});
+    assert_eq!(
+        app.dispatch(state.to_string().as_bytes(), 0)
+            .error
+            .unwrap()
+            .code,
+        "MEDIA_NOT_READY"
+    );
+    let offline = serde_json::json!({"api_version":1,"generation":1,"command":{"type":"snapshot"}});
+    assert_eq!(
+        app.dispatch(offline.to_string().as_bytes(), 0)
+            .error
+            .unwrap()
+            .code,
+        "NETWORK_INTENT_REQUIRED"
+    );
+}

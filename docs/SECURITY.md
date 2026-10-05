@@ -1,7 +1,8 @@
 # Seguridad y observabilidad
 
 Estado: bases documentadas y controles mínimos implementados en Spike A
-localhost. El binario rechaza bind fuera de loopback; no es un servicio público.
+localhost. Loopback permanece default; bind externo requiere --allow-lan
+experimental con warning. No es un servicio público.
 [PROTOCOL](PROTOCOL.md) fija límites y autoridad; validarlos es condición
 para abrir el primer servidor a una red externa.
 
@@ -11,7 +12,8 @@ para abrir el primer servidor a una red externa.
   ni permisos. Tokens de invitación y resume independientes de al menos 256 bits.
 - Vincular socket a sesión/member_id en el servidor. Validar rol y revisión al
   procesar cada control; cliente no puede falsificar un broadcast autoritativo.
-- WSS fuera de localhost, validación de certificado y política explícita de
+- WSS fuera de localhost en producción (excepción de ensayo LAN controlado con
+  --allow-lan y ws, sin garantía de confidencialidad), validación de certificado y política explícita de
   origins para clientes browser futuros. No tokens en URLs, logs ni snapshots.
 - Antes de mutar: parse, tamaño, schema, versión, rango, epoch, identidad,
   autorización, revisiones e idempotencia; no aplicación parcial.

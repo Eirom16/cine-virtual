@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "scenario": "vertical_slice_2_verification",
+  "timestamp_utc": "2026-10-05T02:09:24.247502+00:00",
+  "source_base_commit": "b792f37",
+  "checks": [
+    {
+      "command": "cargo fmt --all -- --check",
+      "result": "PASS"
+    },
+    {
+      "command": "cargo clippy --workspace --all-targets -- -D warnings",
+      "result": "PASS"
+    },
+    {
+      "command": "cargo test --workspace",
+      "result": "PASS: 90 ordinary tests; 6 SDK tests ignored by default"
+    },
+    {
+      "command": "cargo build --workspace",
+      "result": "PASS"
+    },
+    {
+      "command": "python3 scripts/check_docs.py",
+      "result": "PASS: 33 Markdown, 4 JSON examples, local links"
+    },
+    {
+      "command": "cargo test -p cine-client --test replica -- --ignored --test-threads=1 --nocapture",
+      "result": "PASS: 2 SDK tests"
+    },
+    {
+      "command": "cargo test -p cine-player-mpv --test real_player -- --ignored --test-threads=1 --nocapture",
+      "result": "PASS: 4 SDK tests"
+    },
+    {
+      "command": "flutter analyze",
+      "result": "PASS"
+    },
+    {
+      "command": "flutter test (CINE_BRIDGE_LIBRARY points to built shared library)",
+      "result": "PASS: 5 tests"
+    },
+    {
+      "command": "python3 scripts/demo_control.py",
+      "result": "PASS"
+    },
+    {
+      "command": "python3 scripts/demo_real_media.py --seconds 25",
+      "result": "PASS"
+    },
+    {
+      "command": "python3 scripts/demo_mobile_ui.py --platform linux",
+      "result": "PASS"
+    },
+    {
+      "command": "python3 scripts/demo_mobile_ui.py --platform android",
+      "result": "PASS: physical Android"
+    },
+    {
+      "command": "python3 scripts/demo_cross_platform.py",
+      "result": "FUNCTIONAL PASS: 600.08s; precision goal FAIL"
+    },
+    {
+      "command": "python3 scripts/demo_cross_platform.py --mismatch-only --no-build",
+      "result": "PASS: physical mismatched file"
+    },
+    {
+      "command": "python3 scripts/demo_cross_platform.py --seconds 30",
+      "result": "FUNCTIONAL PASS: 88.05s final regression; precision goal FAIL"
+    },
+    {
+      "command": "git diff --check",
+      "result": "PASS"
+    }
+  ],
+  "android_build_install_runtime": "NDK armv7 + debug Flutter APK, installed and run on physical Android 9",
+  "core_multimedia_dependencies": false,
+  "lan_without_opt_in_rejected": true,
+  "android_demo_process_stopped": true,
+  "precision_gate_passed": false,
+  "not_executed": [
+    "degraded network/qdisc",
+    "release profiling",
+    "iOS build/runtime",
+    "exhaustive Activity recreation/multiple Android models"
+  ],
+  "notes": [
+    "Earlier fixture/Ready-race failures retained in separate evidence; final regression passes after fixes.",
+    "The 600-second raw dataset precedes the bounded Ready retry and effective_ready telemetry fix; short regression verifies those changes.",
+    "No push, release, license change or v0.1 completion."
+  ]
+}

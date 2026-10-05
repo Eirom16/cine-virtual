@@ -4,7 +4,7 @@ Base de un proyecto con vocación open source para ver contenido juntos desde
 Windows, Linux, macOS, Android e iOS. Cada dispositivo conserva su archivo y el
 servidor coordina la sala; el control de reproducción no transporta el vídeo.
 
-**Estado: vertical slice Linux + Spike C móvil/UI, previo al MVP v0.1.** Servidor WebSocket
+**Estado: vertical slice Linux + Spike C móvil/UI; recorrido Linux ↔ Android ejecutado con precisión móvil pendiente, previo al MVP v0.1.** Servidor WebSocket
 y dos clientes CLI integran libmpv in-process, archivo local, metadata, SHA-256
 completo, Ready, controles programados, correcciones y resume con snapshot.
 FakePlayer y los instrumentos anteriores se conservan. La licencia está
@@ -14,9 +14,9 @@ open source definitiva.
 
 | Estado | Alcance real |
 | --- | --- |
-| Implemented | Core determinista, RoomService en memoria, codec v1, autoridad/Ready, controles programados y resume; FakePlayer y dos libmpv reales sobre WebSocket localhost, archivo/probe/hash locales. |
+| Implemented | Core determinista, RoomService en memoria, codec v1, autoridad/Ready, controles programados y resume; FakePlayer y dos libmpv reales sobre WebSocket localhost, archivo/probe/hash locales y control Linux ↔ Android físico; el gate de precisión móvil sigue pendiente. |
 | Planned | Completar validación móvil/dispositivos, UI de producto, packaging y hardening antes de v0.1. |
-| Experimental | Spikes A/B, vertical slice Linux (libmpv PROVISIONAL) y Spike C: UI de ingeniería Flutter, C ABI/Rust y candidato Media3; evidencia y límites por plataforma en experimento 02. |
+| Experimental | Spikes A/B, vertical slice Linux (libmpv PROVISIONAL) y Spike C: UI de ingeniería Flutter, C ABI/Rust y candidato Media3; evidencia y límites por plataforma en experimentos 02 y 07. |
 
 El objetivo de v0.1 es demostrar dos clientes con el mismo vídeo local,
 Play/Pause/Seek programados y recuperación tras una desconexión temporal.
@@ -90,6 +90,7 @@ python3 scripts/demo_real_media.py
 Comandos manuales y evidencia en [Spike A](experiments/03-websocket-sync/README.md),
 [Spike B](experiments/01-player-crossplatform/README.md) y
 [vertical slice 1](experiments/06-real-vertical-slice/README.md) y
-[Spike C móvil/UI](experiments/02-rust-ui-bridge/README.md).
+[Spike C móvil/UI](experiments/02-rust-ui-bridge/README.md) y
+[vertical slice 2 Linux ↔ Android](experiments/07-linux-android-room/README.md).
 Consulta [CONTRIBUTING](docs/CONTRIBUTING.md) antes de proponer cambios; la licencia
 sigue pendiente y no se solicitan aportes públicos ni se publica una release.

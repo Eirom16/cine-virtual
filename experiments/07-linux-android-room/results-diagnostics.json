@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "status": "HISTORICAL_DIAGNOSTICS",
+  "observed_failures": [
+    "Initial TCP port blocked by UFW",
+    "SAF result before Flutter foreground led to HASH_ABI_-5",
+    "After USB reconnect, Wi-Fi subnet mismatch and bilateral ping failure"
+  ],
+  "resolved_in_code": [
+    "connect timeout",
+    "await foreground/recovery before FD hashing",
+    "ignore stale SDK generations",
+    "owner cancellation/join",
+    "SAF scroll and Flutter accessibility labels",
+    "Fresh SDK sample required for Ready",
+    "Hash/verification bound to generation",
+    "Local Ready invalidated until metadata reverified",
+    "Late NTP responses rejected after lifecycle generation change"
+  ],
+  "resolved_environment": [
+    "Authorized physical Android reconnected",
+    "Wi-Fi enabled, same router/subnet, real TCP and WebSocket confirmed",
+    "Controlled LAN port reachable without modifying firewall from harness"
+  ],
+  "latest_evidence": "See results-lan.json and results-background.json for final session status"
+}

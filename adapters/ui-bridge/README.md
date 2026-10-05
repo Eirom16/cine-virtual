@@ -70,3 +70,19 @@ local; en Windows hash_fd retorna unsupported, sin contaminar Core. Windows,
 macOS e iOS todavía no compilados/ejecutados. Guardrails/pruebas en
 [tests](tests/boundary.rs). ABI manual necesita revisión unsafe, versionado y
 comparar codegen si la API crece; registry poison/panic no es recuperación de SDK.
+
+## Extensión vertical slice 2
+
+Command::Network añade intents a un owner Rust cancelable, usando el Client<P>
+compartido. No modifica el protocolo wire o las estructuras ABI. Status polling
+mantiene la UI a 2 Hz; SDK Android consume efectos de una cola 32 a 20 ms por JNI
+para evitar que el polling de UI retrase deadlines. Kotlin solo adapta Media3.
+NativeDrive valida muestras/capabilities, NativeDestroy usa el mismo registry
+idempotente. La Activity registra el handle y cierra el engine fuera de main;
+no depende únicamente de dispose Dart. Payloads de invitación son privados, no
+logs; en modo sala la respuesta omite digest de hashing.
+
+Clock/Snapshot/controles locales de Spike C se rechazan en modo Network: Flutter
+no puede inventar verdad de sala. Suspend/resume usan la misma réplica/runtime;
+ver [experimento 07](../../experiments/07-linux-android-room/README.md) para evidencia
+y limitaciones. Ninguna dependencia SDK entra en cine-core o cine-rooms.

@@ -1,0 +1,600 @@
+{
+  "schema_version": 1,
+  "scenario": "android_real_media_mismatch",
+  "timestamp_utc": "2026-10-05T01:33:07.993440+00:00",
+  "requested_wall_seconds": 30.0,
+  "passed": true,
+  "network": "controlled Wi-Fi/LAN ws; no tunnel",
+  "source_base_commit": "b792f37",
+  "device": {
+    "android": "9",
+    "abi": "armeabi-v7a",
+    "physical": true
+  },
+  "linux_hash": {
+    "hash_ms": 849.840053,
+    "size_bytes": 24300725,
+    "status": "complete"
+  },
+  "status": "PASS",
+  "expected_error": "MEDIA_MISMATCH",
+  "participant_ready": false,
+  "media_bytes_original": 24300725,
+  "media_bytes_android": 24300726,
+  "android_samples": [
+    {
+      "sync": null,
+      "clock": null,
+      "sequence": null,
+      "media": null,
+      "busy": true,
+      "last_action": null,
+      "error": null,
+      "hash": {
+        "state": "",
+        "read_bytes": 0,
+        "size_bytes": 0,
+        "elapsed_ms": 0.0
+      }
+    },
+    {
+      "sync": {
+        "at_ms": 7000,
+        "buffering": false,
+        "clock_diagnostics": {
+          "accepted": 8,
+          "discarded": 0,
+          "rtt_jitter_range_ms": 2.0
+        },
+        "clock_trusted": true,
+        "correction": "none",
+        "corrections": {
+          "rate": 0,
+          "restore": 0,
+          "seek": 0
+        },
+        "drift_ms": null,
+        "media_revision": null,
+        "playing": false,
+        "position_ms": 0,
+        "rate": 1.0,
+        "ready": false,
+        "sample_age_ms": 7000,
+        "seeking": false,
+        "sequence": null,
+        "server_ms": 11839,
+        "snapshot_required": true,
+        "target_ms": null,
+        "uncertainty_ms": 1.5
+      },
+      "clock": {
+        "offset_ms": 11838.5,
+        "rtt_ms": 3.0,
+        "sample_count": 8,
+        "uncertainty_ms": 1.5
+      },
+      "sequence": null,
+      "media": {
+        "codecs": null,
+        "duration_ms": null,
+        "identity_match": null,
+        "local_loaded": false,
+        "media_revision": null,
+        "mime": null,
+        "size_bytes": null
+      },
+      "busy": false,
+      "last_action": "join",
+      "error": null,
+      "hash": {
+        "state": "",
+        "read_bytes": 0,
+        "size_bytes": 0,
+        "elapsed_ms": 0.0
+      }
+    },
+    {
+      "sync": {
+        "at_ms": 7549,
+        "buffering": false,
+        "clock_diagnostics": {
+          "accepted": 8,
+          "discarded": 0,
+          "rtt_jitter_range_ms": 2.0
+        },
+        "clock_trusted": true,
+        "correction": "none",
+        "corrections": {
+          "rate": 0,
+          "restore": 0,
+          "seek": 0
+        },
+        "drift_ms": 0,
+        "media_revision": 1,
+        "playing": false,
+        "position_ms": 0,
+        "rate": 1.0,
+        "ready": false,
+        "sample_age_ms": 7549,
+        "seeking": false,
+        "sequence": 5,
+        "server_ms": 11839,
+        "snapshot_required": false,
+        "target_ms": 0,
+        "uncertainty_ms": 1.5
+      },
+      "clock": {
+        "offset_ms": 11838.5,
+        "rtt_ms": 3.0,
+        "sample_count": 8,
+        "uncertainty_ms": 1.5
+      },
+      "sequence": 5,
+      "media": {
+        "codecs": null,
+        "duration_ms": null,
+        "identity_match": null,
+        "local_loaded": false,
+        "media_revision": 1,
+        "mime": null,
+        "size_bytes": null
+      },
+      "busy": false,
+      "last_action": "join",
+      "error": null,
+      "hash": {
+        "state": "",
+        "read_bytes": 0,
+        "size_bytes": 0,
+        "elapsed_ms": 0.0
+      }
+    },
+    {
+      "sync": {
+        "at_ms": 8049,
+        "buffering": false,
+        "clock_diagnostics": {
+          "accepted": 8,
+          "discarded": 0,
+          "rtt_jitter_range_ms": 2.0
+        },
+        "clock_trusted": true,
+        "correction": "none",
+        "corrections": {
+          "rate": 0,
+          "restore": 0,
+          "seek": 0
+        },
+        "drift_ms": 0,
+        "media_revision": 1,
+        "playing": false,
+        "position_ms": 0,
+        "rate": 1.0,
+        "ready": false,
+        "sample_age_ms": 91,
+        "seeking": false,
+        "sequence": 5,
+        "server_ms": 19797,
+        "snapshot_required": false,
+        "target_ms": 0,
+        "uncertainty_ms": 1.5
+      },
+      "clock": {
+        "offset_ms": 11838.5,
+        "rtt_ms": 3.0,
+        "sample_count": 8,
+        "uncertainty_ms": 1.5
+      },
+      "sequence": 5,
+      "media": {
+        "codecs": null,
+        "duration_ms": null,
+        "identity_match": null,
+        "local_loaded": false,
+        "media_revision": 1,
+        "mime": null,
+        "size_bytes": null
+      },
+      "busy": false,
+      "last_action": "join",
+      "error": null,
+      "hash": {
+        "state": "",
+        "read_bytes": 0,
+        "size_bytes": 0,
+        "elapsed_ms": 0.0
+      }
+    },
+    {
+      "sync": {
+        "at_ms": 8550,
+        "buffering": false,
+        "clock_diagnostics": {
+          "accepted": 8,
+          "discarded": 0,
+          "rtt_jitter_range_ms": 2.0
+        },
+        "clock_trusted": true,
+        "correction": "none",
+        "corrections": {
+          "rate": 0,
+          "restore": 0,
+          "seek": 0
+        },
+        "drift_ms": 0,
+        "media_revision": 1,
+        "playing": false,
+        "position_ms": 0,
+        "rate": 1.0,
+        "ready": false,
+        "sample_age_ms": 39,
+        "seeking": false,
+        "sequence": 5,
+        "server_ms": 20350,
+        "snapshot_required": false,
+        "target_ms": 0,
+        "uncertainty_ms": 1.5
+      },
+      "clock": {
+        "offset_ms": 11838.5,
+        "rtt_ms": 3.0,
+        "sample_count": 8,
+        "uncertainty_ms": 1.5
+      },
+      "sequence": 5,
+      "media": {
+        "codecs": null,
+        "duration_ms": null,
+        "identity_match": null,
+        "local_loaded": false,
+        "media_revision": 1,
+        "mime": null,
+        "size_bytes": null
+      },
+      "busy": false,
+      "last_action": "join",
+      "error": null,
+      "hash": {
+        "state": "",
+        "read_bytes": 0,
+        "size_bytes": 0,
+        "elapsed_ms": 0.0
+      }
+    },
+    {
+      "sync": {
+        "at_ms": 32199,
+        "buffering": false,
+        "clock_diagnostics": {
+          "accepted": 0,
+          "discarded": 0,
+          "rtt_jitter_range_ms": 0.0
+        },
+        "clock_trusted": false,
+        "correction": "none",
+        "corrections": {
+          "rate": 0,
+          "restore": 0,
+          "seek": 0
+        },
+        "drift_ms": null,
+        "media_revision": 1,
+        "playing": false,
+        "position_ms": 0,
+        "rate": 1.0,
+        "ready": false,
+        "sample_age_ms": 32199,
+        "seeking": false,
+        "sequence": 6,
+        "server_ms": null,
+        "snapshot_required": false,
+        "target_ms": null,
+        "uncertainty_ms": null
+      },
+      "clock": null,
+      "sequence": 6,
+      "media": {
+        "codecs": null,
+        "duration_ms": null,
+        "identity_match": null,
+        "local_loaded": false,
+        "media_revision": 1,
+        "mime": null,
+        "size_bytes": null
+      },
+      "busy": true,
+      "last_action": null,
+      "error": null,
+      "hash": {
+        "state": "",
+        "read_bytes": 0,
+        "size_bytes": 0,
+        "elapsed_ms": 0.0
+      }
+    },
+    {
+      "sync": {
+        "at_ms": 32999,
+        "buffering": false,
+        "clock_diagnostics": {
+          "accepted": 8,
+          "discarded": 0,
+          "rtt_jitter_range_ms": 5.0
+        },
+        "clock_trusted": true,
+        "correction": "none",
+        "corrections": {
+          "rate": 0,
+          "restore": 0,
+          "seek": 0
+        },
+        "drift_ms": 0,
+        "media_revision": 1,
+        "playing": false,
+        "position_ms": 0,
+        "rate": 1.0,
+        "ready": false,
+        "sample_age_ms": 19,
+        "seeking": false,
+        "sequence": 6,
+        "server_ms": 44819,
+        "snapshot_required": false,
+        "target_ms": 0,
+        "uncertainty_ms": 3.5
+      },
+      "clock": {
+        "offset_ms": 11839.0,
+        "rtt_ms": 4.0,
+        "sample_count": 8,
+        "uncertainty_ms": 3.5
+      },
+      "sequence": 6,
+      "media": {
+        "codecs": null,
+        "duration_ms": null,
+        "identity_match": null,
+        "local_loaded": false,
+        "media_revision": 1,
+        "mime": null,
+        "size_bytes": null
+      },
+      "busy": false,
+      "last_action": "foreground",
+      "error": null,
+      "hash": {
+        "state": "",
+        "read_bytes": 0,
+        "size_bytes": 0,
+        "elapsed_ms": 0.0
+      }
+    },
+    {
+      "sync": {
+        "at_ms": 33499,
+        "buffering": true,
+        "clock_diagnostics": {
+          "accepted": 8,
+          "discarded": 0,
+          "rtt_jitter_range_ms": 5.0
+        },
+        "clock_trusted": true,
+        "correction": "none",
+        "corrections": {
+          "rate": 0,
+          "restore": 0,
+          "seek": 0
+        },
+        "drift_ms": 0,
+        "media_revision": 1,
+        "playing": false,
+        "position_ms": 0,
+        "rate": 1.0,
+        "ready": false,
+        "sample_age_ms": 11,
+        "seeking": false,
+        "sequence": 6,
+        "server_ms": 45327,
+        "snapshot_required": false,
+        "target_ms": 0,
+        "uncertainty_ms": 3.5
+      },
+      "clock": {
+        "offset_ms": 11839.0,
+        "rtt_ms": 4.0,
+        "sample_count": 8,
+        "uncertainty_ms": 3.5
+      },
+      "sequence": 6,
+      "media": {
+        "codecs": null,
+        "duration_ms": null,
+        "identity_match": null,
+        "local_loaded": false,
+        "media_revision": 1,
+        "mime": null,
+        "size_bytes": null
+      },
+      "busy": false,
+      "last_action": "foreground",
+      "error": null,
+      "hash": {
+        "state": "running",
+        "read_bytes": 23068672,
+        "size_bytes": 24300726,
+        "elapsed_ms": 0.0
+      }
+    },
+    {
+      "sync": {
+        "at_ms": 33999,
+        "buffering": true,
+        "clock_diagnostics": {
+          "accepted": 8,
+          "discarded": 0,
+          "rtt_jitter_range_ms": 5.0
+        },
+        "clock_trusted": true,
+        "correction": "none",
+        "corrections": {
+          "rate": 0,
+          "restore": 0,
+          "seek": 0
+        },
+        "drift_ms": 0,
+        "media_revision": 1,
+        "playing": false,
+        "position_ms": 0,
+        "rate": 1.0,
+        "ready": false,
+        "sample_age_ms": 17,
+        "seeking": false,
+        "sequence": 7,
+        "server_ms": 45821,
+        "snapshot_required": false,
+        "target_ms": 0,
+        "uncertainty_ms": 3.5
+      },
+      "clock": {
+        "offset_ms": 11839.0,
+        "rtt_ms": 4.0,
+        "sample_count": 8,
+        "uncertainty_ms": 3.5
+      },
+      "sequence": 7,
+      "media": {
+        "codecs": null,
+        "duration_ms": null,
+        "identity_match": null,
+        "local_loaded": false,
+        "media_revision": 1,
+        "mime": null,
+        "size_bytes": null
+      },
+      "busy": false,
+      "last_action": "foreground",
+      "error": null,
+      "hash": {
+        "state": "complete",
+        "read_bytes": 24300726,
+        "size_bytes": 24300726,
+        "elapsed_ms": 489.74703800000003
+      }
+    },
+    {
+      "sync": {
+        "at_ms": 34500,
+        "buffering": true,
+        "clock_diagnostics": {
+          "accepted": 8,
+          "discarded": 0,
+          "rtt_jitter_range_ms": 5.0
+        },
+        "clock_trusted": true,
+        "correction": "none",
+        "corrections": {
+          "rate": 0,
+          "restore": 0,
+          "seek": 0
+        },
+        "drift_ms": 0,
+        "media_revision": 1,
+        "playing": false,
+        "position_ms": 0,
+        "rate": 1.0,
+        "ready": false,
+        "sample_age_ms": 2,
+        "seeking": false,
+        "sequence": 7,
+        "server_ms": 46337,
+        "snapshot_required": false,
+        "target_ms": 0,
+        "uncertainty_ms": 3.5
+      },
+      "clock": {
+        "offset_ms": 11839.0,
+        "rtt_ms": 4.0,
+        "sample_count": 8,
+        "uncertainty_ms": 3.5
+      },
+      "sequence": 7,
+      "media": {
+        "codecs": null,
+        "duration_ms": null,
+        "identity_match": null,
+        "local_loaded": false,
+        "media_revision": 1,
+        "mime": null,
+        "size_bytes": null
+      },
+      "busy": false,
+      "last_action": "foreground",
+      "error": null,
+      "hash": {
+        "state": "complete",
+        "read_bytes": 24300726,
+        "size_bytes": 24300726,
+        "elapsed_ms": 489.74703800000003
+      }
+    },
+    {
+      "sync": {
+        "at_ms": 35149,
+        "buffering": false,
+        "clock_diagnostics": {
+          "accepted": 8,
+          "discarded": 0,
+          "rtt_jitter_range_ms": 5.0
+        },
+        "clock_trusted": true,
+        "correction": "none",
+        "corrections": {
+          "rate": 0,
+          "restore": 0,
+          "seek": 0
+        },
+        "drift_ms": 0,
+        "media_revision": 1,
+        "playing": false,
+        "position_ms": 0,
+        "rate": 1.0,
+        "ready": true,
+        "sample_age_ms": 231,
+        "seeking": false,
+        "sequence": 8,
+        "server_ms": 46757,
+        "snapshot_required": false,
+        "target_ms": 0,
+        "uncertainty_ms": 3.5
+      },
+      "clock": {
+        "offset_ms": 11839.0,
+        "rtt_ms": 4.0,
+        "sample_count": 8,
+        "uncertainty_ms": 3.5
+      },
+      "sequence": 8,
+      "media": {
+        "codecs": [],
+        "duration_ms": 620000,
+        "identity_match": false,
+        "local_loaded": true,
+        "media_revision": 1,
+        "mime": null,
+        "size_bytes": 24300726
+      },
+      "busy": false,
+      "last_action": "ready",
+      "error": "MEDIA_MISMATCH",
+      "hash": {
+        "state": "complete",
+        "read_bytes": 24300726,
+        "size_bytes": 24300726,
+        "elapsed_ms": 489.74703800000003
+      }
+    }
+  ],
+  "room_preserved": true,
+  "teardown_observed": true,
+  "cleanup_errors": [],
+  "processes_reaped": true
+}

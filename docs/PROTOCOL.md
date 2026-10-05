@@ -10,7 +10,9 @@ identifican tipos wire, no funciones de UI.
 
 Inicialmente WebSocket con un objeto JSON UTF-8 por mensaje de texto. Control y
 multimedia viajan por canales separados: prohibidos bytes de archivos en este
-protocolo. WSS fuera de localhost; sin compresión por defecto. Máximo 64 KiB por
+protocolo. WSS fuera de localhost en producción; sin compresión por defecto.
+El vertical slice 2 permite excepcionalmente ws en LAN controlada mediante modo
+explícito --allow-lan; no altera v1 ni aprueba exposición pública. Máximo 64 KiB por
 mensaje reensamblado, 16 miembros, profundidad JSON 12. Enteros JSON dentro de
 0..9007199254740991 (rango seguro interoperable), excepto drift_ms signed en
 ±9007199254740991 y offsets internos signed;

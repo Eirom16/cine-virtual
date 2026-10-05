@@ -2,7 +2,6 @@ use crate::{
     player_backend::{ApplicationPlayer, BackendPlayer, PlayerView},
     replica::{Execution, Replica},
 };
-use cine_core::player::Player;
 use cine_core::replica::Delivery;
 use cine_core::{
     clock::ClockSample,
@@ -34,24 +33,27 @@ struct Request {
     message: WireMessage,
     reply: oneshot::Sender<WireMessage>,
 }
-struct Session {
-    replica: Replica<BackendPlayer>,
+struct Session<P: ApplicationPlayer> {
+    replica: Replica<P>,
     local: Option<LocalMedia>,
     local_descriptor: Option<MediaDescriptor>,
     hash_status: Value,
     announced_failure: bool,
     credentials: Option<Value>,
+    corrections: [u64; 3],
+    last_correction: &'static str,
 }
-pub struct Client {
+pub struct Client<P: ApplicationPlayer = BackendPlayer> {
     url: String,
     name: String,
     boot: Instant,
-    session: Arc<Mutex<Session>>,
+    allow_lan: bool,
+    session: Arc<Mutex<Session<P>>>,
     notify: Arc<Notify>,
     sender: Option<mpsc::Sender<Request>>,
     task: Option<tokio::task::JoinHandle<()>>,
 }
-impl Drop for Client {
+impl<P: ApplicationPlayer> Drop for Client<P> {
     fn drop(&mut self) {
         if let Some(task) = self.task.take() {
             task.abort();
@@ -68,12 +70,33 @@ impl Client {
         backend: &str,
         visible: bool,
     ) -> Result<Self, ClientError> {
+        Self::connect_configured(url, name, backend, visible, false).await
+    }
+    pub async fn connect_configured(
+        url: &str,
+        name: &str,
+        backend: &str,
+        visible: bool,
+        allow_lan: bool,
+    ) -> Result<Self, ClientError> {
         let boot = Instant::now();
         let player = BackendPlayer::new(backend, boot, visible)?;
+        Self::connect_injected(url, name, player, boot, allow_lan).await
+    }
+}
+impl<P: ApplicationPlayer + Send + 'static> Client<P> {
+    pub async fn connect_injected(
+        url: &str,
+        name: &str,
+        player: P,
+        boot: Instant,
+        allow_lan: bool,
+    ) -> Result<Self, ClientError> {
         let mut client = Self {
             url: url.into(),
             name: name.into(),
             boot,
+            allow_lan,
             session: Arc::new(Mutex::new(Session {
                 replica: Replica::with_player(player),
                 local: None,
@@ -81,6 +104,8 @@ impl Client {
                 hash_status: json!({"status":"idle"}),
                 announced_failure: false,
                 credentials: None,
+                corrections: [0; 3],
+                last_correction: "none",
             })),
             notify: Arc::new(Notify::new()),
             sender: None,
@@ -93,16 +118,24 @@ impl Client {
         self.boot.elapsed().as_millis() as u64
     }
     async fn start(&mut self) -> Result<(), ClientError> {
-        if !self.url.starts_with("ws://127.0.0.1:")
+        if !self.allow_lan
+            && !self.url.starts_with("ws://127.0.0.1:")
             && !self.url.starts_with("ws://localhost:")
             && !self.url.starts_with("ws://[::1]:")
         {
             return Err("This spike uses ws:// loopback endpoints only".into());
         }
+        if !self.url.starts_with("ws://") || self.url.len() > 512 {
+            return Err("INVALID_ENDPOINT".into());
+        }
         let config = WebSocketConfig::default()
             .max_message_size(Some(MAX_MESSAGE_BYTES))
             .max_frame_size(Some(MAX_MESSAGE_BYTES));
-        let (mut ws, _) = connect_async_with_config(&self.url, Some(config), true).await?;
+        let (mut ws, _) = time::timeout(
+            Duration::from_secs(8),
+            connect_async_with_config(&self.url, Some(config), true),
+        )
+        .await??;
         let (tx, mut rx) = mpsc::channel::<Request>(32);
         self.sender = Some(tx);
         let (ready_tx, ready_rx) = oneshot::channel();
@@ -136,7 +169,7 @@ impl Client {
             }
             let mut ready_tx = Some(ready_tx);
             let mut pending: HashMap<Uuid, oneshot::Sender<WireMessage>> = HashMap::new();
-            let mut samples: HashMap<Uuid, u64> = HashMap::new();
+            let mut samples: HashMap<Uuid, (u64, u64)> = HashMap::new();
             let mut sync_reply: Option<(Uuid, oneshot::Sender<WireMessage>)> = None;
             let mut warmup = time::interval(Duration::from_millis(100));
             let mut sync_tick = time::interval(Duration::from_millis(500));
@@ -159,10 +192,11 @@ impl Client {
                         notify.notify_waiters();
                     },
                     _=player_tick.tick()=>{
-                        shared.lock().unwrap().replica.prepare_pending(now());
+                        if !shared.lock().unwrap().replica.suspended() {shared.lock().unwrap().replica.prepare_pending(now());}
                     },
                     _=sync_tick.tick()=>{
-                        let correction=shared.lock().unwrap().replica.correct_drift(now());
+                        let correction={let mut s=shared.lock().unwrap();let c=s.replica.correct_drift(now());
+                            s.last_correction=match c {cine_core::sync::Correction::None=>"none",cine_core::sync::Correction::SetRate(1.0)=>{s.corrections[1]+=1;"restore"},cine_core::sync::Correction::SetRate(_)=>{s.corrections[0]+=1;"rate"},cine_core::sync::Correction::Seek(_)=>{s.corrections[2]+=1;"seek"}};c};
                         match correction {
                             cine_core::sync::Correction::None=>{},
                             cine_core::sync::Correction::SetRate(rate)=>tracing::info!(event="sync_correction",kind="rate",rate),
@@ -171,13 +205,13 @@ impl Client {
                         let status={let s=shared.lock().unwrap();let r=&s.replica;let view=r.player.view();
                             if r.player.asynchronous() && r.connected && r.state.is_some(){
                                 let target=r.target_position(view.sampled_at_ms);
-                                tracing::info!(event="sync_sample",at_ms=now(),sample_at_ms=view.sampled_at_ms,sample_age_ms=now().saturating_sub(view.sampled_at_ms),ready=view.ready,server_ms=r.server_now(view.sampled_at_ms),sequence=r.state.as_ref().map(|s|s.sequence),
+                                tracing::info!(event="sync_sample",at_ms=now(),sample_at_ms=view.sampled_at_ms,sample_age_ms=now().saturating_sub(view.sampled_at_ms),ready=view.ready,room_ready=r.effective_ready(),server_ms=r.server_now(view.sampled_at_ms),sequence=r.state.as_ref().map(|s|s.sequence),
                                     position_ms=view.position_ms,target_ms=target,drift_ms=target.map(|t|view.position_ms as i64-t as i64),
                                     playing=view.playing,seeking=view.seeking,buffering=view.buffering,clock_trusted=r.trusted(now()),rate=view.rate,
                                     correction=match correction {cine_core::sync::Correction::None=>"none",cine_core::sync::Correction::SetRate(1.0)=>"restore",cine_core::sync::Correction::SetRate(_)=>"rate",cine_core::sync::Correction::Seek(_)=>"seek"});
                             }
                             let ready_member=r.member_id.is_some_and(|id|r.state.as_ref().is_some_and(|st|st.members.iter().any(|m|m.member_id==id && m.ready)));
-                            (view.failed,view.buffering,ready_member && !r.trusted(now()))};
+                            (view.failed,view.buffering && !view.seeking,ready_member && !r.trusted(now()))};
                         let report={let mut s=shared.lock().unwrap();let failing=status.0||status.1||status.2;
                             if failing && !s.announced_failure {s.announced_failure=true;s.replica.state.as_ref().and_then(|st|st.media.as_ref().map(|m|(st.room_id,st.room_epoch,m.media_revision,s.replica.member_id)))}else{if !failing{s.announced_failure=false;}None}};
                         if let Some((room,epoch,revision,member))=report {
@@ -189,9 +223,9 @@ impl Client {
                     },
                     _=warmup.tick(),if negotiated=>{
                         let count=shared.lock().unwrap().replica.samples;
-                        if count<8 || now().saturating_sub(last_ping)>=5_000 {
+                        if !shared.lock().unwrap().replica.suspended() && (count<8 || now().saturating_sub(last_ping)>=5_000) {
                             if samples.len()>=8 {samples.clear();}
-                            let id=Uuid::new_v4();let t1=now();samples.insert(id,t1);last_ping=t1;
+                            let id=Uuid::new_v4();let t1=now();samples.insert(id,(t1,shared.lock().unwrap().replica.clock_generation()));last_ping=t1;
                             let ping=WireMessage{protocol_version:1,event_id:Uuid::new_v4(),kind:"TIME_PING".into(),room_id:None,room_epoch:None,
                                 sender_id:shared.lock().unwrap().replica.member_id.map(|id|id.to_string()),sequence:None,sent_at_ms:t1,payload:json!({"sample_id":id,"t1_ms":t1})};
                             if ws.send(Message::Text(encode(&ping).unwrap().into())).await.is_err(){break;}
@@ -223,11 +257,12 @@ impl Client {
                             },
                             "TIME_PONG"=>{
                                 let Some(id)=message.payload["sample_id"].as_str().and_then(|s|Uuid::parse_str(s).ok()) else{break};
-                                let Some(t1)=samples.remove(&id) else{continue};
+                                let Some((t1,generation))=samples.remove(&id) else{continue};
                                 let Some(t2)=message.payload["t2_ms"].as_u64() else{break};
                                 let Some(t3)=message.payload["t3_ms"].as_u64() else{break};
                                 let mut s=shared.lock().unwrap();
                                 if message.payload["t1_ms"].as_u64()!=Some(t1)||message.payload["clock_epoch"].as_str()!=s.replica.clock_epoch.map(|id|id.to_string()).as_deref(){break;}
+                                if s.replica.suspended() || s.replica.clock_generation()!=generation {continue;}
                                 s.replica.sample(ClockSample{t1:t1 as i64,t2:t2 as i64,t3:t3 as i64,t4:t4 as i64},t4);
                                 if s.replica.samples>=8 && s.replica.trusted(t4) {
                                     let estimate=s.replica.estimate().unwrap();
@@ -411,6 +446,260 @@ impl Client {
             "previous_media_revision":s.media.as_ref().map_or(0,|m|m.media_revision),"descriptor":descriptor})).await?;
         require_ack(&r)
     }
+    pub async fn attach_media(&self, descriptor: MediaDescriptor) -> Result<(), ClientError> {
+        if !descriptor.valid_local() {
+            return Err("INVALID_METADATA".into());
+        }
+        if let Some(m) = self.state().and_then(|s| s.media) {
+            require_ack(
+                &self
+                    .request(
+                        "MEDIA_NOT_READY",
+                        json!({"media_revision":m.media_revision,"reason":"loading"}),
+                    )
+                    .await?,
+            )?;
+        }
+        self.session.lock().unwrap().local_descriptor = Some(descriptor.clone());
+        let state = self.state().ok_or("No room")?;
+        if self.session.lock().unwrap().replica.member_id == Some(state.host_id) {
+            require_ack(&self.request("MEDIA_SELECT_REQUEST", json!({"expected_sequence":state.sequence,"authority_revision":state.authority_revision,
+                "previous_media_revision":state.media.as_ref().map_or(0,|m|m.media_revision),"descriptor":MediaDto::from(&descriptor)})).await?)?;
+        }
+        Ok(())
+    }
+    pub async fn suspend(&self) -> Result<(), ClientError> {
+        {
+            let mut s = self.session.lock().unwrap();
+            s.replica.suspend(self.now());
+        }
+        if let Some(m) = self.state().and_then(|s| s.media) {
+            require_ack(
+                &self
+                    .request(
+                        "MEDIA_NOT_READY",
+                        json!({"media_revision":m.media_revision,"reason":"user"}),
+                    )
+                    .await?,
+            )?;
+        }
+        Ok(())
+    }
+    pub async fn recover_foreground(&self) -> Result<(), ClientError> {
+        {
+            self.session.lock().unwrap().replica.start_connection();
+        }
+        time::timeout(Duration::from_secs(8), async {
+            while !self.session.lock().unwrap().replica.trusted(self.now())
+                || self.session.lock().unwrap().replica.samples < 8
+            {
+                time::sleep(Duration::from_millis(20)).await;
+            }
+        })
+        .await?;
+        let last = self.state().map_or(0, |s| s.sequence);
+        let response = self
+            .request(
+                "SYNC_REQUEST",
+                json!({"last_sequence":last,"reason":"resume"}),
+            )
+            .await?;
+        if response.kind != "ROOM_STATE" {
+            require_ack(&response)?;
+        }
+        Ok(())
+    }
+    pub fn hash_status(&self) -> Value {
+        self.session.lock().unwrap().hash_status.clone()
+    }
+    pub fn media_summary(&self) -> Value {
+        let s = self.session.lock().unwrap();
+        let local = s.local_descriptor.as_ref();
+        let selected = s.replica.state.as_ref().and_then(|st| st.media.as_ref());
+        json!({"local_loaded":s.replica.player.view().ready,"duration_ms":local.map(|m|m.duration_ms),"size_bytes":local.map(|m|m.identity.size_bytes),
+            "codecs":local.map(|m|&m.codecs),"mime":local.and_then(|m|m.mime.as_ref()),"media_revision":selected.map(|m|m.media_revision),
+            "identity_match":local.zip(selected).map(|(a,b)|a.identity.matches(&b.descriptor.identity))})
+    }
+    pub fn sync_summary(&self) -> Value {
+        let s = self.session.lock().unwrap();
+        let r = &s.replica;
+        let p = r.player.view();
+        let sample = if r.player.asynchronous() {
+            p.sampled_at_ms
+        } else {
+            self.now()
+        };
+        let target = r.target_position(sample);
+        json!({"room_ready":r.effective_ready(),"snapshot_required":r.snapshot_required(),"sequence":r.state.as_ref().map(|s|s.sequence),"media_revision":r.state.as_ref().and_then(|s|s.media.as_ref().map(|m|m.media_revision)),"at_ms":self.now(),"server_ms":r.server_now(sample),"sample_age_ms":self.now().saturating_sub(sample),"ready":p.ready,"position_ms":p.position_ms,"target_ms":target,"drift_ms":target.map(|t|p.position_ms as i64-t as i64),"playing":p.playing,"seeking":p.seeking,"buffering":p.buffering,"clock_trusted":r.trusted(self.now()),"uncertainty_ms":r.uncertainty(),"clock_diagnostics":r.clock_diagnostics(),"rate":p.rate,"correction":s.last_correction,"corrections":{"rate":s.corrections[0],"restore":s.corrections[1],"seek":s.corrections[2]}})
+    }
+    pub async fn ready(&self) -> Result<(), ClientError> {
+        let state = self.state().ok_or("No room")?;
+        let selected = state.media.ok_or("No media")?;
+        let (descriptor, uncertainty) = {
+            let s = self.session.lock().unwrap();
+            let view = s.replica.player.view();
+            validate_ready_player(&view)?;
+            if s.replica.player.asynchronous()
+                && self.now().saturating_sub(view.sampled_at_ms) > 100
+            {
+                return Err("MEDIA_NOT_READY".into());
+            }
+            if !s.replica.trusted(self.now()) {
+                return Err("CLOCK_UNCERTAIN".into());
+            }
+            let descriptor = if let Some(local) = &s.local {
+                local.handle.unchanged()?;
+                s.local_descriptor.clone().ok_or("MEDIA_NOT_READY")?
+            } else if let Some(descriptor) = &s.local_descriptor {
+                descriptor.clone()
+            } else if !s.replica.player.asynchronous() {
+                demo_media()
+            } else {
+                return Err("MEDIA_NOT_READY".into());
+            };
+            (descriptor, s.replica.uncertainty().unwrap().ceil() as u64)
+        };
+        let r=self.request("MEDIA_METADATA",json!({"media_revision":selected.media_revision,"identity":cine_protocol::IdentityDto::from(&descriptor.identity),
+            "duration_ms":descriptor.duration_ms,"mime":descriptor.mime,"codecs":descriptor.codecs})).await?;
+        require_ack(&r)?;
+        self.session
+            .lock()
+            .unwrap()
+            .replica
+            .local_reverification_required = false;
+        let r=self.request("MEDIA_READY",json!({"media_revision":selected.media_revision,"clock_uncertainty_ms":uncertainty})).await?;
+        require_ack(&r)
+    }
+    pub fn fault(&self, kind: &str, value: u64) -> Result<(), ClientError> {
+        let mut s = self.session.lock().unwrap();
+        match kind {
+            "pause" => s.replica.player.pause()?,
+            "clock" => s.replica.clock_blocked_until = self.now() + value,
+            "seek" => s.replica.player.seek(value)?,
+            _ => return Err("Unknown fault".into()),
+        };
+        Ok(())
+    }
+    pub async fn control(
+        &self,
+        kind: &str,
+        position: Option<u64>,
+    ) -> Result<WireMessage, ClientError> {
+        let s = self.state().ok_or("No room")?;
+        let mut payload = json!({"expected_sequence":s.sequence,"authority_revision":s.authority_revision,
+            "media_revision":s.media.as_ref().ok_or("No media")?.media_revision});
+        if let Some(pos) = position {
+            payload["position_ms"] = json!(pos);
+        }
+        self.request(kind, payload).await
+    }
+    pub async fn disconnect(&mut self) {
+        self.session.lock().unwrap().replica.disconnect(self.now());
+        self.sender.take();
+        if let Some(mut task) = self.task.take()
+            && time::timeout(Duration::from_secs(2), &mut task)
+                .await
+                .is_err()
+        {
+            task.abort();
+            let _ = task.await;
+        }
+    }
+    pub async fn resume(&mut self) -> Result<(), ClientError> {
+        self.resume_snapshot().await?;
+        self.ready().await
+    }
+    /// Resume transport and room truth without authorizing a new local Ready claim.
+    pub async fn resume_snapshot(&mut self) -> Result<(), ClientError> {
+        if self.connected() {
+            return Err("Disconnect before resume".into());
+        }
+        self.disconnect().await;
+        let credentials = self
+            .session
+            .lock()
+            .unwrap()
+            .credentials
+            .clone()
+            .ok_or("No resume credentials")?;
+        self.start().await?;
+        if self.session.lock().unwrap().credentials.is_none() {
+            return Err("Server clock epoch changed; resume credentials invalidated".into());
+        }
+        let message = WireMessage {
+            protocol_version: 1,
+            event_id: Uuid::new_v4(),
+            kind: "ROOM_RESUME".into(),
+            room_id: Some(Uuid::parse_str(
+                credentials["room_id"].as_str().ok_or("Missing room")?,
+            )?),
+            room_epoch: Some(Uuid::parse_str(
+                credentials["room_epoch"].as_str().ok_or("Missing epoch")?,
+            )?),
+            sender_id: None,
+            sequence: None,
+            sent_at_ms: self.now(),
+            payload: json!({"resume_token":credentials["resume_token"],"last_sequence":self.state().map_or(0,|s|s.sequence)}),
+        };
+        let (tx, rx) = oneshot::channel();
+        self.sender
+            .as_ref()
+            .unwrap()
+            .send(Request { message, reply: tx })
+            .await?;
+        let reply = time::timeout(Duration::from_secs(3), rx).await??;
+        require_ack(&reply)?;
+        self.wait_state(
+            reply.payload["room_sequence"]
+                .as_u64()
+                .ok_or("Invalid ACK")?,
+        )
+        .await?;
+        Ok(())
+    }
+    pub fn state_summary(&self) -> Value {
+        let s = self.state();
+        let p = self.player();
+        json!({"connected":self.connected(),"room_id":s.as_ref().map(|s|s.room_id),"sequence":s.as_ref().map(|s|s.sequence),
+            "host_id":s.as_ref().map(|s|s.host_id),"members":s.as_ref().map(|s|s.members.iter().map(|m|json!({"member_id":m.member_id,"connected":m.connected,"ready":m.ready})).collect::<Vec<_>>()),
+            "playing":p.playing,"position_ms":cine_core::player::Player::position(&p).ok(),"rate":p.rate,"player_ready":p.ready,"seeking":p.seeking,
+            "clock":self.clock().map(|(rtt,offset,count)|json!({"rtt_ms":rtt,"offset_ms":offset,"sample_count":count,"uncertainty_ms":self.session.lock().unwrap().replica.uncertainty()}))})
+    }
+}
+pub fn require_ack(reply: &WireMessage) -> Result<(), ClientError> {
+    if reply.kind == "ACK" {
+        Ok(())
+    } else {
+        Err(reply.payload["error"]["code"]
+            .as_str()
+            .unwrap_or("INVALID_RESPONSE")
+            .to_owned()
+            .into())
+    }
+}
+pub fn demo_media() -> MediaDescriptor {
+    MediaDescriptor {
+        media_id: Uuid::new_v4().to_string(),
+        source_type: SourceType::LocalFile,
+        title: Some("Synthetic spike media".into()),
+        duration_ms: 300_000,
+        identity: ContentIdentity {
+            size_bytes: 1_024,
+            sha256: [0xaa; 32],
+        },
+        mime: Some("video/mp4".into()),
+        codecs: vec!["synthetic".into()],
+    }
+}
+
+fn validate_ready_player(p: &PlayerView) -> Result<(), ClientError> {
+    if !p.ready || p.failed || p.buffering || p.seeking || p.duration_ms == 0 {
+        Err("MEDIA_NOT_READY".into())
+    } else {
+        Ok(())
+    }
+}
+impl Client<BackendPlayer> {
     pub async fn select(&self, path: &Path) -> Result<(), ClientError> {
         if let Some(m) = self.state().and_then(|s| s.media) {
             require_ack(
@@ -473,178 +762,8 @@ impl Client {
         }
         Ok(())
     }
-    pub fn hash_status(&self) -> Value {
-        self.session.lock().unwrap().hash_status.clone()
-    }
-    pub fn media_summary(&self) -> Value {
-        let s = self.session.lock().unwrap();
-        let local = s.local_descriptor.as_ref();
-        let selected = s.replica.state.as_ref().and_then(|st| st.media.as_ref());
-        json!({"local_loaded":s.replica.player.view().ready,"duration_ms":local.map(|m|m.duration_ms),"size_bytes":local.map(|m|m.identity.size_bytes),
-            "codecs":local.map(|m|&m.codecs),"mime":local.and_then(|m|m.mime.as_ref()),"media_revision":selected.map(|m|m.media_revision),
-            "identity_match":local.zip(selected).map(|(a,b)|a.identity.matches(&b.descriptor.identity))})
-    }
-    pub fn sync_summary(&self) -> Value {
-        let s = self.session.lock().unwrap();
-        let r = &s.replica;
-        let p = r.player.view();
-        let sample = if r.player.asynchronous() {
-            p.sampled_at_ms
-        } else {
-            self.now()
-        };
-        let target = r.target_position(sample);
-        json!({"at_ms":self.now(),"server_ms":r.server_now(sample),"sample_age_ms":self.now().saturating_sub(sample),"ready":p.ready,"position_ms":p.position_ms,"target_ms":target,"drift_ms":target.map(|t|p.position_ms as i64-t as i64),"playing":p.playing,"seeking":p.seeking,"buffering":p.buffering,"clock_trusted":r.trusted(self.now()),"uncertainty_ms":r.uncertainty(),"rate":p.rate})
-    }
-    pub async fn ready(&self) -> Result<(), ClientError> {
-        let state = self.state().ok_or("No room")?;
-        let selected = state.media.ok_or("No media")?;
-        let (descriptor, uncertainty) = {
-            let s = self.session.lock().unwrap();
-            validate_ready_player(&s.replica.player.view())?;
-            if !s.replica.trusted(self.now()) {
-                return Err("CLOCK_UNCERTAIN".into());
-            }
-            let descriptor = if let Some(local) = &s.local {
-                local.handle.unchanged()?;
-                s.local_descriptor.clone().ok_or("MEDIA_NOT_READY")?
-            } else if s.replica.player.real().is_none() {
-                demo_media()
-            } else {
-                return Err("MEDIA_NOT_READY".into());
-            };
-            (descriptor, s.replica.uncertainty().unwrap().ceil() as u64)
-        };
-        let r=self.request("MEDIA_METADATA",json!({"media_revision":selected.media_revision,"identity":cine_protocol::IdentityDto::from(&descriptor.identity),
-            "duration_ms":descriptor.duration_ms,"mime":descriptor.mime,"codecs":descriptor.codecs})).await?;
-        require_ack(&r)?;
-        let r=self.request("MEDIA_READY",json!({"media_revision":selected.media_revision,"clock_uncertainty_ms":uncertainty})).await?;
-        require_ack(&r)
-    }
-    pub fn fault(&self, kind: &str, value: u64) -> Result<(), ClientError> {
-        let mut s = self.session.lock().unwrap();
-        match kind {
-            "pause" => s.replica.player.pause()?,
-            "clock" => s.replica.clock_blocked_until = self.now() + value,
-            "seek" => s.replica.player.seek(value)?,
-            _ => return Err("Unknown fault".into()),
-        };
-        Ok(())
-    }
-    pub async fn control(
-        &self,
-        kind: &str,
-        position: Option<u64>,
-    ) -> Result<WireMessage, ClientError> {
-        let s = self.state().ok_or("No room")?;
-        let mut payload = json!({"expected_sequence":s.sequence,"authority_revision":s.authority_revision,
-            "media_revision":s.media.as_ref().ok_or("No media")?.media_revision});
-        if let Some(pos) = position {
-            payload["position_ms"] = json!(pos);
-        }
-        self.request(kind, payload).await
-    }
-    pub async fn disconnect(&mut self) {
-        self.session.lock().unwrap().replica.disconnect(self.now());
-        self.sender.take();
-        if let Some(mut task) = self.task.take()
-            && time::timeout(Duration::from_secs(2), &mut task)
-                .await
-                .is_err()
-        {
-            task.abort();
-            let _ = task.await;
-        }
-    }
-    pub async fn resume(&mut self) -> Result<(), ClientError> {
-        if self.connected() {
-            return Err("Disconnect before resume".into());
-        }
-        self.disconnect().await;
-        let credentials = self
-            .session
-            .lock()
-            .unwrap()
-            .credentials
-            .clone()
-            .ok_or("No resume credentials")?;
-        self.start().await?;
-        if self.session.lock().unwrap().credentials.is_none() {
-            return Err("Server clock epoch changed; resume credentials invalidated".into());
-        }
-        let message = WireMessage {
-            protocol_version: 1,
-            event_id: Uuid::new_v4(),
-            kind: "ROOM_RESUME".into(),
-            room_id: Some(Uuid::parse_str(
-                credentials["room_id"].as_str().ok_or("Missing room")?,
-            )?),
-            room_epoch: Some(Uuid::parse_str(
-                credentials["room_epoch"].as_str().ok_or("Missing epoch")?,
-            )?),
-            sender_id: None,
-            sequence: None,
-            sent_at_ms: self.now(),
-            payload: json!({"resume_token":credentials["resume_token"],"last_sequence":self.state().map_or(0,|s|s.sequence)}),
-        };
-        let (tx, rx) = oneshot::channel();
-        self.sender
-            .as_ref()
-            .unwrap()
-            .send(Request { message, reply: tx })
-            .await?;
-        let reply = time::timeout(Duration::from_secs(3), rx).await??;
-        require_ack(&reply)?;
-        self.wait_state(
-            reply.payload["room_sequence"]
-                .as_u64()
-                .ok_or("Invalid ACK")?,
-        )
-        .await?;
-        self.ready().await
-    }
-    pub fn state_summary(&self) -> Value {
-        let s = self.state();
-        let p = self.player();
-        json!({"connected":self.connected(),"room_id":s.as_ref().map(|s|s.room_id),"sequence":s.as_ref().map(|s|s.sequence),
-            "host_id":s.as_ref().map(|s|s.host_id),"members":s.as_ref().map(|s|s.members.iter().map(|m|json!({"member_id":m.member_id,"connected":m.connected,"ready":m.ready})).collect::<Vec<_>>()),
-            "playing":p.playing,"position_ms":cine_core::player::Player::position(&p).ok(),"rate":p.rate,"player_ready":p.ready,"seeking":p.seeking,
-            "clock":self.clock().map(|(rtt,offset,count)|json!({"rtt_ms":rtt,"offset_ms":offset,"sample_count":count,"uncertainty_ms":self.session.lock().unwrap().replica.uncertainty()}))})
-    }
-}
-pub fn require_ack(reply: &WireMessage) -> Result<(), ClientError> {
-    if reply.kind == "ACK" {
-        Ok(())
-    } else {
-        Err(reply.payload["error"]["code"]
-            .as_str()
-            .unwrap_or("INVALID_RESPONSE")
-            .to_owned()
-            .into())
-    }
-}
-pub fn demo_media() -> MediaDescriptor {
-    MediaDescriptor {
-        media_id: Uuid::new_v4().to_string(),
-        source_type: SourceType::LocalFile,
-        title: Some("Synthetic spike media".into()),
-        duration_ms: 300_000,
-        identity: ContentIdentity {
-            size_bytes: 1_024,
-            sha256: [0xaa; 32],
-        },
-        mime: Some("video/mp4".into()),
-        codecs: vec!["synthetic".into()],
-    }
 }
 
-fn validate_ready_player(p: &PlayerView) -> Result<(), ClientError> {
-    if !p.ready || p.failed || p.buffering || p.seeking || p.duration_ms == 0 {
-        Err("MEDIA_NOT_READY".into())
-    } else {
-        Ok(())
-    }
-}
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -6,8 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'bridge.dart';
+import 'room.dart';
 
-void main() => runApp(const MaterialApp(home: SpikeScreen()));
+void main() => runApp(
+  const MaterialApp(
+    home: bool.fromEnvironment('ROOM_MODE') ? RoomScreen() : SpikeScreen(),
+  ),
+);
 
 class SpikeScreen extends StatefulWidget {
   const SpikeScreen({super.key});
@@ -35,6 +40,9 @@ class _SpikeScreenState extends State<SpikeScreen> with WidgetsBindingObserver {
         'playback_rate': Platform.isAndroid,
         'content_uri_input': Platform.isAndroid,
       });
+      if (Platform.isAndroid) {
+        unawaited(native.invokeMethod('bindOwner', bridge!.handle));
+      }
       status = 'Rust connected';
       timer = Timer.periodic(const Duration(milliseconds: 500), (_) => poll());
       if (automatic) {

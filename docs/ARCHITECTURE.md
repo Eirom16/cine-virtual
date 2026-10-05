@@ -3,7 +3,8 @@
 Estado: fundaciones conservadas; el Spike A implementa adapters WebSocket,
 RoomService, codec y cliente CLI con FakePlayer. Spike B añade un Player libmpv
 experimental Linux. El vertical slice 1 integra red + vídeo real con LocalMedia;
-Spike C añade UI de ingeniería/bridge aislados; no hay UI de producto.
+Spike C añade UI de ingeniería/bridge aislados; el vertical slice 2 reutiliza
+Application para Linux/Android. No hay UI de producto.
 [PRODUCT](PRODUCT.md) delimita v0.1 y [PROTOCOL](PROTOCOL.md)
 define el contrato normativo de control. [DECISIONS](DECISIONS.md) registra motivos.
 
@@ -219,6 +220,30 @@ Application mínimas: playback_rate/content_uri_input. Android mide seek/READY/
 rendered_first_frame separados; no promete precisión de frame por booleano.
 
 Suspend/resume invalida generation, deadline, hash y clock; requiere recuperación.
-El prototipo usa fixtures de reloj/snapshot offline: falta incorporar el runtime
-de red existente para Ready/resume móviles reales. iOS requiere Mac/Xcode y sigue
+El prototipo aislado de Spike C usa fixtures de reloj/snapshot offline. El modo
+sala del vertical slice 2 incorpora el runtime existente para Ready/resume reales. iOS requiere Mac/Xcode y sigue
 como investigación. Evidencia por plataforma en [RESULTS](../experiments/02-rust-ui-bridge/RESULTS.md).
+
+## Application compartida Linux/Android — Vertical slice 2
+
+Client<P> extrae el runtime probado sin duplicar red/clock/réplica/scheduler/Core.
+Desktop inyecta BackendPlayer; Android inyecta MobilePlayer, proxy Send-safe de
+muestras/efectos, nunca el SDK. El requisito Send está en la composición del
+runtime, no en Player/Domain. Descriptor portable entra por attach_media; FD/URI
+siguen en LocalMedia/adapter nativo. FakePlayer y CLI se conservan.
+
+Flutter usa intents C ABI; owner Rust Tokio current-thread controla Client.
+Kotlin main Looper observa Media3 y drena 32 efectos cada 20 ms mediante JNI;
+no conoce protocolo/timeline/autoridad/corrección. UI consulta estado a 2 Hz.
+No se exponen structs Rust como ABI ni se cambia el bridge a FRB.
+
+Activity posee el handle y libera el engine aunque Dart dispose no llegue;
+Dart dispose async es vía idempotente adicional. Registry remueve handle antes
+de cancelar/join fuera de mutex. Suspend invalida generación/clock/deadlines/
+Ready; conserva socket, separando foreground recovery de ROOM_RESUME de red.
+Recuperación usa clock real + snapshot + hash/load/Ready, sin fixtures offline.
+Los fixtures anteriores quedan solo en modo local de Spike C.
+
+Implementación y evidencia física (distinguir ejecuciones aprobadas y fallidas)
+en [experimento 07](../experiments/07-linux-android-room/README.md).
+No fija Flutter, libmpv o Media3 ni completa v0.1.

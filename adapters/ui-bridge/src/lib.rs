@@ -1,4 +1,7 @@
 //! Experimental Application boundary: DTOs, never a Rust struct ABI or SDK object.
+#[cfg(target_os = "android")]
+mod android;
+pub mod network;
 use cine_core::{
     clock::{ClockFilter, ClockSample},
     sync::{Correction, Observation, SyncConfig, SyncEngine},
@@ -30,6 +33,7 @@ pub struct Request {
 )]
 pub enum Command {
     State,
+    Network(network::Intent),
     Configure(PlayerCapabilities),
     Sample(Sample),
     Play,
@@ -88,6 +92,7 @@ pub struct Reply {
     pub capabilities: PlayerCapabilities,
     pub effects: Vec<Effect>,
     pub hash: HashStatus,
+    pub network: Option<serde_json::Value>,
 }
 #[derive(Debug, Default, Clone, Serialize)]
 pub struct HashStatus {
@@ -100,6 +105,7 @@ pub struct HashStatus {
     pub digest: Option<String>,
 }
 struct HashJob {
+    generation: u64,
     cancel: Arc<AtomicBool>,
     status: Arc<Mutex<HashStatus>>,
     worker: Option<std::thread::JoinHandle<()>>,
@@ -124,6 +130,9 @@ pub struct Application {
     sync: SyncEngine,
     deadline: Option<u64>,
     job: Option<HashJob>,
+    network: Option<network::Network>,
+    started: Instant,
+    attached_generation: Option<u64>,
 }
 impl Default for Application {
     fn default() -> Self {
@@ -139,6 +148,9 @@ impl Default for Application {
             sync: SyncEngine::new(SyncConfig::default()).unwrap(),
             deadline: None,
             job: None,
+            network: None,
+            started: Instant::now(),
+            attached_generation: None,
         }
     }
 }
@@ -176,6 +188,7 @@ impl Application {
             sample: self.sample,
             capabilities: self.caps,
             effects,
+            network: self.network.as_ref().map(|n| n.status()),
             hash: self
                 .job
                 .as_ref()
@@ -203,6 +216,22 @@ impl Application {
         if request.generation != self.generation {
             return self.reply(now, vec![], Some("STALE_GENERATION"));
         }
+        if self.network.is_some()
+            && matches!(
+                request.command,
+                Command::Play
+                    | Command::Pause
+                    | Command::Seek { .. }
+                    | Command::Rate { .. }
+                    | Command::Clock { .. }
+                    | Command::Snapshot
+                    | Command::SimulateDrift { .. }
+                    | Command::Observe { .. }
+                    | Command::SchedulePlay { .. }
+            )
+        {
+            return self.reply(now, vec![], Some("NETWORK_INTENT_REQUIRED"));
+        }
         let mut effects = vec![];
         let mut error = None;
         match request.command {
@@ -213,6 +242,67 @@ impl Application {
                         effects.push(self.effect("play", 0.0));
                     }
                 }
+            }
+            Command::Network(intent) => {
+                if self.network.is_none() {
+                    match network::Network::new(
+                        self.started,
+                        self.generation,
+                        self.caps.playback_rate,
+                    ) {
+                        Ok(network) => self.network = Some(network),
+                        Err(e) => return self.reply(now, vec![], Some(e)),
+                    }
+                }
+                if matches!(intent, network::Intent::Ready)
+                    && (self.suspended || self.attached_generation != Some(self.generation))
+                {
+                    return self.reply(now, vec![], Some("MEDIA_NOT_READY"));
+                }
+                let descriptor = if matches!(intent, network::Intent::Attach) {
+                    if self.suspended || !self.sample.loaded || self.sample.duration_ms == 0 {
+                        return self.reply(now, vec![], Some("MEDIA_NOT_READY"));
+                    }
+                    let hash = self
+                        .job
+                        .as_ref()
+                        .map(|j| j.status.lock().unwrap().clone())
+                        .unwrap_or_default();
+                    if hash.state != "complete"
+                        || self
+                            .job
+                            .as_ref()
+                            .is_none_or(|j| j.generation != self.generation)
+                    {
+                        return self.reply(now, vec![], Some("MEDIA_NOT_READY"));
+                    }
+                    let digest = hash.digest.unwrap();
+                    let mut sha256 = [0; 32];
+                    for (i, b) in sha256.iter_mut().enumerate() {
+                        *b = u8::from_str_radix(&digest[i * 2..i * 2 + 2], 16).unwrap();
+                    }
+                    self.attached_generation = Some(self.generation);
+                    Some(cine_core::media::MediaDescriptor {
+                        media_id: uuid::Uuid::new_v4().to_string(),
+                        source_type: cine_core::media::SourceType::LocalFile,
+                        title: None,
+                        duration_ms: self.sample.duration_ms,
+                        identity: cine_core::media::ContentIdentity {
+                            size_bytes: hash.size_bytes,
+                            sha256,
+                        },
+                        mime: None,
+                        codecs: vec![],
+                    })
+                } else {
+                    None
+                };
+                error = self
+                    .network
+                    .as_ref()
+                    .unwrap()
+                    .enqueue(intent, self.generation, descriptor)
+                    .err();
             }
             Command::Configure(caps) => self.caps = caps,
             Command::Sample(sample) => {
@@ -262,6 +352,16 @@ impl Application {
             Command::Suspend | Command::Resume | Command::PlayerError => {
                 self.suspended = matches!(request.command, Command::Suspend);
                 self.generation += 1;
+                self.attached_generation = None;
+                if let Some(n) = &self.network {
+                    n.reset(self.generation);
+                    let intent = if self.suspended {
+                        network::Intent::Suspend
+                    } else {
+                        network::Intent::Foreground
+                    };
+                    error = n.enqueue(intent, self.generation, None).err();
+                }
                 self.clock = ClockFilter::default();
                 self.last_clock = None;
                 self.clock_samples.clear();
@@ -434,7 +534,9 @@ impl Application {
                 _ => s.state = "read_failed",
             }
         });
+        self.attached_generation = None;
         self.job = Some(HashJob {
+            generation: self.generation,
             cancel,
             status,
             worker: Some(worker),
@@ -445,6 +547,13 @@ impl Application {
 struct Instance {
     started: Instant,
     app: Application,
+}
+impl Drop for Instance {
+    fn drop(&mut self) {
+        // Stop/cancel/join the networking owner before releasing local workers.
+        self.app.network.take();
+        self.app.job.take();
+    }
 }
 static REGISTRY: OnceLock<Mutex<HashMap<u64, Instance>>> = OnceLock::new();
 static NEXT: AtomicU64 = AtomicU64::new(1);
@@ -458,11 +567,15 @@ pub extern "C" fn cine_bridge_create() -> u64 {
         return 0;
     }
     let id = NEXT.fetch_add(1, Ordering::Relaxed);
+    let started = Instant::now();
     instances.insert(
         id,
         Instance {
-            started: Instant::now(),
-            app: Application::default(),
+            started,
+            app: Application {
+                started,
+                ..Default::default()
+            },
         },
     );
     id
@@ -498,7 +611,18 @@ pub unsafe extern "C" fn cine_bridge_call(
         return -1;
     };
     let now = instance.started.elapsed().as_millis() as u64;
-    let reply = instance.app.dispatch(bytes, now);
+    let mut reply = instance.app.dispatch(bytes, now);
+    if let Some(n) = &instance.app.network {
+        let status = n.status();
+        reply.clock_trusted =
+            status["sync"]["clock_trusted"].as_bool().unwrap_or(false) && !reply.suspended;
+        reply.snapshot_required = !status["connected"].as_bool().unwrap_or(false)
+            || status["sync"]["snapshot_required"]
+                .as_bool()
+                .unwrap_or(true)
+            || reply.suspended;
+        reply.hash.digest = None;
+    }
     let serialized = serde_json::to_vec(&reply).unwrap();
     if serialized.len() > capacity {
         return -3;
@@ -554,6 +678,41 @@ mod fd_tests {
         assert!(job.status.lock().unwrap().digest.is_none());
         // Original borrowed FD remains owned and usable by the native adapter.
         assert_eq!(file.metadata().unwrap().len(), 8 * 1024 * 1024);
+        std::fs::remove_file(path).unwrap();
+    }
+    #[test]
+    fn completed_fd_hash_from_old_generation_cannot_attach_after_resume() {
+        let path =
+            std::env::temp_dir().join(format!("cine-bridge-generation-{}", std::process::id()));
+        std::fs::write(&path, b"abc").unwrap();
+        let file = std::fs::File::open(&path).unwrap();
+        let mut app = Application::default();
+        app.start_hash(file.as_raw_fd()).unwrap();
+        app.job
+            .as_mut()
+            .unwrap()
+            .worker
+            .take()
+            .unwrap()
+            .join()
+            .unwrap();
+        let dispatch = |app: &mut Application, command: serde_json::Value| {
+            app.dispatch(
+                serde_json::json!({"api_version":1,"generation":app.generation,"command":command})
+                    .to_string()
+                    .as_bytes(),
+                0,
+            )
+        };
+        dispatch(&mut app, serde_json::json!({"type":"suspend"}));
+        dispatch(&mut app, serde_json::json!({"type":"resume"}));
+        app.sample.loaded = true;
+        app.sample.duration_ms = 1000;
+        let result = dispatch(
+            &mut app,
+            serde_json::json!({"type":"network","payload":{"action":"attach"}}),
+        );
+        assert_eq!(result.error.unwrap().code, "MEDIA_NOT_READY");
         std::fs::remove_file(path).unwrap();
     }
     #[test]

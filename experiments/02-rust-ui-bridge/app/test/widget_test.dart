@@ -30,6 +30,34 @@ void main() {
     await b.disposeAsync();
     expect(() => b.call('state'), throwsA(isA<BridgeFailure>()));
   });
+  test(
+    'network intents validate UUIDs and forbid offline truth in room mode',
+    () async {
+      final b = CineBridge();
+      expect(
+        () => b.call('network', {
+          'action': 'join',
+          'room_id': 'bad',
+          'room_epoch': 'bad',
+          'invite_token': 'test',
+        }),
+        throwsA(isA<BridgeFailure>()),
+      );
+      expect(
+        () => b.call('network', {'action': 'ready'}),
+        throwsA(isA<BridgeFailure>()),
+      );
+      expect(() => b.call('snapshot'), throwsA(isA<BridgeFailure>()));
+      final before = b.generation;
+      b.call('suspend');
+      expect(b.acceptsObservation(before), false);
+      await b.disposeAsync();
+      expect(
+        () => b.call('network', {'action': 'ready'}),
+        throwsA(isA<BridgeFailure>()),
+      );
+    },
+  );
   testWidgets('engineering screen presents Rust state without room policy', (
     tester,
   ) async {

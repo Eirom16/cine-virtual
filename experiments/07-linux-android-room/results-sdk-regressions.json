@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "scenario": "linux_sdk_regressions",
+  "source_base_commit": "b792f37",
+  "no_android_runtime_claim": true,
+  "client_owner": {
+    "passed_tests": 2,
+    "passed": true,
+    "lifecycle": {
+      "after": {
+        "cpu_ticks": 147,
+        "open_fds": 4,
+        "rss_kib": 79612,
+        "threads": 2
+      },
+      "before": {
+        "cpu_ticks": 51,
+        "open_fds": 4,
+        "rss_kib": 33628,
+        "threads": 2
+      },
+      "checkpoints": [
+        {
+          "cpu_ticks": 70,
+          "open_fds": 4,
+          "rss_kib": 45188,
+          "threads": 2
+        },
+        {
+          "cpu_ticks": 90,
+          "open_fds": 4,
+          "rss_kib": 56620,
+          "threads": 2
+        },
+        {
+          "cpu_ticks": 109,
+          "open_fds": 4,
+          "rss_kib": 67656,
+          "threads": 2
+        },
+        {
+          "cpu_ticks": 128,
+          "open_fds": 4,
+          "rss_kib": 78016,
+          "threads": 2
+        },
+        {
+          "cpu_ticks": 147,
+          "open_fds": 4,
+          "rss_kib": 79612,
+          "threads": 2
+        }
+      ],
+      "cycles": 5
+    }
+  },
+  "mpv": {
+    "passed_tests": 4,
+    "passed": true
+  }
+}
