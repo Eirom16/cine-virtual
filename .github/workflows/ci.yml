@@ -4,6 +4,12 @@ on:
   push:
     branches: [master, main]
   workflow_dispatch:
+    inputs:
+      platform:
+        description: Build all platforms or diagnose one (base gate always runs)
+        type: choice
+        default: all
+        options: [all, linux, windows, macos, android, ios]
 permissions:
   contents: read
 concurrency:
@@ -33,18 +39,23 @@ jobs:
       - run: python -m unittest discover -s scripts/tests -v
       - run: python scripts/ci_build.py flutter-checks
   linux:
+    if: github.event_name != 'workflow_dispatch' || inputs.platform == 'all' || inputs.platform == 'linux'
     needs: base
     uses: ./.github/workflows/build-linux.yml
   windows:
+    if: github.event_name != 'workflow_dispatch' || inputs.platform == 'all' || inputs.platform == 'windows'
     needs: base
     uses: ./.github/workflows/build-windows.yml
   macos:
+    if: github.event_name != 'workflow_dispatch' || inputs.platform == 'all' || inputs.platform == 'macos'
     needs: base
     uses: ./.github/workflows/build-macos.yml
   android:
+    if: github.event_name != 'workflow_dispatch' || inputs.platform == 'all' || inputs.platform == 'android'
     needs: base
     uses: ./.github/workflows/build-android.yml
   ios:
+    if: github.event_name != 'workflow_dispatch' || inputs.platform == 'all' || inputs.platform == 'ios'
     needs: base
     uses: ./.github/workflows/build-ios.yml
   summary:
@@ -56,6 +67,8 @@ jobs:
       - name: Aggregate actual workflow outcomes
         env:
           RESULTS: ${{ toJSON(needs) }}
+          RUN_EVENT: ${{ github.event_name }}
+          TARGET_PLATFORM: ${{ inputs.platform }}
         run: |
           python - <<'PY'
           import json, os
@@ -65,6 +78,8 @@ jobs:
               for name in ['base', 'linux', 'windows', 'macos', 'android', 'ios']:
                   outcome = results[name]['result']
                   status = {'success':'PASS', 'failure':'FAIL'}.get(outcome, 'BLOCKED')
+                  if outcome == 'skipped' and name != 'base' and os.environ['RUN_EVENT'] == 'workflow_dispatch' and os.environ['TARGET_PLATFORM'] not in ['all', name]:
+                      status = 'NOT APPLICABLE (not requested)'
                   out.write(f'| {name} | {status} | NOT TESTED by compilation |\n')
               out.write('\nSee each build summary for Core, Flutter, Player and package outcomes. iOS Player NOT IMPLEMENTED.\n')
           PY

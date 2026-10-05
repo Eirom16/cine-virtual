@@ -49,9 +49,11 @@ def check():
             events = data['on']
             if path.name == 'ci.yml':
                 assert set(events) == {'push', 'pull_request', 'workflow_dispatch'}
+                assert events['workflow_dispatch']['inputs']['platform']['options'] == ['all', 'linux', 'windows', 'macos', 'android', 'ios']
                 for platform in ['linux', 'windows', 'macos', 'android', 'ios']:
                     job = data['jobs'][platform]
                     assert job['needs'] == 'base', 'Expensive build bypasses base gate'
+                    assert job['if'] == f"github.event_name != 'workflow_dispatch' || inputs.platform == 'all' || inputs.platform == '{platform}'", 'Manual selection must not omit PR/push builds'
             else:
                 assert set(events) == {'workflow_call', 'workflow_dispatch'}, 'Duplicate automatic triggers'
             for job in data['jobs'].values():
