@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "timestamp_utc": "2026-10-06T14:30:10.792048+00:00",
+  "source_commit": "cc7544b",
+  "production_changes": false,
+  "historical_files_modified": false,
+  "checks": {
+    "cargo_fmt": "PASS",
+    "cargo_clippy_workspace_all_targets_locked": "PASS",
+    "cargo_test_workspace_locked": "PASS",
+    "cargo_build_workspace_locked": "PASS",
+    "flutter_analyze": "PASS",
+    "flutter_test": {
+      "status": "PASS",
+      "tests": 6
+    },
+    "python_unittest": {
+      "status": "PASS",
+      "tests": 10
+    },
+    "check_ci": "PASS with pinned validator dependency in isolated temporary environment",
+    "check_docs": "PASS",
+    "raw_aggregate_audit": "PASS: eight controls-only runs and modern recovery",
+    "privacy": "PASS: no device serial, token, URI, personal path, full SHA or private address",
+    "git_diff_check": "PASS",
+    "new_report_local_links": {
+      "status": "PASS",
+      "checked": 21
+    },
+    "privacy_checked_files": 23,
+    "staged_scope": "PASS: new experimental evidence/analyzer files only, no existing files changed"
+  },
+  "validator_first_attempt": {
+    "status": "BLOCKED",
+    "reason": "PyYAML absent from system Python; used isolated validator environment with existing pinned requirements",
+    "production_changed": false
+  },
+  "physical_runs": [
+    {
+      "file": "modern-device-run-1.json",
+      "functional": "PASS",
+      "hash_ready_controls_telemetry_teardown": "TESTED",
+      "android_p95_ms": 178
+    },
+    {
+      "file": "modern-device-run-2.json",
+      "functional": "PASS",
+      "hash_ready_controls_telemetry_teardown": "TESTED",
+      "android_p95_ms": 148
+    },
+    {
+      "file": "modern-device-run-3.json",
+      "functional": "PASS",
+      "hash_ready_controls_telemetry_teardown": "TESTED",
+      "android_p95_ms": 148
+    },
+    {
+      "file": "modern-device-run-4.json",
+      "functional": "PASS",
+      "hash_ready_controls_telemetry_teardown": "TESTED",
+      "android_p95_ms": 137
+    },
+    {
+      "file": "modern-device-run-5.json",
+      "functional": "PASS",
+      "hash_ready_controls_telemetry_teardown": "TESTED",
+      "android_p95_ms": 185
+    }
+  ],
+  "recovery": {
+    "file": "modern-device-recovery.json",
+    "functional": "PASS",
+    "precision": "FAIL",
+    "android_p95_ms": 9394,
+    "cross_device_p95_ms": 214
+  },
+  "baseline_hosted_ci": {
+    "source_commit": "cc7544b",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Eirom16/cine-virtual/actions/runs/37417972718"
+  },
+  "regression_scope": "Physical Linux/libmpv and Android/Media3 exercised in six real room runs; shared Rust suite and Flutter tests passed. No standalone FakePlayer/Linux UI smoke rerun because production is unchanged.",
+  "source_worktree_dirty_explanation": "Modern raw reports were captured with untracked experimental evidence and offline analyzer only; tracked production and historical files identical to cc7544b.",
+  "cleanup": {
+    "android_process_stopped": true,
+    "owned_fixture_removed": true,
+    "all_run_processes_reaped": true
+  }
+}

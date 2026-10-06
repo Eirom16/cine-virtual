@@ -1,0 +1,176 @@
+{
+  "driver_wall_time_percent": {
+    "driver_cost_ns": 7.633276107005243,
+    "jni_cost_ns": 3.803346963763081,
+    "source_cost_ns": 2.249498221843219
+  },
+  "wall_time_is_not_thread_cpu": true,
+  "thread_cpu_percent_one_core_lower_bound": {
+    "main": 16.233971322089573,
+    "other": 9.432969069125976,
+    "flutter_raster": 6.295664624260418,
+    "media3": 30.751900280041266,
+    "rust_owner": 2.463520939927989,
+    "codec_audio": 10.46470006106163
+  },
+  "thread_cpu_limitation": "Exited threads disappear from group counters; lower bound, not exhaustive attribution",
+  "rejected_completion_callbacks": [],
+  "schema_version": 1,
+  "timing_ms": {
+    "scheduled_control_first_dispatch": {
+      "p50_ms": 11.5,
+      "p95_ms": 23.5,
+      "p99_ms": 23.5,
+      "max_ms": 23.5,
+      "count": 6
+    },
+    "network_runtime": {
+      "p50_ms": 14.5,
+      "p95_ms": 66,
+      "p99_ms": 66,
+      "max_ms": 66,
+      "count": 6
+    },
+    "scheduler_lateness": {
+      "p50_ms": 1,
+      "p95_ms": 2.5,
+      "p99_ms": 2.5,
+      "max_ms": 2.5,
+      "count": 9
+    },
+    "effect_queue": {
+      "p50_ms": 8,
+      "p95_ms": 20,
+      "p99_ms": 22,
+      "max_ms": 22,
+      "count": 21
+    },
+    "poll_lateness": {
+      "p50_ms": 0,
+      "p95_ms": 5,
+      "p99_ms": 21,
+      "max_ms": 158,
+      "count": 177
+    },
+    "jni_roundtrip": {
+      "p50_ms": 1,
+      "p95_ms": 2,
+      "p99_ms": 2,
+      "max_ms": 3,
+      "count": 177
+    },
+    "jni_parse_and_registry": {
+      "p50_ms": 0.143,
+      "p95_ms": 0.256,
+      "p99_ms": 0.323,
+      "max_ms": 0.417231,
+      "count": 177
+    },
+    "source_timestamp_relabel_error": {
+      "p50_ms": 1,
+      "p95_ms": 2,
+      "p99_ms": 2,
+      "max_ms": 2,
+      "count": 177
+    },
+    "media3_call": {
+      "p50_ms": 5,
+      "p95_ms": 10,
+      "p99_ms": 14,
+      "max_ms": 14,
+      "count": 21
+    },
+    "media3_first_callback": {
+      "p50_ms": 5,
+      "p95_ms": 9,
+      "p99_ms": 10,
+      "max_ms": 10,
+      "count": 20
+    },
+    "playing_completion": {
+      "p50_ms": 7,
+      "p95_ms": 9,
+      "p99_ms": 9,
+      "max_ms": 9,
+      "count": 2
+    },
+    "paused_completion": {
+      "p50_ms": 5,
+      "p95_ms": 7,
+      "p99_ms": 7,
+      "max_ms": 7,
+      "count": 2
+    },
+    "rate_completion": {
+      "p50_ms": 4,
+      "p95_ms": 6,
+      "p99_ms": 6,
+      "max_ms": 6,
+      "count": 11
+    },
+    "seek_ready": {
+      "p50_ms": 183,
+      "p95_ms": 224,
+      "p99_ms": 224,
+      "max_ms": 224,
+      "count": 5
+    },
+    "seek_loss": {
+      "p50_ms": 180,
+      "p95_ms": 224,
+      "p99_ms": 224,
+      "max_ms": 224,
+      "count": 5
+    },
+    "seek_stable": {
+      "p50_ms": 241,
+      "p95_ms": 260,
+      "p99_ms": 260,
+      "max_ms": 260,
+      "count": 5
+    },
+    "observation_return": {
+      "p50_ms": 1,
+      "p95_ms": 2,
+      "p99_ms": 2,
+      "max_ms": 2,
+      "count": 177
+    }
+  },
+  "hard_seek_classifications": {
+    "LEGITIMATE": 0,
+    "TRANSIENT_AFTER_SEEK": 0,
+    "STALE_SAMPLE": 0,
+    "SCHEDULER_DELAY": 0,
+    "PLAYER_COMPLETION_DELAY": 0,
+    "SNAPSHOT_RECOVERY": 0,
+    "OTHER": 0
+  },
+  "hard_seek_decisions": [],
+  "classification_status": "INFERRED from MEASURED timestamps; OTHER preserved",
+  "clock_relation": "Rust process Instant and Kotlin elapsedRealtime bracket; no raw cross-origin subtraction",
+  "raw_event_counts": {
+    "driver_observation": 177,
+    "authoritative_received": 36,
+    "seek_lifecycle": 26,
+    "timeline_changed": 3,
+    "playback_state_changed": 12,
+    "drift_observation": 193,
+    "scheduler_planned": 6,
+    "effect_received": 21,
+    "media3_call": 21,
+    "position_discontinuity": 5,
+    "media3_return": 21,
+    "native_dispatch": 21,
+    "seek_ready_candidate": 5,
+    "seek_loss_measured": 5,
+    "native_seek_ready": 5,
+    "first_stable_position": 5,
+    "stable_observation_delivered": 5,
+    "playing_completed": 4,
+    "native_playing_changed": 6,
+    "rate_completed": 11,
+    "playing_changed": 2,
+    "resources_after_rust_destroy": 1
+  }
+}

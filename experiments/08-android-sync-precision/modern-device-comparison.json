@@ -1,0 +1,2206 @@
+{
+  "schema_version": 1,
+  "analysis_status": "MEASURED per-run metrics; inference belongs to comparison report",
+  "goal_ms": 150,
+  "old_profile_runs": [
+    {
+      "file": "results-after-profile-1.json",
+      "status": "MEASURED",
+      "functional_status": "PASS",
+      "android_p95_goal_met": false,
+      "cross_device_p95_goal_met": false,
+      "source_base_commit": "81f5cff",
+      "source_worktree_dirty": null,
+      "build_mode": "profile",
+      "device": {
+        "android": "9",
+        "abi": "armeabi-v7a",
+        "physical": true
+      },
+      "wall_seconds": 90.10586938699998,
+      "media_size_bytes": 24300725,
+      "android_drift": {
+        "p50_ms": 11,
+        "p95_ms": 153,
+        "p99_ms": 203,
+        "max_ms": 250,
+        "count": 191
+      },
+      "linux_drift": {
+        "p50_ms": 27,
+        "p95_ms": 63,
+        "p99_ms": 64,
+        "max_ms": 5000,
+        "count": 260
+      },
+      "android_drift_by_sequence_descriptive_only": {
+        "10": {
+          "p50_ms": 0,
+          "p95_ms": 0,
+          "p99_ms": 0,
+          "max_ms": 0,
+          "count": 10
+        },
+        "11": {
+          "p50_ms": 116,
+          "p95_ms": 250,
+          "p99_ms": 250,
+          "max_ms": 250,
+          "count": 19
+        },
+        "12": {
+          "p50_ms": 34,
+          "p95_ms": 34,
+          "p99_ms": 34,
+          "max_ms": 34,
+          "count": 1
+        },
+        "13": {
+          "p50_ms": 0,
+          "p95_ms": 3,
+          "p99_ms": 3,
+          "max_ms": 3,
+          "count": 2
+        },
+        "14": {
+          "p50_ms": 92,
+          "p95_ms": 171,
+          "p99_ms": 174,
+          "max_ms": 174,
+          "count": 22
+        },
+        "15": {
+          "p50_ms": 10,
+          "p95_ms": 17,
+          "p99_ms": 34,
+          "max_ms": 61,
+          "count": 134
+        },
+        "16": {
+          "p50_ms": 42,
+          "p95_ms": 42,
+          "p99_ms": 42,
+          "max_ms": 42,
+          "count": 3
+        }
+      },
+      "cross_device_difference": {
+        "p50_ms": 67.0,
+        "p95_ms": 155.0,
+        "p99_ms": 202.0,
+        "max_ms": 283.0,
+        "count": 189
+      },
+      "corrections": {
+        "rate": 4,
+        "restore": 2,
+        "seek": 1
+      },
+      "cpu_percent_one_core": 76.43513849180219,
+      "controls_window_cpu": {
+        "status": "MEASURED",
+        "window_seconds": 84.998,
+        "sample_count": 18,
+        "cpu_percent_one_core": 90.17859243746912,
+        "policy": "First resource sample after initial scheduled Play through last resource sample before final scheduled Pause; no interpolation"
+      },
+      "timing_ms": {
+        "scheduled_control_first_dispatch": {
+          "p50_ms": 16.5,
+          "p95_ms": 67,
+          "p99_ms": 67,
+          "max_ms": 67,
+          "count": 6
+        },
+        "network_runtime": {
+          "p50_ms": 113,
+          "p95_ms": 202.5,
+          "p99_ms": 202.5,
+          "max_ms": 202.5,
+          "count": 6
+        },
+        "scheduler_lateness": {
+          "p50_ms": 1.5,
+          "p95_ms": 2,
+          "p99_ms": 2,
+          "max_ms": 2,
+          "count": 9
+        },
+        "effect_queue": {
+          "p50_ms": 15,
+          "p95_ms": 22,
+          "p99_ms": 22,
+          "max_ms": 22,
+          "count": 18
+        },
+        "poll_lateness": {
+          "p50_ms": 0,
+          "p95_ms": 32,
+          "p99_ms": 64,
+          "max_ms": 207,
+          "count": 167
+        },
+        "jni_roundtrip": {
+          "p50_ms": 1,
+          "p95_ms": 1,
+          "p99_ms": 3,
+          "max_ms": 3,
+          "count": 167
+        },
+        "jni_parse_and_registry": {
+          "p50_ms": 0.214,
+          "p95_ms": 0.34,
+          "p99_ms": 0.431,
+          "max_ms": 0.8108069999999999,
+          "count": 167
+        },
+        "source_timestamp_relabel_error": {
+          "p50_ms": 1,
+          "p95_ms": 1,
+          "p99_ms": 2,
+          "max_ms": 3,
+          "count": 167
+        },
+        "media3_call": {
+          "p50_ms": 9,
+          "p95_ms": 23,
+          "p99_ms": 23,
+          "max_ms": 23,
+          "count": 18
+        },
+        "media3_first_callback": {
+          "p50_ms": 10,
+          "p95_ms": 18,
+          "p99_ms": 18,
+          "max_ms": 18,
+          "count": 14
+        },
+        "playing_completion": {
+          "p50_ms": 7,
+          "p95_ms": 15,
+          "p99_ms": 15,
+          "max_ms": 15,
+          "count": 2
+        },
+        "paused_completion": {
+          "p50_ms": 12,
+          "p95_ms": 13,
+          "p99_ms": 13,
+          "max_ms": 13,
+          "count": 2
+        },
+        "rate_completion": {
+          "p50_ms": 8,
+          "p95_ms": 10,
+          "p99_ms": 10,
+          "max_ms": 10,
+          "count": 6
+        },
+        "seek_ready": {
+          "p50_ms": 260,
+          "p95_ms": 438,
+          "p99_ms": 438,
+          "max_ms": 438,
+          "count": 4
+        },
+        "seek_loss": {
+          "p50_ms": 249,
+          "p95_ms": 422,
+          "p99_ms": 422,
+          "max_ms": 422,
+          "count": 4
+        },
+        "seek_stable": {
+          "p50_ms": 377,
+          "p95_ms": 530,
+          "p99_ms": 530,
+          "max_ms": 530,
+          "count": 4
+        },
+        "observation_return": {
+          "p50_ms": 1,
+          "p95_ms": 1,
+          "p99_ms": 2,
+          "max_ms": 3,
+          "count": 167
+        }
+      },
+      "command_looper": {
+        "lateness_after_due_ms": {
+          "p50_ms": 0,
+          "p95_ms": 2,
+          "p99_ms": 2,
+          "max_ms": 2,
+          "count": 18
+        },
+        "post_to_execution_ms": {
+          "p50_ms": 20,
+          "p95_ms": 22,
+          "p99_ms": 22,
+          "max_ms": 22,
+          "count": 18
+        },
+        "policy": "Each effect references its polling runnable; post-to-execution includes deliberate 20ms polling period. Multiple effects can share a runnable; this is effect-weighted, not unique-runnable weighted."
+      },
+      "hard_seek_classifications": {
+        "LEGITIMATE": 0,
+        "TRANSIENT_AFTER_SEEK": 0,
+        "STALE_SAMPLE": 0,
+        "SCHEDULER_DELAY": 0,
+        "PLAYER_COMPLETION_DELAY": 1,
+        "SNAPSHOT_RECOVERY": 0,
+        "OTHER": 0
+      },
+      "first_play_position_advance": {
+        "status": "MEASURED_INTERVAL",
+        "operation_id": 2,
+        "sequence": 11,
+        "generation": 3,
+        "dispatch_to_first_advance_lower_bound_ms": 7,
+        "dispatch_to_first_advance_upper_bound_ms": 350,
+        "initial_play_dispatch_lateness_ms": 67,
+        "deadline_to_first_advance_lower_bound_ms": 74,
+        "deadline_to_first_advance_upper_bound_ms": 417,
+        "clock_mapping_bracket_ms": 0,
+        "first_observed_position_delta_ms": 215,
+        "effective_lost_advance_at_first_trace_ms": 135,
+        "effective_lost_advance_status": "INFERRED: elapsed minus SDK position advance, assuming rate 1 without intervening rate/seek; not an exact first-advance timestamp",
+        "clock_domain": "Kotlin elapsedRealtime for startup interval; deadline mapped through the same operation source bracket into Rust",
+        "limitation": "Existing driver trace every 25 polls; onset is not exact, SDK position is not physical frame/audio presentation"
+      },
+      "recovery": {},
+      "audit": "TESTED: primary Android and pair aggregates reproduce from raw samples",
+      "teardown_observed": true,
+      "processes_reaped": true
+    },
+    {
+      "file": "results-after-profile-2.json",
+      "status": "MEASURED",
+      "functional_status": "PASS",
+      "android_p95_goal_met": false,
+      "cross_device_p95_goal_met": false,
+      "source_base_commit": "81f5cff",
+      "source_worktree_dirty": null,
+      "build_mode": "profile",
+      "device": {
+        "android": "9",
+        "abi": "armeabi-v7a",
+        "physical": true
+      },
+      "wall_seconds": 90.24716163999983,
+      "media_size_bytes": 24300725,
+      "android_drift": {
+        "p50_ms": 41,
+        "p95_ms": 178,
+        "p99_ms": 245,
+        "max_ms": 251,
+        "count": 191
+      },
+      "linux_drift": {
+        "p50_ms": 12,
+        "p95_ms": 46,
+        "p99_ms": 47,
+        "max_ms": 47,
+        "count": 262
+      },
+      "android_drift_by_sequence_descriptive_only": {
+        "10": {
+          "p50_ms": 0,
+          "p95_ms": 0,
+          "p99_ms": 0,
+          "max_ms": 0,
+          "count": 10
+        },
+        "11": {
+          "p50_ms": 163,
+          "p95_ms": 245,
+          "p99_ms": 251,
+          "max_ms": 251,
+          "count": 20
+        },
+        "12": {
+          "p50_ms": 71,
+          "p95_ms": 71,
+          "p99_ms": 71,
+          "max_ms": 71,
+          "count": 1
+        },
+        "14": {
+          "p50_ms": 85,
+          "p95_ms": 156,
+          "p99_ms": 160,
+          "max_ms": 160,
+          "count": 23
+        },
+        "15": {
+          "p50_ms": 40,
+          "p95_ms": 57,
+          "p99_ms": 65,
+          "max_ms": 67,
+          "count": 135
+        },
+        "16": {
+          "p50_ms": 0,
+          "p95_ms": 36,
+          "p99_ms": 36,
+          "max_ms": 36,
+          "count": 2
+        }
+      },
+      "cross_device_difference": {
+        "p50_ms": 26.0,
+        "p95_ms": 183.0,
+        "p99_ms": 244.0,
+        "max_ms": 262.0,
+        "count": 191
+      },
+      "corrections": {
+        "rate": 4,
+        "restore": 3,
+        "seek": 0
+      },
+      "cpu_percent_one_core": 70.31875166711123,
+      "controls_window_cpu": {
+        "status": "MEASURED",
+        "window_seconds": 84.997,
+        "sample_count": 18,
+        "cpu_percent_one_core": 81.2616915891149,
+        "policy": "First resource sample after initial scheduled Play through last resource sample before final scheduled Pause; no interpolation"
+      },
+      "timing_ms": {
+        "scheduled_control_first_dispatch": {
+          "p50_ms": 13,
+          "p95_ms": 25,
+          "p99_ms": 25,
+          "max_ms": 25,
+          "count": 6
+        },
+        "network_runtime": {
+          "p50_ms": 12,
+          "p95_ms": 116,
+          "p99_ms": 116,
+          "max_ms": 116,
+          "count": 6
+        },
+        "scheduler_lateness": {
+          "p50_ms": 1,
+          "p95_ms": 2,
+          "p99_ms": 2,
+          "max_ms": 2,
+          "count": 10
+        },
+        "effect_queue": {
+          "p50_ms": 12,
+          "p95_ms": 71,
+          "p99_ms": 71,
+          "max_ms": 71,
+          "count": 18
+        },
+        "poll_lateness": {
+          "p50_ms": 0,
+          "p95_ms": 40,
+          "p99_ms": 65,
+          "max_ms": 202,
+          "count": 171
+        },
+        "jni_roundtrip": {
+          "p50_ms": 1,
+          "p95_ms": 2,
+          "p99_ms": 3,
+          "max_ms": 4,
+          "count": 171
+        },
+        "jni_parse_and_registry": {
+          "p50_ms": 0.199,
+          "p95_ms": 0.338,
+          "p99_ms": 0.603,
+          "max_ms": 0.6729229999999999,
+          "count": 171
+        },
+        "source_timestamp_relabel_error": {
+          "p50_ms": 1,
+          "p95_ms": 1,
+          "p99_ms": 3,
+          "max_ms": 3,
+          "count": 171
+        },
+        "media3_call": {
+          "p50_ms": 10,
+          "p95_ms": 15,
+          "p99_ms": 15,
+          "max_ms": 15,
+          "count": 18
+        },
+        "media3_first_callback": {
+          "p50_ms": 8,
+          "p95_ms": 13,
+          "p99_ms": 13,
+          "max_ms": 13,
+          "count": 17
+        },
+        "playing_completion": {
+          "p50_ms": 6,
+          "p95_ms": 13,
+          "p99_ms": 13,
+          "max_ms": 13,
+          "count": 2
+        },
+        "paused_completion": {
+          "p50_ms": 11,
+          "p95_ms": 12,
+          "p99_ms": 12,
+          "max_ms": 12,
+          "count": 2
+        },
+        "rate_completion": {
+          "p50_ms": 7,
+          "p95_ms": 11,
+          "p99_ms": 11,
+          "max_ms": 11,
+          "count": 8
+        },
+        "seek_ready": {
+          "p50_ms": 247,
+          "p95_ms": 366,
+          "p99_ms": 366,
+          "max_ms": 366,
+          "count": 5
+        },
+        "seek_loss": {
+          "p50_ms": 243,
+          "p95_ms": 370,
+          "p99_ms": 370,
+          "max_ms": 370,
+          "count": 5
+        },
+        "seek_stable": {
+          "p50_ms": 319,
+          "p95_ms": 425,
+          "p99_ms": 425,
+          "max_ms": 425,
+          "count": 5
+        },
+        "observation_return": {
+          "p50_ms": 1,
+          "p95_ms": 1,
+          "p99_ms": 3,
+          "max_ms": 3,
+          "count": 171
+        }
+      },
+      "command_looper": {
+        "lateness_after_due_ms": {
+          "p50_ms": 0,
+          "p95_ms": 85,
+          "p99_ms": 85,
+          "max_ms": 85,
+          "count": 18
+        },
+        "post_to_execution_ms": {
+          "p50_ms": 20,
+          "p95_ms": 105,
+          "p99_ms": 105,
+          "max_ms": 105,
+          "count": 18
+        },
+        "policy": "Each effect references its polling runnable; post-to-execution includes deliberate 20ms polling period. Multiple effects can share a runnable; this is effect-weighted, not unique-runnable weighted."
+      },
+      "hard_seek_classifications": {
+        "LEGITIMATE": 0,
+        "TRANSIENT_AFTER_SEEK": 0,
+        "STALE_SAMPLE": 0,
+        "SCHEDULER_DELAY": 0,
+        "PLAYER_COMPLETION_DELAY": 0,
+        "SNAPSHOT_RECOVERY": 0,
+        "OTHER": 0
+      },
+      "first_play_position_advance": {
+        "status": "MEASURED_INTERVAL",
+        "operation_id": 2,
+        "sequence": 11,
+        "generation": 3,
+        "dispatch_to_first_advance_lower_bound_ms": 6,
+        "dispatch_to_first_advance_upper_bound_ms": 140,
+        "initial_play_dispatch_lateness_ms": 8.5,
+        "deadline_to_first_advance_lower_bound_ms": 14.5,
+        "deadline_to_first_advance_upper_bound_ms": 148.5,
+        "clock_mapping_bracket_ms": 0,
+        "first_observed_position_delta_ms": 21,
+        "effective_lost_advance_at_first_trace_ms": 119,
+        "effective_lost_advance_status": "INFERRED: elapsed minus SDK position advance, assuming rate 1 without intervening rate/seek; not an exact first-advance timestamp",
+        "clock_domain": "Kotlin elapsedRealtime for startup interval; deadline mapped through the same operation source bracket into Rust",
+        "limitation": "Existing driver trace every 25 polls; onset is not exact, SDK position is not physical frame/audio presentation"
+      },
+      "recovery": {},
+      "audit": "TESTED: primary Android and pair aggregates reproduce from raw samples",
+      "teardown_observed": true,
+      "processes_reaped": true
+    },
+    {
+      "file": "results-after-profile-3.json",
+      "status": "MEASURED",
+      "functional_status": "PASS",
+      "android_p95_goal_met": false,
+      "cross_device_p95_goal_met": false,
+      "source_base_commit": "81f5cff",
+      "source_worktree_dirty": null,
+      "build_mode": "profile",
+      "device": {
+        "android": "9",
+        "abi": "armeabi-v7a",
+        "physical": true
+      },
+      "wall_seconds": 90.09722265200253,
+      "media_size_bytes": 24300725,
+      "android_drift": {
+        "p50_ms": 26,
+        "p95_ms": 195,
+        "p99_ms": 240,
+        "max_ms": 241,
+        "count": 191
+      },
+      "linux_drift": {
+        "p50_ms": 6,
+        "p95_ms": 42,
+        "p99_ms": 69,
+        "max_ms": 69,
+        "count": 263
+      },
+      "android_drift_by_sequence_descriptive_only": {
+        "10": {
+          "p50_ms": 0,
+          "p95_ms": 0,
+          "p99_ms": 0,
+          "max_ms": 0,
+          "count": 10
+        },
+        "11": {
+          "p50_ms": 195,
+          "p95_ms": 241,
+          "p99_ms": 241,
+          "max_ms": 241,
+          "count": 19
+        },
+        "12": {
+          "p50_ms": 106,
+          "p95_ms": 106,
+          "p99_ms": 106,
+          "max_ms": 106,
+          "count": 1
+        },
+        "14": {
+          "p50_ms": 94,
+          "p95_ms": 169,
+          "p99_ms": 170,
+          "max_ms": 170,
+          "count": 23
+        },
+        "15": {
+          "p50_ms": 21,
+          "p95_ms": 59,
+          "p99_ms": 92,
+          "max_ms": 94,
+          "count": 135
+        },
+        "16": {
+          "p50_ms": 0,
+          "p95_ms": 32,
+          "p99_ms": 32,
+          "max_ms": 32,
+          "count": 3
+        }
+      },
+      "cross_device_difference": {
+        "p50_ms": 20.0,
+        "p95_ms": 209.0,
+        "p99_ms": 283.0,
+        "max_ms": 287.0,
+        "count": 191
+      },
+      "corrections": {
+        "rate": 4,
+        "restore": 2,
+        "seek": 1
+      },
+      "cpu_percent_one_core": 76.28023352793994,
+      "controls_window_cpu": {
+        "status": "MEASURED",
+        "window_seconds": 85.0,
+        "sample_count": 18,
+        "cpu_percent_one_core": 89.09411764705882,
+        "policy": "First resource sample after initial scheduled Play through last resource sample before final scheduled Pause; no interpolation"
+      },
+      "timing_ms": {
+        "scheduled_control_first_dispatch": {
+          "p50_ms": 16,
+          "p95_ms": 32,
+          "p99_ms": 32,
+          "max_ms": 32,
+          "count": 6
+        },
+        "network_runtime": {
+          "p50_ms": 11,
+          "p95_ms": 154,
+          "p99_ms": 154,
+          "max_ms": 154,
+          "count": 6
+        },
+        "scheduler_lateness": {
+          "p50_ms": 1,
+          "p95_ms": 1.5,
+          "p99_ms": 1.5,
+          "max_ms": 1.5,
+          "count": 10
+        },
+        "effect_queue": {
+          "p50_ms": 14,
+          "p95_ms": 115,
+          "p99_ms": 115,
+          "max_ms": 115,
+          "count": 19
+        },
+        "poll_lateness": {
+          "p50_ms": 0,
+          "p95_ms": 45,
+          "p99_ms": 87,
+          "max_ms": 233,
+          "count": 168
+        },
+        "jni_roundtrip": {
+          "p50_ms": 1,
+          "p95_ms": 2,
+          "p99_ms": 4,
+          "max_ms": 4,
+          "count": 168
+        },
+        "jni_parse_and_registry": {
+          "p50_ms": 0.216,
+          "p95_ms": 0.34,
+          "p99_ms": 0.849,
+          "max_ms": 2.449808,
+          "count": 168
+        },
+        "source_timestamp_relabel_error": {
+          "p50_ms": 1,
+          "p95_ms": 1,
+          "p99_ms": 3,
+          "max_ms": 3,
+          "count": 168
+        },
+        "media3_call": {
+          "p50_ms": 10,
+          "p95_ms": 20,
+          "p99_ms": 20,
+          "max_ms": 20,
+          "count": 19
+        },
+        "media3_first_callback": {
+          "p50_ms": 9,
+          "p95_ms": 13,
+          "p99_ms": 13,
+          "max_ms": 13,
+          "count": 17
+        },
+        "playing_completion": {
+          "p50_ms": 7,
+          "p95_ms": 9,
+          "p99_ms": 9,
+          "max_ms": 9,
+          "count": 2
+        },
+        "paused_completion": {
+          "p50_ms": 9,
+          "p95_ms": 9,
+          "p99_ms": 9,
+          "max_ms": 9,
+          "count": 2
+        },
+        "rate_completion": {
+          "p50_ms": 7,
+          "p95_ms": 9,
+          "p99_ms": 9,
+          "max_ms": 9,
+          "count": 7
+        },
+        "seek_ready": {
+          "p50_ms": 244,
+          "p95_ms": 451,
+          "p99_ms": 451,
+          "max_ms": 451,
+          "count": 6
+        },
+        "seek_loss": {
+          "p50_ms": 253,
+          "p95_ms": 470,
+          "p99_ms": 470,
+          "max_ms": 470,
+          "count": 6
+        },
+        "seek_stable": {
+          "p50_ms": 341,
+          "p95_ms": 477,
+          "p99_ms": 477,
+          "max_ms": 477,
+          "count": 6
+        },
+        "observation_return": {
+          "p50_ms": 1,
+          "p95_ms": 1,
+          "p99_ms": 3,
+          "max_ms": 3,
+          "count": 168
+        }
+      },
+      "command_looper": {
+        "lateness_after_due_ms": {
+          "p50_ms": 0,
+          "p95_ms": 157,
+          "p99_ms": 157,
+          "max_ms": 157,
+          "count": 19
+        },
+        "post_to_execution_ms": {
+          "p50_ms": 20,
+          "p95_ms": 177,
+          "p99_ms": 177,
+          "max_ms": 177,
+          "count": 19
+        },
+        "policy": "Each effect references its polling runnable; post-to-execution includes deliberate 20ms polling period. Multiple effects can share a runnable; this is effect-weighted, not unique-runnable weighted."
+      },
+      "hard_seek_classifications": {
+        "LEGITIMATE": 0,
+        "TRANSIENT_AFTER_SEEK": 0,
+        "STALE_SAMPLE": 0,
+        "SCHEDULER_DELAY": 0,
+        "PLAYER_COMPLETION_DELAY": 1,
+        "SNAPSHOT_RECOVERY": 0,
+        "OTHER": 0
+      },
+      "first_play_position_advance": {
+        "status": "MEASURED_INTERVAL",
+        "operation_id": 2,
+        "sequence": 11,
+        "generation": 3,
+        "dispatch_to_first_advance_lower_bound_ms": 7,
+        "dispatch_to_first_advance_upper_bound_ms": 266,
+        "initial_play_dispatch_lateness_ms": 30,
+        "deadline_to_first_advance_lower_bound_ms": 37,
+        "deadline_to_first_advance_upper_bound_ms": 296,
+        "clock_mapping_bracket_ms": 0,
+        "first_observed_position_delta_ms": 150,
+        "effective_lost_advance_at_first_trace_ms": 116,
+        "effective_lost_advance_status": "INFERRED: elapsed minus SDK position advance, assuming rate 1 without intervening rate/seek; not an exact first-advance timestamp",
+        "clock_domain": "Kotlin elapsedRealtime for startup interval; deadline mapped through the same operation source bracket into Rust",
+        "limitation": "Existing driver trace every 25 polls; onset is not exact, SDK position is not physical frame/audio presentation"
+      },
+      "recovery": {},
+      "audit": "TESTED: primary Android and pair aggregates reproduce from raw samples",
+      "teardown_observed": true,
+      "processes_reaped": true
+    }
+  ],
+  "modern_profile_runs": [
+    {
+      "file": "modern-device-run-1.json",
+      "status": "MEASURED",
+      "functional_status": "PASS",
+      "android_p95_goal_met": false,
+      "cross_device_p95_goal_met": false,
+      "source_base_commit": "cc7544b",
+      "source_worktree_dirty": true,
+      "build_mode": "profile",
+      "device": {
+        "android": "15",
+        "abi": "arm64-v8a",
+        "physical": true,
+        "api": 35
+      },
+      "wall_seconds": 90.070239442,
+      "media_size_bytes": 24300725,
+      "android_drift": {
+        "p50_ms": 39,
+        "p95_ms": 178,
+        "p99_ms": 227,
+        "max_ms": 5000,
+        "count": 191
+      },
+      "linux_drift": {
+        "p50_ms": 32,
+        "p95_ms": 67,
+        "p99_ms": 68,
+        "max_ms": 5000,
+        "count": 209
+      },
+      "android_drift_by_sequence_descriptive_only": {
+        "10": {
+          "p50_ms": 0,
+          "p95_ms": 0,
+          "p99_ms": 0,
+          "max_ms": 0,
+          "count": 7
+        },
+        "11": {
+          "p50_ms": 158,
+          "p95_ms": 227,
+          "p99_ms": 5000,
+          "max_ms": 5000,
+          "count": 21
+        },
+        "12": {
+          "p50_ms": 44,
+          "p95_ms": 44,
+          "p99_ms": 44,
+          "max_ms": 44,
+          "count": 1
+        },
+        "13": {
+          "p50_ms": 0,
+          "p95_ms": 0,
+          "p99_ms": 0,
+          "max_ms": 0,
+          "count": 1
+        },
+        "14": {
+          "p50_ms": 98,
+          "p95_ms": 178,
+          "p99_ms": 180,
+          "max_ms": 180,
+          "count": 23
+        },
+        "15": {
+          "p50_ms": 38,
+          "p95_ms": 50,
+          "p99_ms": 59,
+          "max_ms": 61,
+          "count": 135
+        },
+        "16": {
+          "p50_ms": 12,
+          "p95_ms": 19,
+          "p99_ms": 19,
+          "max_ms": 19,
+          "count": 3
+        }
+      },
+      "cross_device_difference": {
+        "p50_ms": 27.0,
+        "p95_ms": 203.0,
+        "p99_ms": 249.0,
+        "max_ms": 251.0,
+        "count": 186
+      },
+      "corrections": {
+        "rate": 5,
+        "restore": 3,
+        "seek": 0
+      },
+      "cpu_percent_one_core": 82.8535037210918,
+      "controls_window_cpu": {
+        "status": "MEASURED",
+        "window_seconds": 84.998,
+        "sample_count": 18,
+        "cpu_percent_one_core": 84.50787077342996,
+        "policy": "First resource sample after initial scheduled Play through last resource sample before final scheduled Pause; no interpolation"
+      },
+      "timing_ms": {
+        "scheduled_control_first_dispatch": {
+          "p50_ms": 18,
+          "p95_ms": 27,
+          "p99_ms": 27,
+          "max_ms": 27,
+          "count": 6
+        },
+        "network_runtime": {
+          "p50_ms": 40,
+          "p95_ms": 98,
+          "p99_ms": 98,
+          "max_ms": 98,
+          "count": 6
+        },
+        "scheduler_lateness": {
+          "p50_ms": 1,
+          "p95_ms": 2,
+          "p99_ms": 2,
+          "max_ms": 2,
+          "count": 9
+        },
+        "effect_queue": {
+          "p50_ms": 16,
+          "p95_ms": 20,
+          "p99_ms": 20,
+          "max_ms": 20,
+          "count": 18
+        },
+        "poll_lateness": {
+          "p50_ms": 0,
+          "p95_ms": 4,
+          "p99_ms": 19,
+          "max_ms": 132,
+          "count": 175
+        },
+        "jni_roundtrip": {
+          "p50_ms": 1,
+          "p95_ms": 2,
+          "p99_ms": 2,
+          "max_ms": 2,
+          "count": 175
+        },
+        "jni_parse_and_registry": {
+          "p50_ms": 0.175,
+          "p95_ms": 0.232,
+          "p99_ms": 0.278,
+          "max_ms": 0.306539,
+          "count": 175
+        },
+        "source_timestamp_relabel_error": {
+          "p50_ms": 1,
+          "p95_ms": 2,
+          "p99_ms": 2,
+          "max_ms": 2,
+          "count": 175
+        },
+        "media3_call": {
+          "p50_ms": 5,
+          "p95_ms": 12,
+          "p99_ms": 12,
+          "max_ms": 12,
+          "count": 18
+        },
+        "media3_first_callback": {
+          "p50_ms": 4,
+          "p95_ms": 9,
+          "p99_ms": 9,
+          "max_ms": 9,
+          "count": 16
+        },
+        "playing_completion": {
+          "p50_ms": 1,
+          "p95_ms": 9,
+          "p99_ms": 9,
+          "max_ms": 9,
+          "count": 2
+        },
+        "paused_completion": {
+          "p50_ms": 4,
+          "p95_ms": 6,
+          "p99_ms": 6,
+          "max_ms": 6,
+          "count": 2
+        },
+        "rate_completion": {
+          "p50_ms": 4,
+          "p95_ms": 5,
+          "p99_ms": 5,
+          "max_ms": 5,
+          "count": 8
+        },
+        "seek_ready": {
+          "p50_ms": 181,
+          "p95_ms": 267,
+          "p99_ms": 267,
+          "max_ms": 267,
+          "count": 4
+        },
+        "seek_loss": {
+          "p50_ms": 224,
+          "p95_ms": 269,
+          "p99_ms": 269,
+          "max_ms": 269,
+          "count": 4
+        },
+        "seek_stable": {
+          "p50_ms": 244,
+          "p95_ms": 291,
+          "p99_ms": 291,
+          "max_ms": 291,
+          "count": 4
+        },
+        "observation_return": {
+          "p50_ms": 1,
+          "p95_ms": 2,
+          "p99_ms": 2,
+          "max_ms": 2,
+          "count": 175
+        }
+      },
+      "command_looper": {
+        "lateness_after_due_ms": {
+          "p50_ms": 0,
+          "p95_ms": 1,
+          "p99_ms": 1,
+          "max_ms": 1,
+          "count": 18
+        },
+        "post_to_execution_ms": {
+          "p50_ms": 20,
+          "p95_ms": 21,
+          "p99_ms": 21,
+          "max_ms": 21,
+          "count": 18
+        },
+        "policy": "Each effect references its polling runnable; post-to-execution includes deliberate 20ms polling period. Multiple effects can share a runnable; this is effect-weighted, not unique-runnable weighted."
+      },
+      "hard_seek_classifications": {
+        "LEGITIMATE": 0,
+        "TRANSIENT_AFTER_SEEK": 0,
+        "STALE_SAMPLE": 0,
+        "SCHEDULER_DELAY": 0,
+        "PLAYER_COMPLETION_DELAY": 0,
+        "SNAPSHOT_RECOVERY": 0,
+        "OTHER": 0
+      },
+      "first_play_position_advance": {
+        "status": "MEASURED_INTERVAL",
+        "operation_id": 2,
+        "sequence": 11,
+        "generation": 3,
+        "dispatch_to_first_advance_lower_bound_ms": 22,
+        "dispatch_to_first_advance_upper_bound_ms": 554,
+        "initial_play_dispatch_lateness_ms": 9,
+        "deadline_to_first_advance_lower_bound_ms": 31,
+        "deadline_to_first_advance_upper_bound_ms": 563,
+        "clock_mapping_bracket_ms": 0,
+        "first_observed_position_delta_ms": 345,
+        "effective_lost_advance_at_first_trace_ms": 209,
+        "effective_lost_advance_status": "INFERRED: elapsed minus SDK position advance, assuming rate 1 without intervening rate/seek; not an exact first-advance timestamp",
+        "clock_domain": "Kotlin elapsedRealtime for startup interval; deadline mapped through the same operation source bracket into Rust",
+        "limitation": "Existing driver trace every 25 polls; onset is not exact, SDK position is not physical frame/audio presentation"
+      },
+      "recovery": {},
+      "audit": "TESTED: primary Android and pair aggregates reproduce from raw samples",
+      "teardown_observed": true,
+      "processes_reaped": true
+    },
+    {
+      "file": "modern-device-run-2.json",
+      "status": "MEASURED",
+      "functional_status": "PASS",
+      "android_p95_goal_met": true,
+      "cross_device_p95_goal_met": true,
+      "source_base_commit": "cc7544b",
+      "source_worktree_dirty": true,
+      "build_mode": "profile",
+      "device": {
+        "android": "15",
+        "abi": "arm64-v8a",
+        "physical": true,
+        "api": 35
+      },
+      "wall_seconds": 90.07165743999997,
+      "media_size_bytes": 24300725,
+      "android_drift": {
+        "p50_ms": 31,
+        "p95_ms": 148,
+        "p99_ms": 159,
+        "max_ms": 5000,
+        "count": 192
+      },
+      "linux_drift": {
+        "p50_ms": 21,
+        "p95_ms": 55,
+        "p99_ms": 56,
+        "max_ms": 57,
+        "count": 204
+      },
+      "android_drift_by_sequence_descriptive_only": {
+        "8": {
+          "p50_ms": 0,
+          "p95_ms": 0,
+          "p99_ms": 0,
+          "max_ms": 0,
+          "count": 1
+        },
+        "10": {
+          "p50_ms": 0,
+          "p95_ms": 0,
+          "p99_ms": 0,
+          "max_ms": 0,
+          "count": 7
+        },
+        "11": {
+          "p50_ms": 98,
+          "p95_ms": 159,
+          "p99_ms": 5000,
+          "max_ms": 5000,
+          "count": 21
+        },
+        "12": {
+          "p50_ms": 36,
+          "p95_ms": 36,
+          "p99_ms": 36,
+          "max_ms": 36,
+          "count": 1
+        },
+        "13": {
+          "p50_ms": 0,
+          "p95_ms": 0,
+          "p99_ms": 0,
+          "max_ms": 0,
+          "count": 1
+        },
+        "14": {
+          "p50_ms": 74,
+          "p95_ms": 153,
+          "p99_ms": 156,
+          "max_ms": 156,
+          "count": 23
+        },
+        "15": {
+          "p50_ms": 28,
+          "p95_ms": 109,
+          "p99_ms": 118,
+          "max_ms": 126,
+          "count": 135
+        },
+        "16": {
+          "p50_ms": 2,
+          "p95_ms": 17,
+          "p99_ms": 17,
+          "max_ms": 17,
+          "count": 3
+        }
+      },
+      "cross_device_difference": {
+        "p50_ms": 20.0,
+        "p95_ms": 148.0,
+        "p99_ms": 199.0,
+        "max_ms": 200.0,
+        "count": 190
+      },
+      "corrections": {
+        "rate": 6,
+        "restore": 3,
+        "seek": 0
+      },
+      "cpu_percent_one_core": 85.66405962168024,
+      "controls_window_cpu": {
+        "status": "MEASURED",
+        "window_seconds": 89.997,
+        "sample_count": 19,
+        "cpu_percent_one_core": 87.13623787459582,
+        "policy": "First resource sample after initial scheduled Play through last resource sample before final scheduled Pause; no interpolation"
+      },
+      "timing_ms": {
+        "scheduled_control_first_dispatch": {
+          "p50_ms": 10.5,
+          "p95_ms": 22.5,
+          "p99_ms": 22.5,
+          "max_ms": 22.5,
+          "count": 6
+        },
+        "network_runtime": {
+          "p50_ms": 76.5,
+          "p95_ms": 112.5,
+          "p99_ms": 112.5,
+          "max_ms": 112.5,
+          "count": 6
+        },
+        "scheduler_lateness": {
+          "p50_ms": 1,
+          "p95_ms": 2.5,
+          "p99_ms": 2.5,
+          "max_ms": 2.5,
+          "count": 9
+        },
+        "effect_queue": {
+          "p50_ms": 6,
+          "p95_ms": 21,
+          "p99_ms": 21,
+          "max_ms": 21,
+          "count": 19
+        },
+        "poll_lateness": {
+          "p50_ms": 0,
+          "p95_ms": 1,
+          "p99_ms": 11,
+          "max_ms": 242,
+          "count": 174
+        },
+        "jni_roundtrip": {
+          "p50_ms": 1,
+          "p95_ms": 2,
+          "p99_ms": 3,
+          "max_ms": 3,
+          "count": 174
+        },
+        "jni_parse_and_registry": {
+          "p50_ms": 0.176,
+          "p95_ms": 0.29,
+          "p99_ms": 0.414,
+          "max_ms": 0.520692,
+          "count": 174
+        },
+        "source_timestamp_relabel_error": {
+          "p50_ms": 1,
+          "p95_ms": 2,
+          "p99_ms": 3,
+          "max_ms": 4,
+          "count": 174
+        },
+        "media3_call": {
+          "p50_ms": 5,
+          "p95_ms": 13,
+          "p99_ms": 13,
+          "max_ms": 13,
+          "count": 19
+        },
+        "media3_first_callback": {
+          "p50_ms": 5,
+          "p95_ms": 9,
+          "p99_ms": 9,
+          "max_ms": 9,
+          "count": 17
+        },
+        "playing_completion": {
+          "p50_ms": 2,
+          "p95_ms": 6,
+          "p99_ms": 6,
+          "max_ms": 6,
+          "count": 2
+        },
+        "paused_completion": {
+          "p50_ms": 3,
+          "p95_ms": 6,
+          "p99_ms": 6,
+          "max_ms": 6,
+          "count": 2
+        },
+        "rate_completion": {
+          "p50_ms": 5,
+          "p95_ms": 6,
+          "p99_ms": 6,
+          "max_ms": 6,
+          "count": 9
+        },
+        "seek_ready": {
+          "p50_ms": 174,
+          "p95_ms": 212,
+          "p99_ms": 212,
+          "max_ms": 212,
+          "count": 4
+        },
+        "seek_loss": {
+          "p50_ms": 162,
+          "p95_ms": 213,
+          "p99_ms": 213,
+          "max_ms": 213,
+          "count": 4
+        },
+        "seek_stable": {
+          "p50_ms": 201,
+          "p95_ms": 243,
+          "p99_ms": 243,
+          "max_ms": 243,
+          "count": 4
+        },
+        "observation_return": {
+          "p50_ms": 1,
+          "p95_ms": 2,
+          "p99_ms": 3,
+          "max_ms": 4,
+          "count": 174
+        }
+      },
+      "command_looper": {
+        "lateness_after_due_ms": {
+          "p50_ms": 1,
+          "p95_ms": 7,
+          "p99_ms": 7,
+          "max_ms": 7,
+          "count": 19
+        },
+        "post_to_execution_ms": {
+          "p50_ms": 21,
+          "p95_ms": 27,
+          "p99_ms": 27,
+          "max_ms": 27,
+          "count": 19
+        },
+        "policy": "Each effect references its polling runnable; post-to-execution includes deliberate 20ms polling period. Multiple effects can share a runnable; this is effect-weighted, not unique-runnable weighted."
+      },
+      "hard_seek_classifications": {
+        "LEGITIMATE": 0,
+        "TRANSIENT_AFTER_SEEK": 0,
+        "STALE_SAMPLE": 0,
+        "SCHEDULER_DELAY": 0,
+        "PLAYER_COMPLETION_DELAY": 0,
+        "SNAPSHOT_RECOVERY": 0,
+        "OTHER": 0
+      },
+      "first_play_position_advance": {
+        "status": "MEASURED_INTERVAL",
+        "operation_id": 2,
+        "sequence": 11,
+        "generation": 3,
+        "dispatch_to_first_advance_lower_bound_ms": 2,
+        "dispatch_to_first_advance_upper_bound_ms": 576,
+        "initial_play_dispatch_lateness_ms": 14.5,
+        "deadline_to_first_advance_lower_bound_ms": 16.5,
+        "deadline_to_first_advance_upper_bound_ms": 590.5,
+        "clock_mapping_bracket_ms": 0,
+        "first_observed_position_delta_ms": 437,
+        "effective_lost_advance_at_first_trace_ms": 139,
+        "effective_lost_advance_status": "INFERRED: elapsed minus SDK position advance, assuming rate 1 without intervening rate/seek; not an exact first-advance timestamp",
+        "clock_domain": "Kotlin elapsedRealtime for startup interval; deadline mapped through the same operation source bracket into Rust",
+        "limitation": "Existing driver trace every 25 polls; onset is not exact, SDK position is not physical frame/audio presentation"
+      },
+      "recovery": {},
+      "audit": "TESTED: primary Android and pair aggregates reproduce from raw samples",
+      "teardown_observed": true,
+      "processes_reaped": true
+    },
+    {
+      "file": "modern-device-run-3.json",
+      "status": "MEASURED",
+      "functional_status": "PASS",
+      "android_p95_goal_met": true,
+      "cross_device_p95_goal_met": true,
+      "source_base_commit": "cc7544b",
+      "source_worktree_dirty": true,
+      "build_mode": "profile",
+      "device": {
+        "android": "15",
+        "abi": "arm64-v8a",
+        "physical": true,
+        "api": 35
+      },
+      "wall_seconds": 90.07063149800001,
+      "media_size_bytes": 24300725,
+      "android_drift": {
+        "p50_ms": 41,
+        "p95_ms": 148,
+        "p99_ms": 163,
+        "max_ms": 5000,
+        "count": 191
+      },
+      "linux_drift": {
+        "p50_ms": 27,
+        "p95_ms": 63,
+        "p99_ms": 64,
+        "max_ms": 5000,
+        "count": 204
+      },
+      "android_drift_by_sequence_descriptive_only": {
+        "10": {
+          "p50_ms": 0,
+          "p95_ms": 0,
+          "p99_ms": 0,
+          "max_ms": 0,
+          "count": 7
+        },
+        "11": {
+          "p50_ms": 100,
+          "p95_ms": 158,
+          "p99_ms": 5000,
+          "max_ms": 5000,
+          "count": 21
+        },
+        "12": {
+          "p50_ms": 33,
+          "p95_ms": 33,
+          "p99_ms": 33,
+          "max_ms": 33,
+          "count": 1
+        },
+        "13": {
+          "p50_ms": 0,
+          "p95_ms": 0,
+          "p99_ms": 0,
+          "max_ms": 0,
+          "count": 1
+        },
+        "14": {
+          "p50_ms": 74,
+          "p95_ms": 145,
+          "p99_ms": 148,
+          "max_ms": 148,
+          "count": 23
+        },
+        "15": {
+          "p50_ms": 39,
+          "p95_ms": 122,
+          "p99_ms": 161,
+          "max_ms": 163,
+          "count": 135
+        },
+        "16": {
+          "p50_ms": 0,
+          "p95_ms": 36,
+          "p99_ms": 36,
+          "max_ms": 36,
+          "count": 3
+        }
+      },
+      "cross_device_difference": {
+        "p50_ms": 24.0,
+        "p95_ms": 143.0,
+        "p99_ms": 191.0,
+        "max_ms": 192.0,
+        "count": 191
+      },
+      "corrections": {
+        "rate": 8,
+        "restore": 5,
+        "seek": 0
+      },
+      "cpu_percent_one_core": 86.25444746205183,
+      "controls_window_cpu": {
+        "status": "MEASURED",
+        "window_seconds": 90.003,
+        "sample_count": 19,
+        "cpu_percent_one_core": 87.59708009733009,
+        "policy": "First resource sample after initial scheduled Play through last resource sample before final scheduled Pause; no interpolation"
+      },
+      "timing_ms": {
+        "scheduled_control_first_dispatch": {
+          "p50_ms": 20,
+          "p95_ms": 26.5,
+          "p99_ms": 26.5,
+          "max_ms": 26.5,
+          "count": 6
+        },
+        "network_runtime": {
+          "p50_ms": 22,
+          "p95_ms": 87.5,
+          "p99_ms": 87.5,
+          "max_ms": 87.5,
+          "count": 6
+        },
+        "scheduler_lateness": {
+          "p50_ms": 1.5,
+          "p95_ms": 4,
+          "p99_ms": 4,
+          "max_ms": 4,
+          "count": 9
+        },
+        "effect_queue": {
+          "p50_ms": 9,
+          "p95_ms": 20,
+          "p99_ms": 21,
+          "max_ms": 21,
+          "count": 23
+        },
+        "poll_lateness": {
+          "p50_ms": 0,
+          "p95_ms": 4,
+          "p99_ms": 46,
+          "max_ms": 212,
+          "count": 173
+        },
+        "jni_roundtrip": {
+          "p50_ms": 1,
+          "p95_ms": 2,
+          "p99_ms": 3,
+          "max_ms": 3,
+          "count": 173
+        },
+        "jni_parse_and_registry": {
+          "p50_ms": 0.17,
+          "p95_ms": 0.311,
+          "p99_ms": 0.369,
+          "max_ms": 0.42946199999999995,
+          "count": 173
+        },
+        "source_timestamp_relabel_error": {
+          "p50_ms": 1,
+          "p95_ms": 2,
+          "p99_ms": 2,
+          "max_ms": 2,
+          "count": 173
+        },
+        "media3_call": {
+          "p50_ms": 5,
+          "p95_ms": 12,
+          "p99_ms": 13,
+          "max_ms": 13,
+          "count": 23
+        },
+        "media3_first_callback": {
+          "p50_ms": 4,
+          "p95_ms": 8,
+          "p99_ms": 10,
+          "max_ms": 10,
+          "count": 22
+        },
+        "playing_completion": {
+          "p50_ms": 2,
+          "p95_ms": 7,
+          "p99_ms": 7,
+          "max_ms": 7,
+          "count": 2
+        },
+        "paused_completion": {
+          "p50_ms": 2,
+          "p95_ms": 3,
+          "p99_ms": 3,
+          "max_ms": 3,
+          "count": 2
+        },
+        "rate_completion": {
+          "p50_ms": 4,
+          "p95_ms": 6,
+          "p99_ms": 6,
+          "max_ms": 6,
+          "count": 13
+        },
+        "seek_ready": {
+          "p50_ms": 157,
+          "p95_ms": 225,
+          "p99_ms": 225,
+          "max_ms": 225,
+          "count": 5
+        },
+        "seek_loss": {
+          "p50_ms": 159,
+          "p95_ms": 226,
+          "p99_ms": 226,
+          "max_ms": 226,
+          "count": 5
+        },
+        "seek_stable": {
+          "p50_ms": 192,
+          "p95_ms": 292,
+          "p99_ms": 292,
+          "max_ms": 292,
+          "count": 5
+        },
+        "observation_return": {
+          "p50_ms": 1,
+          "p95_ms": 2,
+          "p99_ms": 2,
+          "max_ms": 2,
+          "count": 173
+        }
+      },
+      "command_looper": {
+        "lateness_after_due_ms": {
+          "p50_ms": 0,
+          "p95_ms": 1,
+          "p99_ms": 2,
+          "max_ms": 2,
+          "count": 23
+        },
+        "post_to_execution_ms": {
+          "p50_ms": 20,
+          "p95_ms": 21,
+          "p99_ms": 22,
+          "max_ms": 22,
+          "count": 23
+        },
+        "policy": "Each effect references its polling runnable; post-to-execution includes deliberate 20ms polling period. Multiple effects can share a runnable; this is effect-weighted, not unique-runnable weighted."
+      },
+      "hard_seek_classifications": {
+        "LEGITIMATE": 0,
+        "TRANSIENT_AFTER_SEEK": 0,
+        "STALE_SAMPLE": 0,
+        "SCHEDULER_DELAY": 0,
+        "PLAYER_COMPLETION_DELAY": 0,
+        "SNAPSHOT_RECOVERY": 0,
+        "OTHER": 0
+      },
+      "first_play_position_advance": {
+        "status": "MEASURED_INTERVAL",
+        "operation_id": 2,
+        "sequence": 11,
+        "generation": 3,
+        "dispatch_to_first_advance_lower_bound_ms": 2,
+        "dispatch_to_first_advance_upper_bound_ms": 90,
+        "initial_play_dispatch_lateness_ms": 20,
+        "deadline_to_first_advance_lower_bound_ms": 22,
+        "deadline_to_first_advance_upper_bound_ms": 110,
+        "clock_mapping_bracket_ms": 0,
+        "first_observed_position_delta_ms": 13,
+        "effective_lost_advance_at_first_trace_ms": 77,
+        "effective_lost_advance_status": "INFERRED: elapsed minus SDK position advance, assuming rate 1 without intervening rate/seek; not an exact first-advance timestamp",
+        "clock_domain": "Kotlin elapsedRealtime for startup interval; deadline mapped through the same operation source bracket into Rust",
+        "limitation": "Existing driver trace every 25 polls; onset is not exact, SDK position is not physical frame/audio presentation"
+      },
+      "recovery": {},
+      "audit": "TESTED: primary Android and pair aggregates reproduce from raw samples",
+      "teardown_observed": true,
+      "processes_reaped": true
+    },
+    {
+      "file": "modern-device-run-4.json",
+      "status": "MEASURED",
+      "functional_status": "PASS",
+      "android_p95_goal_met": true,
+      "cross_device_p95_goal_met": true,
+      "source_base_commit": "cc7544b",
+      "source_worktree_dirty": true,
+      "build_mode": "profile",
+      "device": {
+        "android": "15",
+        "abi": "arm64-v8a",
+        "physical": true,
+        "api": 35
+      },
+      "wall_seconds": 90.05862746699995,
+      "media_size_bytes": 24300725,
+      "android_drift": {
+        "p50_ms": 33,
+        "p95_ms": 137,
+        "p99_ms": 154,
+        "max_ms": 5000,
+        "count": 191
+      },
+      "linux_drift": {
+        "p50_ms": 26,
+        "p95_ms": 60,
+        "p99_ms": 62,
+        "max_ms": 5000,
+        "count": 207
+      },
+      "android_drift_by_sequence_descriptive_only": {
+        "10": {
+          "p50_ms": 0,
+          "p95_ms": 0,
+          "p99_ms": 0,
+          "max_ms": 0,
+          "count": 7
+        },
+        "11": {
+          "p50_ms": 96,
+          "p95_ms": 154,
+          "p99_ms": 5000,
+          "max_ms": 5000,
+          "count": 21
+        },
+        "12": {
+          "p50_ms": 32,
+          "p95_ms": 32,
+          "p99_ms": 32,
+          "max_ms": 32,
+          "count": 1
+        },
+        "13": {
+          "p50_ms": 0,
+          "p95_ms": 0,
+          "p99_ms": 0,
+          "max_ms": 0,
+          "count": 1
+        },
+        "14": {
+          "p50_ms": 67,
+          "p95_ms": 146,
+          "p99_ms": 153,
+          "max_ms": 153,
+          "count": 23
+        },
+        "15": {
+          "p50_ms": 31,
+          "p95_ms": 105,
+          "p99_ms": 134,
+          "max_ms": 137,
+          "count": 135
+        },
+        "16": {
+          "p50_ms": 0,
+          "p95_ms": 21,
+          "p99_ms": 21,
+          "max_ms": 21,
+          "count": 3
+        }
+      },
+      "cross_device_difference": {
+        "p50_ms": 25.0,
+        "p95_ms": 148.0,
+        "p99_ms": 193.0,
+        "max_ms": 197.0,
+        "count": 191
+      },
+      "corrections": {
+        "rate": 7,
+        "restore": 4,
+        "seek": 0
+      },
+      "cpu_percent_one_core": 76.10595245615144,
+      "controls_window_cpu": {
+        "status": "MEASURED",
+        "window_seconds": 84.995,
+        "sample_count": 18,
+        "cpu_percent_one_core": 76.66333313724336,
+        "policy": "First resource sample after initial scheduled Play through last resource sample before final scheduled Pause; no interpolation"
+      },
+      "timing_ms": {
+        "scheduled_control_first_dispatch": {
+          "p50_ms": 11.5,
+          "p95_ms": 23.5,
+          "p99_ms": 23.5,
+          "max_ms": 23.5,
+          "count": 6
+        },
+        "network_runtime": {
+          "p50_ms": 14.5,
+          "p95_ms": 66,
+          "p99_ms": 66,
+          "max_ms": 66,
+          "count": 6
+        },
+        "scheduler_lateness": {
+          "p50_ms": 1,
+          "p95_ms": 2.5,
+          "p99_ms": 2.5,
+          "max_ms": 2.5,
+          "count": 9
+        },
+        "effect_queue": {
+          "p50_ms": 8,
+          "p95_ms": 20,
+          "p99_ms": 22,
+          "max_ms": 22,
+          "count": 21
+        },
+        "poll_lateness": {
+          "p50_ms": 0,
+          "p95_ms": 5,
+          "p99_ms": 21,
+          "max_ms": 158,
+          "count": 177
+        },
+        "jni_roundtrip": {
+          "p50_ms": 1,
+          "p95_ms": 2,
+          "p99_ms": 2,
+          "max_ms": 3,
+          "count": 177
+        },
+        "jni_parse_and_registry": {
+          "p50_ms": 0.143,
+          "p95_ms": 0.256,
+          "p99_ms": 0.323,
+          "max_ms": 0.417231,
+          "count": 177
+        },
+        "source_timestamp_relabel_error": {
+          "p50_ms": 1,
+          "p95_ms": 2,
+          "p99_ms": 2,
+          "max_ms": 2,
+          "count": 177
+        },
+        "media3_call": {
+          "p50_ms": 5,
+          "p95_ms": 10,
+          "p99_ms": 14,
+          "max_ms": 14,
+          "count": 21
+        },
+        "media3_first_callback": {
+          "p50_ms": 5,
+          "p95_ms": 9,
+          "p99_ms": 10,
+          "max_ms": 10,
+          "count": 20
+        },
+        "playing_completion": {
+          "p50_ms": 7,
+          "p95_ms": 9,
+          "p99_ms": 9,
+          "max_ms": 9,
+          "count": 2
+        },
+        "paused_completion": {
+          "p50_ms": 5,
+          "p95_ms": 7,
+          "p99_ms": 7,
+          "max_ms": 7,
+          "count": 2
+        },
+        "rate_completion": {
+          "p50_ms": 4,
+          "p95_ms": 6,
+          "p99_ms": 6,
+          "max_ms": 6,
+          "count": 11
+        },
+        "seek_ready": {
+          "p50_ms": 183,
+          "p95_ms": 224,
+          "p99_ms": 224,
+          "max_ms": 224,
+          "count": 5
+        },
+        "seek_loss": {
+          "p50_ms": 180,
+          "p95_ms": 224,
+          "p99_ms": 224,
+          "max_ms": 224,
+          "count": 5
+        },
+        "seek_stable": {
+          "p50_ms": 241,
+          "p95_ms": 260,
+          "p99_ms": 260,
+          "max_ms": 260,
+          "count": 5
+        },
+        "observation_return": {
+          "p50_ms": 1,
+          "p95_ms": 2,
+          "p99_ms": 2,
+          "max_ms": 2,
+          "count": 177
+        }
+      },
+      "command_looper": {
+        "lateness_after_due_ms": {
+          "p50_ms": 1,
+          "p95_ms": 1,
+          "p99_ms": 1,
+          "max_ms": 1,
+          "count": 21
+        },
+        "post_to_execution_ms": {
+          "p50_ms": 21,
+          "p95_ms": 21,
+          "p99_ms": 21,
+          "max_ms": 21,
+          "count": 21
+        },
+        "policy": "Each effect references its polling runnable; post-to-execution includes deliberate 20ms polling period. Multiple effects can share a runnable; this is effect-weighted, not unique-runnable weighted."
+      },
+      "hard_seek_classifications": {
+        "LEGITIMATE": 0,
+        "TRANSIENT_AFTER_SEEK": 0,
+        "STALE_SAMPLE": 0,
+        "SCHEDULER_DELAY": 0,
+        "PLAYER_COMPLETION_DELAY": 0,
+        "SNAPSHOT_RECOVERY": 0,
+        "OTHER": 0
+      },
+      "first_play_position_advance": {
+        "status": "MEASURED_INTERVAL",
+        "operation_id": 2,
+        "sequence": 11,
+        "generation": 3,
+        "dispatch_to_first_advance_lower_bound_ms": 9,
+        "dispatch_to_first_advance_upper_bound_ms": 297,
+        "initial_play_dispatch_lateness_ms": 6.5,
+        "deadline_to_first_advance_lower_bound_ms": 15.5,
+        "deadline_to_first_advance_upper_bound_ms": 303.5,
+        "clock_mapping_bracket_ms": 0,
+        "first_observed_position_delta_ms": 174,
+        "effective_lost_advance_at_first_trace_ms": 123,
+        "effective_lost_advance_status": "INFERRED: elapsed minus SDK position advance, assuming rate 1 without intervening rate/seek; not an exact first-advance timestamp",
+        "clock_domain": "Kotlin elapsedRealtime for startup interval; deadline mapped through the same operation source bracket into Rust",
+        "limitation": "Existing driver trace every 25 polls; onset is not exact, SDK position is not physical frame/audio presentation"
+      },
+      "recovery": {},
+      "audit": "TESTED: primary Android and pair aggregates reproduce from raw samples",
+      "teardown_observed": true,
+      "processes_reaped": true
+    },
+    {
+      "file": "modern-device-run-5.json",
+      "status": "MEASURED",
+      "functional_status": "PASS",
+      "android_p95_goal_met": false,
+      "cross_device_p95_goal_met": false,
+      "source_base_commit": "cc7544b",
+      "source_worktree_dirty": true,
+      "build_mode": "profile",
+      "device": {
+        "android": "15",
+        "abi": "arm64-v8a",
+        "physical": true,
+        "api": 35
+      },
+      "wall_seconds": 90.06133683899998,
+      "media_size_bytes": 24300725,
+      "android_drift": {
+        "p50_ms": 27,
+        "p95_ms": 185,
+        "p99_ms": 230,
+        "max_ms": 5000,
+        "count": 190
+      },
+      "linux_drift": {
+        "p50_ms": 29,
+        "p95_ms": 64,
+        "p99_ms": 64,
+        "max_ms": 5000,
+        "count": 206
+      },
+      "android_drift_by_sequence_descriptive_only": {
+        "10": {
+          "p50_ms": 0,
+          "p95_ms": 0,
+          "p99_ms": 0,
+          "max_ms": 0,
+          "count": 7
+        },
+        "11": {
+          "p50_ms": 172,
+          "p95_ms": 230,
+          "p99_ms": 5000,
+          "max_ms": 5000,
+          "count": 21
+        },
+        "12": {
+          "p50_ms": 55,
+          "p95_ms": 55,
+          "p99_ms": 55,
+          "max_ms": 55,
+          "count": 1
+        },
+        "14": {
+          "p50_ms": 100,
+          "p95_ms": 174,
+          "p99_ms": 179,
+          "max_ms": 179,
+          "count": 23
+        },
+        "15": {
+          "p50_ms": 25,
+          "p95_ms": 76,
+          "p99_ms": 105,
+          "max_ms": 107,
+          "count": 135
+        },
+        "16": {
+          "p50_ms": 0,
+          "p95_ms": 35,
+          "p99_ms": 35,
+          "max_ms": 35,
+          "count": 3
+        }
+      },
+      "cross_device_difference": {
+        "p50_ms": 33.0,
+        "p95_ms": 200.0,
+        "p99_ms": 255.0,
+        "max_ms": 256.0,
+        "count": 189
+      },
+      "corrections": {
+        "rate": 6,
+        "restore": 2,
+        "seek": 0
+      },
+      "cpu_percent_one_core": 76.12300112642251,
+      "controls_window_cpu": {
+        "status": "MEASURED",
+        "window_seconds": 85.001,
+        "sample_count": 18,
+        "cpu_percent_one_core": 76.46968859189892,
+        "policy": "First resource sample after initial scheduled Play through last resource sample before final scheduled Pause; no interpolation"
+      },
+      "timing_ms": {
+        "scheduled_control_first_dispatch": {
+          "p50_ms": 14,
+          "p95_ms": 29,
+          "p99_ms": 29,
+          "max_ms": 29,
+          "count": 6
+        },
+        "network_runtime": {
+          "p50_ms": 5,
+          "p95_ms": 95,
+          "p99_ms": 95,
+          "max_ms": 95,
+          "count": 6
+        },
+        "scheduler_lateness": {
+          "p50_ms": 1,
+          "p95_ms": 2.5,
+          "p99_ms": 2.5,
+          "max_ms": 2.5,
+          "count": 10
+        },
+        "effect_queue": {
+          "p50_ms": 14,
+          "p95_ms": 74,
+          "p99_ms": 74,
+          "max_ms": 74,
+          "count": 19
+        },
+        "poll_lateness": {
+          "p50_ms": 0,
+          "p95_ms": 1,
+          "p99_ms": 205,
+          "max_ms": 289,
+          "count": 177
+        },
+        "jni_roundtrip": {
+          "p50_ms": 1,
+          "p95_ms": 2,
+          "p99_ms": 2,
+          "max_ms": 4,
+          "count": 177
+        },
+        "jni_parse_and_registry": {
+          "p50_ms": 0.147,
+          "p95_ms": 0.225,
+          "p99_ms": 0.253,
+          "max_ms": 0.286076,
+          "count": 177
+        },
+        "source_timestamp_relabel_error": {
+          "p50_ms": 1,
+          "p95_ms": 2,
+          "p99_ms": 2,
+          "max_ms": 2,
+          "count": 177
+        },
+        "media3_call": {
+          "p50_ms": 2,
+          "p95_ms": 13,
+          "p99_ms": 13,
+          "max_ms": 13,
+          "count": 19
+        },
+        "media3_first_callback": {
+          "p50_ms": 1,
+          "p95_ms": 9,
+          "p99_ms": 9,
+          "max_ms": 9,
+          "count": 18
+        },
+        "playing_completion": {
+          "p50_ms": 1,
+          "p95_ms": 3,
+          "p99_ms": 3,
+          "max_ms": 3,
+          "count": 2
+        },
+        "paused_completion": {
+          "p50_ms": 1,
+          "p95_ms": 3,
+          "p99_ms": 3,
+          "max_ms": 3,
+          "count": 2
+        },
+        "rate_completion": {
+          "p50_ms": 1,
+          "p95_ms": 4,
+          "p99_ms": 4,
+          "max_ms": 4,
+          "count": 9
+        },
+        "seek_ready": {
+          "p50_ms": 196,
+          "p95_ms": 315,
+          "p99_ms": 315,
+          "max_ms": 315,
+          "count": 5
+        },
+        "seek_loss": {
+          "p50_ms": 219,
+          "p95_ms": 317,
+          "p99_ms": 317,
+          "max_ms": 317,
+          "count": 5
+        },
+        "seek_stable": {
+          "p50_ms": 241,
+          "p95_ms": 347,
+          "p99_ms": 347,
+          "max_ms": 347,
+          "count": 5
+        },
+        "observation_return": {
+          "p50_ms": 1,
+          "p95_ms": 2,
+          "p99_ms": 2,
+          "max_ms": 2,
+          "count": 177
+        }
+      },
+      "command_looper": {
+        "lateness_after_due_ms": {
+          "p50_ms": 1,
+          "p95_ms": 70,
+          "p99_ms": 70,
+          "max_ms": 70,
+          "count": 19
+        },
+        "post_to_execution_ms": {
+          "p50_ms": 21,
+          "p95_ms": 90,
+          "p99_ms": 90,
+          "max_ms": 90,
+          "count": 19
+        },
+        "policy": "Each effect references its polling runnable; post-to-execution includes deliberate 20ms polling period. Multiple effects can share a runnable; this is effect-weighted, not unique-runnable weighted."
+      },
+      "hard_seek_classifications": {
+        "LEGITIMATE": 0,
+        "TRANSIENT_AFTER_SEEK": 0,
+        "STALE_SAMPLE": 0,
+        "SCHEDULER_DELAY": 0,
+        "PLAYER_COMPLETION_DELAY": 0,
+        "SNAPSHOT_RECOVERY": 0,
+        "OTHER": 0
+      },
+      "first_play_position_advance": {
+        "status": "MEASURED_INTERVAL",
+        "operation_id": 2,
+        "sequence": 11,
+        "generation": 3,
+        "dispatch_to_first_advance_lower_bound_ms": 63,
+        "dispatch_to_first_advance_upper_bound_ms": 611,
+        "initial_play_dispatch_lateness_ms": 29,
+        "deadline_to_first_advance_lower_bound_ms": 92,
+        "deadline_to_first_advance_upper_bound_ms": 640,
+        "clock_mapping_bracket_ms": 0,
+        "first_observed_position_delta_ms": 417,
+        "effective_lost_advance_at_first_trace_ms": 194,
+        "effective_lost_advance_status": "INFERRED: elapsed minus SDK position advance, assuming rate 1 without intervening rate/seek; not an exact first-advance timestamp",
+        "clock_domain": "Kotlin elapsedRealtime for startup interval; deadline mapped through the same operation source bracket into Rust",
+        "limitation": "Existing driver trace every 25 polls; onset is not exact, SDK position is not physical frame/audio presentation"
+      },
+      "recovery": {},
+      "audit": "TESTED: primary Android and pair aggregates reproduce from raw samples",
+      "teardown_observed": true,
+      "processes_reaped": true
+    }
+  ],
+  "modern_android_pass_count": 3,
+  "modern_cross_device_pass_count": 3,
+  "source_limitations": [
+    "Historical Profile APKs used V1; current cc7544b uses V2, which keeps measuring seek loss after a position stabilized while paused. Historical APK hashes are unavailable; binary identity is unproven.",
+    "Only modern phone connected; historical comparison is sequential, not contemporaneous randomized A/B. Device, OS, ABI and load vary together.",
+    "LAN transport and Linux host/fixture are reused; historical Wi-Fi identity and interference cannot be independently verified.",
+    "Recovery is measured separately; historical 600s recovery was Debug and cannot be pooled with the controls-only Profile comparison."
+  ],
+  "modern_recovery": {
+    "file": "modern-device-recovery.json",
+    "functional_status": "PASS",
+    "build_mode": "profile",
+    "recovery": {
+      "foreground_ms": 1356.0221740001452,
+      "foreground_post_ready_convergence_ms": 7383.310607000112,
+      "foreground_initial_drift_ms": -32,
+      "network_resume_ms": 12229.873935000114,
+      "network_post_ready_convergence_ms": 5179.17165699987,
+      "same_member_after_resume": true
+    },
+    "android_drift_separate_population": {
+      "p50_ms": 93,
+      "p95_ms": 9394,
+      "p99_ms": 13392,
+      "max_ms": 13437,
+      "count": 182
+    },
+    "cross_device_separate_population": {
+      "p50_ms": 55.0,
+      "p95_ms": 214.0,
+      "p99_ms": 243.0,
+      "max_ms": 244.0,
+      "count": 154
+    },
+    "corrections": {
+      "counts": {
+        "rate": 8,
+        "restore": 4,
+        "seek": 0
+      },
+      "soft_per_minute": 5.321956673064682,
+      "hard_per_minute": 0.0
+    },
+    "audit": "TESTED: Android and pair aggregates reproduce from raw samples",
+    "convergence_limitation": "Inherited wait counts three valid samples <=150ms anywhere since the action index, not consecutive; foreground index begins before HOME. Wait timing is not an exact post-Ready settling interval."
+  }
+}

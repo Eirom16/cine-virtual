@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "status": "TESTED",
+  "source_commit": "cc7544b",
+  "manufacturer": "samsung",
+  "model": "SM-A146U",
+  "android": "15",
+  "api": 35,
+  "primary_abi": "arm64-v8a",
+  "available_abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "armeabi"
+  ],
+  "bits": 64,
+  "soc_manufacturer": "Mediatek",
+  "soc_model": "MT6833",
+  "physical": true,
+  "connected_physical_count": 1,
+  "build_mode": "profile",
+  "rust_build_mode": "release",
+  "rust_target": "aarch64-linux-android",
+  "flutter_abis": [
+    "arm64-v8a"
+  ],
+  "app_abis": [
+    "arm64-v8a"
+  ],
+  "apk_bridge_elf_bits": 64,
+  "apk_bridge_elf_machine": 183,
+  "packaged_bridge_matches_current_stripped_build": true,
+  "other_packaged_native_abis": [
+    "armeabi-v7a",
+    "x86_64"
+  ],
+  "toolchain": {
+    "flutter": "3.47.6",
+    "dart": "3.13.5",
+    "media3": "1.11.1",
+    "ndk": "28.2.13676358",
+    "rust": "1.99.0"
+  },
+  "fixture_bytes": 24300725,
+  "network": "Existing Linux LAN and validated Android Wi-Fi; no adb tunnel",
+  "build_attempts": [
+    {
+      "status": "FAIL",
+      "runtime_executed": false,
+      "reason": "Generated package configuration referenced removed temporary Flutter SDK"
+    },
+    {
+      "status": "PASS",
+      "action": "Regenerate ignored Flutter package configuration with pub get; rebuild same locked dependencies"
+    }
+  ],
+  "production_changes": false,
+  "initial_git_state": "master tracking origin/master; clean cc7544b",
+  "run_conditions": [
+    {
+      "run": 1,
+      "status": "MEASURED",
+      "battery_percent": 64,
+      "battery_temperature_c": 30.0,
+      "thermal_status": 0,
+      "usb_powered": true
+    },
+    {
+      "run": 2,
+      "status": "MEASURED",
+      "battery_percent": 64,
+      "battery_temperature_c": 31.0,
+      "thermal_status": 0,
+      "usb_powered": true
+    },
+    {
+      "run": 3,
+      "status": "MEASURED",
+      "battery_percent": 64,
+      "battery_temperature_c": 31.0,
+      "thermal_status": 0,
+      "usb_powered": true
+    },
+    {
+      "run": 4,
+      "status": "MEASURED",
+      "battery_percent": 64,
+      "battery_temperature_c": 32.0,
+      "thermal_status": 0,
+      "usb_powered": true
+    },
+    {
+      "run": 5,
+      "status": "MEASURED",
+      "battery_percent": 64,
+      "battery_temperature_c": 33.0,
+      "thermal_status": 0,
+      "usb_powered": true
+    }
+  ],
+  "installed_primary_cpu_abi": "arm64-v8a",
+  "installed_secondary_cpu_abi": "null",
+  "physical_bridge_hash_ready_verified": true,
+  "recovery_end_conditions": {
+    "battery_percent": 64,
+    "battery_temperature_c": 33.0,
+    "thermal_status": 0
+  }
+}
