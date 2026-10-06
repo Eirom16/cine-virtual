@@ -1,0 +1,482 @@
+{
+  "schema_version": 1,
+  "classification": "MEASURED recomputation of saved raw",
+  "runs": [
+    {
+      "source": "results-after-600-debug-v2.json",
+      "comparisons": {
+        "linux_drift": {
+          "published": {
+            "p50_ms": 17,
+            "p95_ms": 50,
+            "p99_ms": 51,
+            "max_ms": 5000,
+            "count": 1306
+          },
+          "recomputed_from_raw": {
+            "p50_ms": 17,
+            "p95_ms": 50,
+            "p99_ms": 51,
+            "max_ms": 5000,
+            "count": 1306
+          },
+          "count_delta": 0,
+          "quantiles_and_max_equal": true
+        },
+        "android_drift": {
+          "published": {
+            "p50_ms": 23,
+            "p95_ms": 120,
+            "p99_ms": 6268,
+            "max_ms": 11761,
+            "count": 1193
+          },
+          "recomputed_from_raw": {
+            "p50_ms": 23,
+            "p95_ms": 120,
+            "p99_ms": 6268,
+            "max_ms": 11761,
+            "count": 1194
+          },
+          "count_delta": 1,
+          "quantiles_and_max_equal": true
+        }
+      },
+      "cross_pair_aggregate_matches": true,
+      "precision_applicable": true
+    },
+    {
+      "source": "results-after-600-debug.json",
+      "comparisons": {
+        "linux_drift": {
+          "published": {
+            "p50_ms": 23,
+            "p95_ms": 56,
+            "p99_ms": 57,
+            "max_ms": 5000,
+            "count": 1289
+          },
+          "recomputed_from_raw": {
+            "p50_ms": 23,
+            "p95_ms": 56,
+            "p99_ms": 57,
+            "max_ms": 5000,
+            "count": 1289
+          },
+          "count_delta": 0,
+          "quantiles_and_max_equal": true
+        },
+        "android_drift": {
+          "published": {
+            "p50_ms": 23,
+            "p95_ms": 72,
+            "p99_ms": 6094,
+            "max_ms": 11601,
+            "count": 1194
+          },
+          "recomputed_from_raw": {
+            "p50_ms": 23,
+            "p95_ms": 72,
+            "p99_ms": 6094,
+            "max_ms": 11601,
+            "count": 1195
+          },
+          "count_delta": 1,
+          "quantiles_and_max_equal": true
+        }
+      },
+      "cross_pair_aggregate_matches": true,
+      "precision_applicable": true
+    },
+    {
+      "source": "results-after-debug.json",
+      "comparisons": {
+        "linux_drift": {
+          "published": {
+            "p50_ms": 17,
+            "p95_ms": 53,
+            "p99_ms": 55,
+            "max_ms": 5000,
+            "count": 291
+          },
+          "recomputed_from_raw": {
+            "p50_ms": 17,
+            "p95_ms": 53,
+            "p99_ms": 55,
+            "max_ms": 5000,
+            "count": 291
+          },
+          "count_delta": 0,
+          "quantiles_and_max_equal": true
+        },
+        "android_drift": {
+          "published": {
+            "p50_ms": 22,
+            "p95_ms": 171,
+            "p99_ms": 320,
+            "max_ms": 350,
+            "count": 189
+          },
+          "recomputed_from_raw": {
+            "p50_ms": 22,
+            "p95_ms": 171,
+            "p99_ms": 320,
+            "max_ms": 350,
+            "count": 190
+          },
+          "count_delta": 1,
+          "quantiles_and_max_equal": true
+        }
+      },
+      "cross_pair_aggregate_matches": true,
+      "precision_applicable": true
+    },
+    {
+      "source": "results-after-profile-1.json",
+      "comparisons": {
+        "linux_drift": {
+          "published": {
+            "p50_ms": 27,
+            "p95_ms": 63,
+            "p99_ms": 64,
+            "max_ms": 5000,
+            "count": 260
+          },
+          "recomputed_from_raw": {
+            "p50_ms": 27,
+            "p95_ms": 63,
+            "p99_ms": 64,
+            "max_ms": 5000,
+            "count": 260
+          },
+          "count_delta": 0,
+          "quantiles_and_max_equal": true
+        },
+        "android_drift": {
+          "published": {
+            "p50_ms": 11,
+            "p95_ms": 153,
+            "p99_ms": 203,
+            "max_ms": 250,
+            "count": 191
+          },
+          "recomputed_from_raw": {
+            "p50_ms": 11,
+            "p95_ms": 153,
+            "p99_ms": 203,
+            "max_ms": 250,
+            "count": 191
+          },
+          "count_delta": 0,
+          "quantiles_and_max_equal": true
+        }
+      },
+      "cross_pair_aggregate_matches": true,
+      "precision_applicable": true
+    },
+    {
+      "source": "results-after-profile-2.json",
+      "comparisons": {
+        "linux_drift": {
+          "published": {
+            "p50_ms": 12,
+            "p95_ms": 46,
+            "p99_ms": 47,
+            "max_ms": 47,
+            "count": 262
+          },
+          "recomputed_from_raw": {
+            "p50_ms": 12,
+            "p95_ms": 46,
+            "p99_ms": 47,
+            "max_ms": 47,
+            "count": 262
+          },
+          "count_delta": 0,
+          "quantiles_and_max_equal": true
+        },
+        "android_drift": {
+          "published": {
+            "p50_ms": 41,
+            "p95_ms": 178,
+            "p99_ms": 245,
+            "max_ms": 251,
+            "count": 191
+          },
+          "recomputed_from_raw": {
+            "p50_ms": 41,
+            "p95_ms": 178,
+            "p99_ms": 245,
+            "max_ms": 251,
+            "count": 191
+          },
+          "count_delta": 0,
+          "quantiles_and_max_equal": true
+        }
+      },
+      "cross_pair_aggregate_matches": true,
+      "precision_applicable": true
+    },
+    {
+      "source": "results-after-profile-3.json",
+      "comparisons": {
+        "linux_drift": {
+          "published": {
+            "p50_ms": 6,
+            "p95_ms": 42,
+            "p99_ms": 69,
+            "max_ms": 69,
+            "count": 263
+          },
+          "recomputed_from_raw": {
+            "p50_ms": 6,
+            "p95_ms": 42,
+            "p99_ms": 69,
+            "max_ms": 69,
+            "count": 263
+          },
+          "count_delta": 0,
+          "quantiles_and_max_equal": true
+        },
+        "android_drift": {
+          "published": {
+            "p50_ms": 26,
+            "p95_ms": 195,
+            "p99_ms": 240,
+            "max_ms": 241,
+            "count": 191
+          },
+          "recomputed_from_raw": {
+            "p50_ms": 26,
+            "p95_ms": 195,
+            "p99_ms": 240,
+            "max_ms": 241,
+            "count": 191
+          },
+          "count_delta": 0,
+          "quantiles_and_max_equal": true
+        }
+      },
+      "cross_pair_aggregate_matches": true,
+      "precision_applicable": true
+    },
+    {
+      "source": "results-after-recovery-v2.json",
+      "comparisons": {
+        "linux_drift": {
+          "published": {
+            "p50_ms": 22,
+            "p95_ms": 73,
+            "p99_ms": 74,
+            "max_ms": 5000,
+            "count": 249
+          },
+          "recomputed_from_raw": {
+            "p50_ms": 22,
+            "p95_ms": 73,
+            "p99_ms": 74,
+            "max_ms": 5000,
+            "count": 249
+          },
+          "count_delta": 0,
+          "quantiles_and_max_equal": true
+        },
+        "android_drift": {
+          "published": {
+            "p50_ms": 34,
+            "p95_ms": 8625,
+            "p99_ms": 11135,
+            "max_ms": 32069,
+            "count": 137
+          },
+          "recomputed_from_raw": {
+            "p50_ms": 34,
+            "p95_ms": 8625,
+            "p99_ms": 11135,
+            "max_ms": 32069,
+            "count": 137
+          },
+          "count_delta": 0,
+          "quantiles_and_max_equal": true
+        }
+      },
+      "cross_pair_aggregate_matches": true,
+      "precision_applicable": true
+    },
+    {
+      "source": "results-before-debug.json",
+      "comparisons": {
+        "linux_drift": {
+          "published": {
+            "p50_ms": 18,
+            "p95_ms": 54,
+            "p99_ms": 55,
+            "max_ms": 5000,
+            "count": 343
+          },
+          "recomputed_from_raw": {
+            "p50_ms": 18,
+            "p95_ms": 54,
+            "p99_ms": 55,
+            "max_ms": 5000,
+            "count": 343
+          },
+          "count_delta": 0,
+          "quantiles_and_max_equal": true
+        },
+        "android_drift": {
+          "published": {
+            "p50_ms": 418,
+            "p95_ms": 10594,
+            "p99_ms": 14386,
+            "max_ms": 14386,
+            "count": 184
+          },
+          "recomputed_from_raw": {
+            "p50_ms": 418,
+            "p95_ms": 10594,
+            "p99_ms": 14386,
+            "max_ms": 14386,
+            "count": 184
+          },
+          "count_delta": 0,
+          "quantiles_and_max_equal": true
+        }
+      },
+      "cross_pair_aggregate_matches": true,
+      "precision_applicable": true
+    },
+    {
+      "source": "results-before-profile.json",
+      "comparisons": {
+        "linux_drift": {
+          "published": {
+            "p50_ms": 9,
+            "p95_ms": 28,
+            "p99_ms": 29,
+            "max_ms": 5000,
+            "count": 261
+          },
+          "recomputed_from_raw": {
+            "p50_ms": 9,
+            "p95_ms": 28,
+            "p99_ms": 29,
+            "max_ms": 5000,
+            "count": 261
+          },
+          "count_delta": 0,
+          "quantiles_and_max_equal": true
+        },
+        "android_drift": {
+          "published": {
+            "p50_ms": 226,
+            "p95_ms": 573,
+            "p99_ms": 627,
+            "max_ms": 5000,
+            "count": 187
+          },
+          "recomputed_from_raw": {
+            "p50_ms": 226,
+            "p95_ms": 573,
+            "p99_ms": 627,
+            "max_ms": 5000,
+            "count": 187
+          },
+          "count_delta": 0,
+          "quantiles_and_max_equal": true
+        }
+      },
+      "cross_pair_aggregate_matches": true,
+      "precision_applicable": true
+    },
+    {
+      "source": "results-faults-profile.json",
+      "comparisons": {
+        "linux_drift": {
+          "published": {
+            "p50_ms": 20,
+            "p95_ms": 56,
+            "p99_ms": 57,
+            "max_ms": 5000,
+            "count": 263
+          },
+          "recomputed_from_raw": {
+            "p50_ms": 20,
+            "p95_ms": 56,
+            "p99_ms": 57,
+            "max_ms": 5000,
+            "count": 263
+          },
+          "count_delta": 0,
+          "quantiles_and_max_equal": true
+        },
+        "android_drift": {
+          "published": {
+            "p50_ms": 48,
+            "p95_ms": 809,
+            "p99_ms": 1108,
+            "max_ms": 5000,
+            "count": 181
+          },
+          "recomputed_from_raw": {
+            "p50_ms": 48,
+            "p95_ms": 809,
+            "p99_ms": 1108,
+            "max_ms": 5000,
+            "count": 181
+          },
+          "count_delta": 0,
+          "quantiles_and_max_equal": true
+        }
+      },
+      "cross_pair_aggregate_matches": true,
+      "precision_applicable": false
+    },
+    {
+      "source": "results-faults-stable-profile.json",
+      "comparisons": {
+        "linux_drift": {
+          "published": {
+            "p50_ms": 16,
+            "p95_ms": 37,
+            "p99_ms": 41,
+            "max_ms": 5000,
+            "count": 319
+          },
+          "recomputed_from_raw": {
+            "p50_ms": 16,
+            "p95_ms": 37,
+            "p99_ms": 41,
+            "max_ms": 5000,
+            "count": 319
+          },
+          "count_delta": 0,
+          "quantiles_and_max_equal": true
+        },
+        "android_drift": {
+          "published": {
+            "p50_ms": 41,
+            "p95_ms": 950,
+            "p99_ms": 1071,
+            "max_ms": 5000,
+            "count": 245
+          },
+          "recomputed_from_raw": {
+            "p50_ms": 41,
+            "p95_ms": 950,
+            "p99_ms": 1071,
+            "max_ms": 5000,
+            "count": 245
+          },
+          "count_delta": 0,
+          "quantiles_and_max_equal": true
+        }
+      },
+      "cross_pair_aggregate_matches": true,
+      "precision_applicable": false
+    }
+  ],
+  "known_race": "Reader could append between aggregate calculation and raw copy; original evidence preserved",
+  "fix": "Future runs freeze sample_snapshot before statistics and use it for saved raw",
+  "all_published_quantiles_and_max_reproduced": true
+}

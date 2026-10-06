@@ -245,5 +245,6 @@
     "Android recovery p99/max remain seconds",
     "Legacy dispatch p95 remains 273 ms",
     "Repeated short primary p95 remains >150 ms"
-  ]
+  ],
+  "aggregate_audit": "results-aggregate-audit.json; 1193 aggregate vs 1194 saved raw; quantiles/max match"
 }

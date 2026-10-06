@@ -171,3 +171,17 @@ La cifra legacy dispatch mantiene la fórmula del experimento 07 para comparaci�
 su ancla antes de JNI puede añadir el pequeño coste de JNI dos veces. El análisis
 de scheduler/queue/SDK usa timestamps separados y calibración; no se presenta la
 cifra legacy como latencia de seek ni como medida exacta de frame/audio.
+
+## Auditoría independiente de agregados
+
+```sh
+python3 scripts/audit_android_metrics.py experiments/08-android-sync-precision --output experiments/08-android-sync-precision/results-aggregate-audit.json
+```
+
+La recomputación reproduce todos los p50/p95/p99/máximos publicados y los agregados
+cross-device de pair_samples, incluidos faults separados. after-debug y ambos
+ensayos largos guardaron una muestra Android terminal adicional respecto al
+agregado: el reader avanzó entre cálculo y copia raw. results-aggregate-audit
+conserva ambas cuentas (1193 agregadas/1194 raw en el largo final), sin reescribir
+resultados. El harness ahora congela sample_snapshot antes de calcular y guardar.
+No se modifican filtros, percentiles ni datos físicos para aprobar el gate.

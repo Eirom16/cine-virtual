@@ -106,7 +106,7 @@ MEASURED: p50 17 ms; p95 **50 ms**; p99 51 ms; máximo 5000 ms; n=1306.
 
 ## 27. Métricas Android
 
-MEASURED: p50 23 ms; p95 **120 ms**; p99 6268 ms; máximo 11761 ms; n=1193.
+MEASURED: p50 23 ms; p95 **120 ms**; p99 6268 ms; máximo 11761 ms; n=1193 en agregado, 1194 en raw por carrera de publicación. [Auditoría](results-aggregate-audit.json) reproduce todos los percentiles/máximo; valores originales preservados.
 
 ## 28. Métricas cross-device
 
@@ -136,6 +136,8 @@ TESTED: estado inicial matriz completa PASS, run 37395948312. El push del commit
 
 MEASURED/IMPLEMENTED: target atrasado tras seek; correlación global de callbacks insuficiente; Kotlin rustNow fuera de alcance durante instrumentación, corregido; telemetría CPU inicial demasiado grande para logcat, compactada; controls-only marcaba background executed, corregido con valor original conservado; primer bias120 canceló lag previo, repeat con baseline estable. Snapshot podía estabilizar posición pausada antes de Play y finalizar prematuramente la medición de pérdida de avance: el primer ensayo largo lo mostró; se separó esa medición del marcador estable y se repitió recovery y ensayo largo. No se borran intentos fallidos.
 
+La recomputación independiente encontró una carrera del harness entre cálculo y copia de muestras: after-debug y ambos largos guardaron una muestra Android terminal adicional. Todos los percentiles/máximos y agregados de pair_samples se reproducen. IMPLEMENTED: congelar sample_snapshot para cálculo y evidencia; originales intactos y auditoría machine-readable.
+
 ## 35. Riesgos restantes
 
 INFERRED/UNTESTED: variabilidad del predictor, cold Play/AudioTrack, callback READY genérico y position masking, frame/audio real, corpus de mayor carga, otros dispositivos, rotación/process death, providers lentos y WAN. Los FAIL cortos siguen abiertos aunque el ensayo largo llegue a aprobar. En el largo final Android p99 6268 ms y máximo 11761 ms; aún hay recuperación muy fuera de meta aunque el p95 pase. No nueva UI ni features.
@@ -154,7 +156,7 @@ IMPLEMENTED/TESTED experimental; **PROVISIONAL FOR ANDROID**. No se abandona ni 
 
 ## 39. Commits
 
-IMPLEMENTED: 81f5cff `diag: instrument android playback timing`; 155299a `fix: compensate android seek completion loss`. La evidencia se guarda por separado en `docs: record android sync precision diagnosis`; hash de cierre desde git log.
+IMPLEMENTED: 81f5cff `diag: instrument android playback timing`; 155299a `fix: compensate android seek completion loss`; ddeb7e7 `docs: record android sync precision diagnosis`. Cierre adicional `fix: freeze diagnostic metric sample boundary`, hash desde git log. Su cambio es del harness; no altera la implementación física probada.
 
 ## 40. Estado Git final
 

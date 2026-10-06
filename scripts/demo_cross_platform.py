@@ -240,7 +240,9 @@ def main():
             time.sleep(.25)
         report['real_wall_seconds']=time.monotonic()-began
         control('pause');time.sleep(1)
-        ls=fields(host,'sync_sample');a=[x for x in ls if valid(x)];bs=[x['sync'] for x in android_samples if valid(x.get('sync'))]
+        # Freeze the reader's list once: statistics and raw evidence need the same boundary.
+        sample_snapshot=android_samples.copy()
+        ls=fields(host,'sync_sample');a=[x for x in ls if valid(x)];bs=[x['sync'] for x in sample_snapshot if valid(x.get('sync'))]
         report['linux_drift']=stats([abs(x['drift_ms']) for x in a]);report['android_drift']=stats([abs(x['drift_ms']) for x in bs])
         pairs=[]
         for b in bs:
@@ -260,7 +262,7 @@ def main():
         report['dispatch_lateness']={'linux':stats([abs(x['linux_scheduler_lateness_ms']) for x in controls]),'android':stats([abs(x['lateness_ms']) for x in android_dispatches.values()]),'missed_definition_ms':50,'linux_missed':sum(x['linux_scheduler_lateness_ms']>50 for x in controls),'android_missed':sum(x['lateness_ms']>50 for x in android_dispatches.values())}
         report['android_seek_ready']=[{k:x[k] for k in ['sequence','latency_ms','target_ms','position_ms','server_ms'] if k in x} for x in android_events if x.get('event')=='native_seek_ready']
         report['clock_android']=[x['clock'] for x in android_samples if x.get('clock')]
-        report['linux_samples']=ls;report['android_samples']=android_samples.copy();report['android_events']=android_events;report['controls']=controls.copy();report['recovery']=recovery;report['linux_resources']=resource_samples;report['android_resources']=android_resources
+        report['linux_samples']=ls;report['android_samples']=sample_snapshot;report['android_events']=android_events;report['controls']=controls.copy();report['recovery']=recovery;report['linux_resources']=resource_samples;report['android_resources']=android_resources
         def resource_summary(items,memory_key,time_key,ticks_per_second):
             good=[x for x in items if all(k in x for k in [memory_key,time_key,'cpu_ticks','threads','fds'])]
             if not good:return {'measured':False}

@@ -33,5 +33,6 @@
   "flutter_test_environment": "PASS after setting documented CINE_BRIDGE_LIBRARY; analyze PASS",
   "seek_completion_reproduction": "PASS: both algorithms request initial legitimate seek; numeric dispatch+completion then unchanged policy repeats seek only without adapter compensation",
   "android_local_smoke": "PASS: SAF/hash/first frame/Play/Pause/Seek/rate/lifecycle/errors/destroy; API28 ARMv7",
-  "linux_android_final_smoke": "PASS functional; final 600.16 s precision gates Android120/cross57; 2 hard seeks"
+  "linux_android_final_smoke": "PASS functional; final 600.16 s precision gates Android120/cross57; 2 hard seeks",
+  "aggregate_audit": "PASS all published quantiles/max/cross-pair aggregates reproduced; 3 runs have 1 extra terminal raw sample; harness boundary fixed; originals preserved"
 }
