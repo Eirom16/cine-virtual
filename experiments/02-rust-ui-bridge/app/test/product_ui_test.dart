@@ -508,4 +508,25 @@ void main() {
     );
     expect(find.text('Verificación cancelada'), findsOneWidget);
   });
+  testWidgets('Idle controls can be restored and navigation stays available', (
+    tester,
+  ) async {
+    final c = await fixture(tester);
+    (c.gateway as TestGateway).sync['playing'] = true;
+    c.poll();
+    var returned = false;
+    await screen(
+      tester,
+      PlayerScreen(controller: c, onLobby: () => returned = true),
+    );
+    await tester.pump(const Duration(seconds: 5));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('player-toggle')), findsNothing);
+    await tester.tap(find.byTooltip('Mostrar controles'));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('player-toggle')), findsOneWidget);
+    await tester.tap(find.byTooltip('Volver a la sala'));
+    expect(returned, true);
+    expect(tester.takeException(), isNull);
+  });
 }

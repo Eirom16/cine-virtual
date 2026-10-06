@@ -113,6 +113,50 @@ class _PlayerScreenState extends State<PlayerScreen> {
               Expanded(
                 child: Column(
                   children: [
+                    AnimatedSize(
+                      duration: CineTokens.motion,
+                      child: visible
+                          ? IgnorePointer(
+                              ignoring: !visible,
+                              child: AnimatedOpacity(
+                                opacity: visible ? 1 : 0,
+                                duration: CineTokens.motion,
+                                child: Container(
+                                  color: CineTokens.background.withValues(
+                                    alpha: .92,
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: CineTokens.sm,
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      IconButton(
+                                        onPressed: widget.onLobby,
+                                        tooltip: 'Volver a la sala',
+                                        icon: const Icon(Icons.arrow_back),
+                                      ),
+                                      Expanded(
+                                        child: Text(
+                                          view.filename.isEmpty
+                                              ? 'Cine Virtual'
+                                              : view.filename,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                      IconButton(
+                                        onPressed: () =>
+                                            showParticipants(desktop),
+                                        tooltip: 'Participantes',
+                                        icon: const Icon(Icons.people_outline),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            )
+                          : const SizedBox.shrink(),
+                    ),
                     Expanded(
                       child: MouseRegion(
                         onHover: (_) => showControls(),
@@ -138,7 +182,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                         viewType: 'cine.mobile/surface',
                                       )
                                     : Center(
-                                        child: Padding(
+                                        child: SingleChildScrollView(
                                           padding: CineTokens.pageInsets,
                                           child: Column(
                                             mainAxisSize: MainAxisSize.min,
@@ -186,69 +230,12 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                         ),
                                       ),
                               ),
-                              Align(
-                                alignment: Alignment.topCenter,
-                                child: IgnorePointer(
-                                  ignoring: !visible,
-                                  child: AnimatedOpacity(
-                                    opacity: visible ? 1 : 0,
-                                    duration: CineTokens.motion,
-                                    child: Container(
-                                      color: CineTokens.background.withValues(
-                                        alpha: .92,
-                                      ),
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: CineTokens.sm,
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          IconButton(
-                                            onPressed: widget.onLobby,
-                                            tooltip: 'Volver a la sala',
-                                            icon: const Icon(Icons.arrow_back),
-                                          ),
-                                          Expanded(
-                                            child: Text(
-                                              view.filename.isEmpty
-                                                  ? 'Cine Virtual'
-                                                  : view.filename,
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ),
-                                          IconButton(
-                                            onPressed: () =>
-                                                showParticipants(desktop),
-                                            tooltip: 'Participantes',
-                                            icon: const Icon(
-                                              Icons.people_outline,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
                               if (controller.playback.value.buffering)
                                 const Center(
                                   child: StatusPill(
                                     'Preparando vídeo…',
                                     color: CineTokens.warning,
                                     icon: Icons.hourglass_top,
-                                  ),
-                                ),
-                              if (!visible)
-                                Positioned(
-                                  right: CineTokens.sm,
-                                  bottom: CineTokens.sm,
-                                  child: IconButton(
-                                    onPressed: showControls,
-                                    tooltip: 'Mostrar controles',
-                                    icon: const Icon(
-                                      Icons.tune,
-                                      color: CineTokens.text,
-                                    ),
                                   ),
                                 ),
                             ],
@@ -279,7 +266,17 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                   }
                                 },
                               )
-                            : const SizedBox.shrink(),
+                            : ColoredBox(
+                                color: CineTokens.background,
+                                child: Align(
+                                  alignment: Alignment.centerRight,
+                                  child: IconButton(
+                                    onPressed: showControls,
+                                    tooltip: 'Mostrar controles',
+                                    icon: const Icon(Icons.tune),
+                                  ),
+                                ),
+                              ),
                       ),
                     ),
                   ],
