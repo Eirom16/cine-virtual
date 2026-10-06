@@ -177,3 +177,17 @@ no equivale a runtime cruzado; verificar resultados físicos antes de promover g
 linking y runtime. SDK headless Linux es opt-in y no valida display/audio físico.
 No teléfono físico ni pruebas de diez minutos en cada push. Apple device/simulator
 son compilaciones unsigned, con Player explícitamente no implementado.
+
+## Precisión Android
+
+[Experimento 08](../experiments/08-android-sync-precision/README.md) conserva
+raw métricas sanitizadas, corridas debug/profile antes/después, faults separados
+y ensayo largo condicionado a convergencia repetida sin storm. Tests numéricos
+cubren pérdida de avance durante seek, proyección/edad de target, paused exacto,
+media duration, generation/operation invalidation y estimación sin sleep fijo.
+Réplica verifica que samples pending/stale no corrigen y que samples frescos
+vuelven a activar corrección. Una observación pausada estable no invalida la
+medida posterior de pérdida de avance al reanudar Play. Tests Python verifican
+offset entre dominios, preservación de OTHER y rechazo de callbacks de completion
+invalidados por comandos opuestos, conservando la evidencia. El diagnóstico no aprueba frame/audio perceptual ni todos
+los dispositivos; functional PASS y p95 gate se publican separadamente.

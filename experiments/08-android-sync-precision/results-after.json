@@ -1,0 +1,249 @@
+{
+  "schema_version": 1,
+  "scenario": "linux-android-room",
+  "real_wall_seconds": 600.1646499119997,
+  "build_mode": "debug",
+  "device": {
+    "android": "9",
+    "abi": "armeabi-v7a",
+    "physical": true,
+    "api": 28
+  },
+  "linux_drift": {
+    "p50_ms": 17,
+    "p95_ms": 50,
+    "p99_ms": 51,
+    "max_ms": 5000,
+    "count": 1306
+  },
+  "android_drift": {
+    "p50_ms": 23,
+    "p95_ms": 120,
+    "p99_ms": 6268,
+    "max_ms": 11761,
+    "count": 1193
+  },
+  "cross_device_difference": {
+    "p50_ms": 18.0,
+    "p95_ms": 57.0,
+    "p99_ms": 186.0,
+    "max_ms": 466.0,
+    "count": 1165
+  },
+  "corrections": {
+    "linux": {
+      "counts": {
+        "rate": 0,
+        "restore": 0,
+        "seek": 0
+      },
+      "soft_per_minute": 0.0,
+      "hard_per_minute": 0.0
+    },
+    "android": {
+      "counts": {
+        "rate": 6,
+        "restore": 3,
+        "seek": 2
+      },
+      "soft_per_minute": 0.5998353952582607,
+      "hard_per_minute": 0.19994513175275355
+    }
+  },
+  "dispatch_lateness": {
+    "linux": {
+      "p50_ms": 1.0,
+      "p95_ms": 2.0,
+      "p99_ms": 2.0,
+      "max_ms": 2.0,
+      "count": 6
+    },
+    "android": {
+      "p50_ms": 20,
+      "p95_ms": 273,
+      "p99_ms": 273,
+      "max_ms": 273,
+      "count": 6
+    },
+    "missed_definition_ms": 50,
+    "linux_missed": 0,
+    "android_missed": 2
+  },
+  "recovery": {
+    "foreground_ms": 1908.1794929988973,
+    "foreground_post_ready_convergence_ms": 0.025296001695096493,
+    "foreground_initial_drift_ms": -33,
+    "network_resume_ms": 13195.230364999588,
+    "network_post_ready_convergence_ms": 1559.1320709972933,
+    "same_member_after_resume": true
+  },
+  "resources_summary": {
+    "linux": {
+      "measured": true,
+      "memory_metric": "rss_kib",
+      "initial_kib": 71276,
+      "final_kib": 41296,
+      "max_kib": 71892,
+      "threads_min": 21,
+      "threads_max": 22,
+      "fds_min": 15,
+      "fds_max": 15,
+      "cpu_percent_one_core": 8.106167176235312
+    },
+    "android": {
+      "measured": true,
+      "memory_metric": "pss_after_hash_and_load_kib",
+      "initial_kib": 204711,
+      "final_kib": 155710,
+      "max_kib": 207690,
+      "threads_min": 40,
+      "threads_max": 49,
+      "fds_min": 110,
+      "fds_max": 176,
+      "cpu_percent_one_core": 78.55061145186484
+    }
+  },
+  "metrics_policy": {
+    "all_loaded_trusted_samples": "Includes room-not-ready recovery/preparation transients; excludes clock untrusted, seek/buffer, stale SDK samples",
+    "steady_room_ready": "Additional subset only; does not replace primary metrics or hide recovery",
+    "convergence_goal_ms": 150,
+    "convergence_requires_samples": 3,
+    "convergence_timeout_seconds": 20
+  },
+  "p95_goal_met": true,
+  "status": "PASS",
+  "teardown_observed": true,
+  "classification": "MEASURED",
+  "source": "results-after-600-debug-v2.json",
+  "short_primary_precision": "FAIL in every repeated 90 s control run",
+  "long_primary_precision": "PASS Android and cross-device",
+  "hard_seek_classifications": {
+    "LEGITIMATE": 0,
+    "TRANSIENT_AFTER_SEEK": 0,
+    "STALE_SAMPLE": 0,
+    "SCHEDULER_DELAY": 0,
+    "PLAYER_COMPLETION_DELAY": 1,
+    "SNAPSHOT_RECOVERY": 1,
+    "OTHER": 0
+  },
+  "timing_ms": {
+    "network_runtime": {
+      "p50_ms": 35.5,
+      "p95_ms": 99.5,
+      "p99_ms": 99.5,
+      "max_ms": 99.5,
+      "count": 6
+    },
+    "scheduler_lateness": {
+      "p50_ms": 1,
+      "p95_ms": 2,
+      "p99_ms": 2,
+      "max_ms": 2,
+      "count": 10
+    },
+    "effect_queue": {
+      "p50_ms": 9,
+      "p95_ms": 121,
+      "p99_ms": 150,
+      "max_ms": 150,
+      "count": 30
+    },
+    "poll_lateness": {
+      "p50_ms": 0,
+      "p95_ms": 51,
+      "p99_ms": 119,
+      "max_ms": 478,
+      "count": 878
+    },
+    "jni_roundtrip": {
+      "p50_ms": 1,
+      "p95_ms": 2,
+      "p99_ms": 2,
+      "max_ms": 8,
+      "count": 878
+    },
+    "jni_parse_and_registry": {
+      "p50_ms": 0.237,
+      "p95_ms": 0.331,
+      "p99_ms": 0.6,
+      "max_ms": 2.729654,
+      "count": 878
+    },
+    "source_timestamp_relabel_error": {
+      "p50_ms": 1,
+      "p95_ms": 1,
+      "p99_ms": 2,
+      "max_ms": 4,
+      "count": 878
+    },
+    "media3_call": {
+      "p50_ms": 6,
+      "p95_ms": 15,
+      "p99_ms": 15,
+      "max_ms": 15,
+      "count": 30
+    },
+    "media3_first_callback": {
+      "p50_ms": 5,
+      "p95_ms": 10,
+      "p99_ms": 10,
+      "max_ms": 10,
+      "count": 25
+    },
+    "playing_completion": {
+      "p50_ms": 5,
+      "p95_ms": 8,
+      "p99_ms": 8,
+      "max_ms": 8,
+      "count": 4
+    },
+    "paused_completion": {
+      "p50_ms": 5,
+      "p95_ms": 10,
+      "p99_ms": 10,
+      "max_ms": 10,
+      "count": 3
+    },
+    "rate_completion": {
+      "p50_ms": 4,
+      "p95_ms": 6,
+      "p99_ms": 6,
+      "max_ms": 6,
+      "count": 10
+    },
+    "seek_ready": {
+      "p50_ms": 255,
+      "p95_ms": 470,
+      "p99_ms": 470,
+      "max_ms": 470,
+      "count": 8
+    },
+    "seek_loss": {
+      "p50_ms": 256,
+      "p95_ms": 406,
+      "p99_ms": 406,
+      "max_ms": 406,
+      "count": 8
+    },
+    "seek_stable": {
+      "p50_ms": 311,
+      "p95_ms": 517,
+      "p99_ms": 517,
+      "max_ms": 517,
+      "count": 8
+    },
+    "observation_return": {
+      "p50_ms": 1,
+      "p95_ms": 1,
+      "p99_ms": 2,
+      "max_ms": 4,
+      "count": 878
+    }
+  },
+  "limitations": [
+    "SDK position, no optical frame/audio confirmation",
+    "Android recovery p99/max remain seconds",
+    "Legacy dispatch p95 remains 273 ms",
+    "Repeated short primary p95 remains >150 ms"
+  ]
+}

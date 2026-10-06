@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "classification": "TESTED",
+  "rust_tests": 97,
+  "rust_suite": "PASS: 97 tests; sockets rerun outside sandbox",
+  "fmt": "PASS",
+  "clippy": "PASS",
+  "docs": "PASS",
+  "check_ci": "PASS using existing validator venv",
+  "flutter_analyze": "PASS",
+  "flutter_tests": 6,
+  "fake_player_demo": "PASS",
+  "linux_real_smoke": "PASS",
+  "linux_ui_smoke": "PASS",
+  "sdk_tests": {
+    "client_owner": 2,
+    "libmpv": 4,
+    "result": "PASS serialized",
+    "diagnostic_failure": "parallel process-global FD assertion collided with another live test Player; three passed, one failed, serial rerun four passed"
+  },
+  "android_compile_diagnostic": {
+    "profile_first_attempt": "FAIL: instrumentation variable referenced before declaration",
+    "profile_after_fix": "PASS"
+  },
+  "physical_precision": "see per-run results; functional PASS is separate from p95 gate",
+  "python_tests": 9,
+  "faults_stable_profile": "PASS: actual 0.98/1.0 callbacks and hard seeks observed",
+  "environment_failures": [
+    "sandbox rejected local WebSocket sockets; full unsandboxed suite passed",
+    "incorrect temporary validator path; existing /tmp validator venv passed",
+    "Flutter test repeated without CINE_BRIDGE_LIBRARY; missing shared library; rerun with documented environment required"
+  ],
+  "flutter_test_environment": "PASS after setting documented CINE_BRIDGE_LIBRARY; analyze PASS",
+  "seek_completion_reproduction": "PASS: both algorithms request initial legitimate seek; numeric dispatch+completion then unchanged policy repeats seek only without adapter compensation",
+  "android_local_smoke": "PASS: SAF/hash/first frame/Play/Pause/Seek/rate/lifecycle/errors/destroy; API28 ARMv7",
+  "linux_android_final_smoke": "PASS functional; final 600.16 s precision gates Android120/cross57; 2 hard seeks"
+}

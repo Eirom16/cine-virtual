@@ -173,6 +173,16 @@ por Wi-Fi durante 600,08 s. p95 Linux 36 ms, Android 514 ms y diferencia 462 ms;
 SyncEngine no cambian. SDK dispatch, completion READY y frame presentado siguen
 siendo observaciones distintas. iOS permanece fuera del gate Linux/Android.
 
+### Evidencia adicional — Precisión Android
+
+El [experimento 08](../experiments/08-android-sync-precision/RESULTS.md) instrumenta
+el pipeline y corrige targets que quedaban atrasados tras el seek asíncrono,
+con una estimación de pérdida de avance local del adapter. Core y sus thresholds
+se conservan. Ensayo final debug físico de 600,16 s: p95 Android 120 ms y diferencia
+57 ms, dos hard seeks; cortos repetidos siguen fallando el gate y los transitorios
+de recuperación mantienen p99 Android de varios segundos. Esta evidencia mejora
+la implementación; no cambia la decisión provisional ni aprueba UI de producto.
+
 ## ADR-007 — Rust inicial, UI/puente candidatos (Provisional)
 
 **Context:** necesitamos pruebas independientes hoy y una base portable.

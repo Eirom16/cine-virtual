@@ -99,5 +99,7 @@ Comandos manuales y evidencia en [Spike A](experiments/03-websocket-sync/README.
 [vertical slice 1](experiments/06-real-vertical-slice/README.md) y
 [Spike C móvil/UI](experiments/02-rust-ui-bridge/README.md) y
 [vertical slice 2 Linux ↔ Android](experiments/07-linux-android-room/README.md).
+El diagnóstico de precisión Android y su evidencia antes/después están en
+[experimento 08](experiments/08-android-sync-precision/README.md).
 Consulta [CONTRIBUTING](docs/CONTRIBUTING.md) antes de proponer cambios; la licencia
 sigue pendiente y no se solicitan aportes públicos ni se publica una release.

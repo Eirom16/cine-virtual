@@ -1,0 +1,32 @@
+{
+  "command_roundtrip_ms": {
+    "p50": 0.132,
+    "p95": 0.286,
+    "max": 1.626,
+    "count": 1000
+  },
+  "updates": [
+    {
+      "hz": 2,
+      "count": 4,
+      "elapsed_ms": 2002,
+      "roundtrip_p95_ms": 0.357
+    },
+    {
+      "hz": 10,
+      "count": 20,
+      "elapsed_ms": 2001,
+      "roundtrip_p95_ms": 0.488
+    }
+  ],
+  "bridge_error_test": true,
+  "passed": true,
+  "platform": "linux",
+  "api_version": 1,
+  "timestamp": "2026-10-06T04:04:53.097830Z",
+  "versions": {
+    "flutter": "3.47.6",
+    "dart": "3.13.5",
+    "bridge_api": 1
+  }
+}

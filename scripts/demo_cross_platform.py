@@ -49,7 +49,7 @@ def main():
     out.mkdir(parents=True,exist_ok=True)
     report={'schema_version':1,'scenario':'linux-android-room','timestamp_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),
             'requested_wall_seconds':args.seconds,'passed':False,'network':'controlled Wi-Fi/LAN ws; no tunnel',
-            'controls_only':args.controls_only,'faults_requested':args.faults_only,'build_mode':args.build_mode,'diagnostic':args.diagnostic,'source_base_commit':subprocess.check_output(['git','rev-parse','--short','HEAD'],cwd=ROOT,text=True).strip()}
+            'controls_only':args.controls_only,'faults_requested':args.faults_only,'build_mode':args.build_mode,'diagnostic':args.diagnostic,'source_worktree_dirty':bool(subprocess.check_output(['git','status','--porcelain'],cwd=ROOT,text=True).strip()),'source_base_commit':subprocess.check_output(['git','rev-parse','--short','HEAD'],cwd=ROOT,text=True).strip()}
     output=out/('results-'+args.label+'.json' if args.label else 'results-mismatch.json' if args.mismatch_only else 'results-lan.json' if args.seconds>=590 else 'results-smoke.json')
     def save():
         data=json.dumps(report,indent=2)
@@ -107,7 +107,7 @@ def main():
         raise RuntimeError('UI_ACTION_NOT_VISIBLE')
     try:
         abi=device('shell','getprop','ro.product.cpu.abi').strip()
-        report['device']={'android':device('shell','getprop','ro.build.version.release').strip(),'abi':abi,'physical':True}
+        report['device']={'android':device('shell','getprop','ro.build.version.release').strip(),'abi':abi,'physical':True,'api':int(device('shell','getprop','ro.build.version.sdk').strip())}
         env=os.environ.copy();env.update(ANDROID_SDK_ROOT=str(TOOLS/'android'),JAVA_HOME=str(TOOLS/'jdk21'))
         env['PATH']=str(TOOLS/'flutter/bin')+os.pathsep+str(TOOLS/'bin')+os.pathsep+env['PATH']
         if not args.no_build:
@@ -194,17 +194,23 @@ def main():
             wait(lambda:any(x.get('sequence')==reply['sequence'] and x.get('reason')=='scheduled' for x in android_events),10)
             controls.append({'command':command,'sequence':reply['sequence'],'execute_at_server_ms':e['expected_server_ms'],'linux_scheduler_lateness_ms':e['lateness_ms']})
         control('play 5000');began=time.monotonic();actions=set();recovery={};resource_samples=[];last_progress=-1
-        while (elapsed:=time.monotonic()-began)<args.seconds or len(actions)<(2 if args.controls_only else 4):
+        while (elapsed:=time.monotonic()-began)<args.seconds or len(actions)<(2 if args.controls_only else 4) or (args.faults_only and sum(x.get('event')=='fault_end' for x in android_events)<3):
             if elapsed>=min(10,args.seconds*.15) and 'paused_seek' not in actions:
                 control('pause');control('seek 10000');control('play 10000');actions.add('paused_seek')
             if elapsed>=min(35,args.seconds*.25) and 'playing_seek' not in actions:
                 current=host.command('sync-state')['position_ms'];control('seek '+str(current+3000));actions.add('playing_seek')
             if args.faults_only:
-                for threshold,bias in [(15,120),(32,700),(49,1000)]:
+                for threshold,bias in [(45,120),(70,700),(95,1000)]:
                     key='fault_'+str(bias)
-                    if elapsed>=threshold and key not in actions:
+                    began_faults=sum(x.get('event')=='fault_begin' for x in android_events)
+                    ended_faults=sum(x.get('event')=='fault_end' for x in android_events)
+                    recent=[x.get('sync') for x in android_samples[-3:]]
+                    stable=len(recent)==3 and all(valid(x) and abs(x['drift_ms'])<=50 for x in recent)
+                    if elapsed>=threshold and key not in actions and stable and began_faults==ended_faults and 'playing_seek' in actions:
                         device('shell','am','start','-n',PACKAGE+'/.MainActivity','--el','cine_fault_ms',str(bias))
                         actions.add(key)
+                        break
+                if elapsed>args.seconds+90:raise RuntimeError('FAULT_CONVERGENCE_TIMEOUT')
             if not args.controls_only and elapsed>=min(120,args.seconds*.4) and 'background' not in actions:
                 count=sum(x.startswith('RECOVERED') for x in markers)
                 resume_samples=len(android_samples)
@@ -267,7 +273,7 @@ def main():
         report['metrics_policy']={'all_loaded_trusted_samples':'Includes room-not-ready recovery/preparation transients; excludes clock untrusted, seek/buffer, stale SDK samples','steady_room_ready':'Additional subset only; does not replace primary metrics or hide recovery','convergence_goal_ms':150,'convergence_requires_samples':3,'convergence_timeout_seconds':20}
         report['p95_goal_met']=all(report[k]['p95_ms'] is not None and report[k]['p95_ms']<=150 for k in ['linux_drift','android_drift'])
         report['passed']=bool(a and bs and pairs and len(actions)==((2 if args.controls_only else 4)+(3 if args.faults_only else 0)));report['status']='PASS' if report['passed'] else 'FAIL'
-        out.joinpath('results-'+args.label+'-background.json' if args.label else 'results-background.json' if args.seconds>=590 else 'results-background-smoke.json').write_text(json.dumps({'schema_version':1,'executed':True,'session_wall_seconds':report['real_wall_seconds'],'recovery':recovery,'background_markers_count':sum(x.startswith('SUSPENDED') for x in markers)},indent=2)+'\n')
+        out.joinpath('results-'+args.label+'-background.json' if args.label else 'results-background.json' if args.seconds>=590 else 'results-background-smoke.json').write_text(json.dumps({'schema_version':1,'executed':not args.controls_only,'status':'NOT_APPLICABLE' if args.controls_only else 'MEASURED','session_wall_seconds':report['real_wall_seconds'],'recovery':recovery,'background_markers_count':sum(x.startswith('SUSPENDED') for x in markers)},indent=2)+'\n')
     except (RuntimeError,AssertionError,subprocess.SubprocessError,KeyError) as e:
         report.update(status='FAIL',failure=str(e) if isinstance(e,RuntimeError) else type(e).__name__,runtime_executed=bool(android_samples),android_samples=android_samples[-50:],android_events=android_events)
         # Never propagate adb command/serial, private arguments or full SDK errors.

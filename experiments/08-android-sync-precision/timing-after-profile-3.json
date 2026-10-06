@@ -1,0 +1,197 @@
+{
+  "driver_wall_time_percent": {
+    "driver_cost_ns": 4.250285021684737,
+    "jni_cost_ns": 2.6486574178482067,
+    "source_cost_ns": 0.5939964053377814
+  },
+  "wall_time_is_not_thread_cpu": true,
+  "thread_cpu_percent_one_core_lower_bound": {
+    "main": 22.060050041701416,
+    "other": 8.740617180984152,
+    "flutter_raster": 8.273561301084237,
+    "media3": 23.96997497914929,
+    "rust_owner": 4.111759799833194,
+    "codec_audio": 8.523769808173478
+  },
+  "thread_cpu_limitation": "Exited threads disappear from group counters; lower bound, not exhaustive attribution",
+  "rejected_completion_callbacks": [],
+  "schema_version": 1,
+  "timing_ms": {
+    "network_runtime": {
+      "p50_ms": 11,
+      "p95_ms": 154,
+      "p99_ms": 154,
+      "max_ms": 154,
+      "count": 6
+    },
+    "scheduler_lateness": {
+      "p50_ms": 1,
+      "p95_ms": 1.5,
+      "p99_ms": 1.5,
+      "max_ms": 1.5,
+      "count": 10
+    },
+    "effect_queue": {
+      "p50_ms": 14,
+      "p95_ms": 115,
+      "p99_ms": 115,
+      "max_ms": 115,
+      "count": 19
+    },
+    "poll_lateness": {
+      "p50_ms": 0,
+      "p95_ms": 45,
+      "p99_ms": 87,
+      "max_ms": 233,
+      "count": 168
+    },
+    "jni_roundtrip": {
+      "p50_ms": 1,
+      "p95_ms": 2,
+      "p99_ms": 4,
+      "max_ms": 4,
+      "count": 168
+    },
+    "jni_parse_and_registry": {
+      "p50_ms": 0.216,
+      "p95_ms": 0.34,
+      "p99_ms": 0.849,
+      "max_ms": 2.449808,
+      "count": 168
+    },
+    "source_timestamp_relabel_error": {
+      "p50_ms": 1,
+      "p95_ms": 1,
+      "p99_ms": 3,
+      "max_ms": 3,
+      "count": 168
+    },
+    "media3_call": {
+      "p50_ms": 10,
+      "p95_ms": 20,
+      "p99_ms": 20,
+      "max_ms": 20,
+      "count": 19
+    },
+    "media3_first_callback": {
+      "p50_ms": 9,
+      "p95_ms": 13,
+      "p99_ms": 13,
+      "max_ms": 13,
+      "count": 17
+    },
+    "playing_completion": {
+      "p50_ms": 7,
+      "p95_ms": 9,
+      "p99_ms": 9,
+      "max_ms": 9,
+      "count": 2
+    },
+    "paused_completion": {
+      "p50_ms": 9,
+      "p95_ms": 9,
+      "p99_ms": 9,
+      "max_ms": 9,
+      "count": 2
+    },
+    "rate_completion": {
+      "p50_ms": 7,
+      "p95_ms": 9,
+      "p99_ms": 9,
+      "max_ms": 9,
+      "count": 7
+    },
+    "seek_ready": {
+      "p50_ms": 244,
+      "p95_ms": 451,
+      "p99_ms": 451,
+      "max_ms": 451,
+      "count": 6
+    },
+    "seek_loss": {
+      "p50_ms": 253,
+      "p95_ms": 470,
+      "p99_ms": 470,
+      "max_ms": 470,
+      "count": 6
+    },
+    "seek_stable": {
+      "p50_ms": 341,
+      "p95_ms": 477,
+      "p99_ms": 477,
+      "max_ms": 477,
+      "count": 6
+    },
+    "observation_return": {
+      "p50_ms": 1,
+      "p95_ms": 1,
+      "p99_ms": 3,
+      "max_ms": 3,
+      "count": 168
+    }
+  },
+  "hard_seek_classifications": {
+    "LEGITIMATE": 0,
+    "TRANSIENT_AFTER_SEEK": 0,
+    "STALE_SAMPLE": 0,
+    "SCHEDULER_DELAY": 0,
+    "PLAYER_COMPLETION_DELAY": 1,
+    "SNAPSHOT_RECOVERY": 0,
+    "OTHER": 0
+  },
+  "hard_seek_decisions": [
+    {
+      "at_ms": 36970,
+      "buffering": false,
+      "consecutive_samples": 3,
+      "drift_ms": -260,
+      "event": "hard_seek_decision",
+      "generation": 3,
+      "playing": true,
+      "ready": true,
+      "sample_age_ms": 4,
+      "sample_at_ms": 36966,
+      "seeking": false,
+      "sequence": 11,
+      "target_ms": 6429,
+      "reported_position_age_ms": 4,
+      "pending_seek": false,
+      "player_state": "READY",
+      "operation_id": 3,
+      "classification": "PLAYER_COMPLETION_DELAY",
+      "classification_evidence": "Lag matches preceding seek stopped playback interval within 150 ms; inferred mechanism",
+      "last_seek_operation": 1,
+      "last_seek_completion_sdk_ms": 76467815,
+      "since_last_seek_completion_ms": 1472,
+      "last_seek_completion_latency_ms": 344,
+      "command_latency_ms": 18
+    }
+  ],
+  "classification_status": "INFERRED from MEASURED timestamps; OTHER preserved",
+  "clock_relation": "Rust process Instant and Kotlin elapsedRealtime bracket; no raw cross-origin subtraction",
+  "raw_event_counts": {
+    "driver_observation": 168,
+    "authoritative_received": 41,
+    "seek_lifecycle": 31,
+    "timeline_changed": 3,
+    "playback_state_changed": 14,
+    "drift_observation": 198,
+    "scheduler_planned": 6,
+    "effect_received": 19,
+    "media3_call": 19,
+    "position_discontinuity": 6,
+    "media3_return": 19,
+    "native_dispatch": 19,
+    "seek_ready_candidate": 6,
+    "seek_loss_measured": 6,
+    "native_seek_ready": 6,
+    "first_stable_position": 6,
+    "stable_observation_delivered": 6,
+    "playing_completed": 4,
+    "native_playing_changed": 8,
+    "hard_seek_decision": 1,
+    "playing_changed": 4,
+    "rate_completed": 7,
+    "resources_after_rust_destroy": 1
+  }
+}

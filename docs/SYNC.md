@@ -168,3 +168,24 @@ y el polling 5 ms/10 ms necesitan validación con corpus más exigente/móvil.
 La demo incluye desconexión con pausa local, ocho muestras nuevas de reloj,
 snapshot, nueva verificación/Ready y seek asíncrono de incorporación. No replay
 de controles antiguos. Saltos de offset/backoff automático/red WAN siguen pendientes.
+
+## Diagnóstico Android de seek
+
+El [experimento 08](../experiments/08-android-sync-precision/README.md) separa
+scheduler, cola, JNI, Looper, READY y primera posición estable. Media3 puede
+interrumpir el avance durante un seek aunque devuelva inmediatamente la API.
+Enviar repetidamente el target del instante de observación vuelve a dejarlo
+atrás al completar. MobilePlayer conserva timestamp/modo del target y proyecta
+al drain/dispatch. Para playing añade una estimación local de tiempo sin avance,
+mediana de las últimas tres operaciones correlacionadas; para paused/prepare
+conserva el target exacto. No espera un sleep para completion ni cambia thresholds.
+La medida playing descuenta el avance de posición hasta la primera muestra que
+avanza; paused usa READY. Generation borra estimación y descarta resultados de
+otra operación. La estimación es una capacidad experimental del adapter, no
+una garantía de seek/frame ni un segundo algoritmo de drift.
+
+La política de Core se conserva; un getter solo expone streak para diagnóstico.
+Las exclusiones seeking/buffering/antigüedad ya existían. Los p95 cortos actuales
+siguen superando 150 ms por transitorios; se conservan completos y no se renombran
+PASS. Relojes, reglas de clasificación y evidencia antes/después están en el
+experimento. Media3 continúa provisional.

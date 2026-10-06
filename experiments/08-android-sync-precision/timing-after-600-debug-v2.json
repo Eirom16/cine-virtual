@@ -1,0 +1,223 @@
+{
+  "driver_wall_time_percent": {
+    "driver_cost_ns": 4.514598511416359,
+    "jni_cost_ns": 2.5350424230588726,
+    "source_cost_ns": 1.1681502318234362
+  },
+  "wall_time_is_not_thread_cpu": true,
+  "thread_cpu_percent_one_core_lower_bound": {
+    "main": 32.34346405949295,
+    "other": 4.696314448332667,
+    "flutter_raster": 2.8316476787733516,
+    "media3": 19.736489827801805,
+    "rust_owner": 4.052185471348072,
+    "codec_audio": 10.084004497878626
+  },
+  "thread_cpu_limitation": "Exited threads disappear from group counters; lower bound, not exhaustive attribution",
+  "rejected_completion_callbacks": [],
+  "schema_version": 1,
+  "timing_ms": {
+    "network_runtime": {
+      "p50_ms": 35.5,
+      "p95_ms": 99.5,
+      "p99_ms": 99.5,
+      "max_ms": 99.5,
+      "count": 6
+    },
+    "scheduler_lateness": {
+      "p50_ms": 1,
+      "p95_ms": 2,
+      "p99_ms": 2,
+      "max_ms": 2,
+      "count": 10
+    },
+    "effect_queue": {
+      "p50_ms": 9,
+      "p95_ms": 121,
+      "p99_ms": 150,
+      "max_ms": 150,
+      "count": 30
+    },
+    "poll_lateness": {
+      "p50_ms": 0,
+      "p95_ms": 51,
+      "p99_ms": 119,
+      "max_ms": 478,
+      "count": 878
+    },
+    "jni_roundtrip": {
+      "p50_ms": 1,
+      "p95_ms": 2,
+      "p99_ms": 2,
+      "max_ms": 8,
+      "count": 878
+    },
+    "jni_parse_and_registry": {
+      "p50_ms": 0.237,
+      "p95_ms": 0.331,
+      "p99_ms": 0.6,
+      "max_ms": 2.729654,
+      "count": 878
+    },
+    "source_timestamp_relabel_error": {
+      "p50_ms": 1,
+      "p95_ms": 1,
+      "p99_ms": 2,
+      "max_ms": 4,
+      "count": 878
+    },
+    "media3_call": {
+      "p50_ms": 6,
+      "p95_ms": 15,
+      "p99_ms": 15,
+      "max_ms": 15,
+      "count": 30
+    },
+    "media3_first_callback": {
+      "p50_ms": 5,
+      "p95_ms": 10,
+      "p99_ms": 10,
+      "max_ms": 10,
+      "count": 25
+    },
+    "playing_completion": {
+      "p50_ms": 5,
+      "p95_ms": 8,
+      "p99_ms": 8,
+      "max_ms": 8,
+      "count": 4
+    },
+    "paused_completion": {
+      "p50_ms": 5,
+      "p95_ms": 10,
+      "p99_ms": 10,
+      "max_ms": 10,
+      "count": 3
+    },
+    "rate_completion": {
+      "p50_ms": 4,
+      "p95_ms": 6,
+      "p99_ms": 6,
+      "max_ms": 6,
+      "count": 10
+    },
+    "seek_ready": {
+      "p50_ms": 255,
+      "p95_ms": 470,
+      "p99_ms": 470,
+      "max_ms": 470,
+      "count": 8
+    },
+    "seek_loss": {
+      "p50_ms": 256,
+      "p95_ms": 406,
+      "p99_ms": 406,
+      "max_ms": 406,
+      "count": 8
+    },
+    "seek_stable": {
+      "p50_ms": 311,
+      "p95_ms": 517,
+      "p99_ms": 517,
+      "max_ms": 517,
+      "count": 8
+    },
+    "observation_return": {
+      "p50_ms": 1,
+      "p95_ms": 1,
+      "p99_ms": 2,
+      "max_ms": 4,
+      "count": 878
+    }
+  },
+  "hard_seek_classifications": {
+    "LEGITIMATE": 0,
+    "TRANSIENT_AFTER_SEEK": 0,
+    "STALE_SAMPLE": 0,
+    "SCHEDULER_DELAY": 0,
+    "PLAYER_COMPLETION_DELAY": 1,
+    "SNAPSHOT_RECOVERY": 1,
+    "OTHER": 0
+  },
+  "hard_seek_decisions": [
+    {
+      "at_ms": 44228,
+      "buffering": false,
+      "consecutive_samples": 3,
+      "drift_ms": -393,
+      "event": "hard_seek_decision",
+      "generation": 3,
+      "playing": true,
+      "ready": true,
+      "sample_age_ms": 2,
+      "sample_at_ms": 44226,
+      "seeking": false,
+      "sequence": 11,
+      "target_ms": 8186,
+      "reported_position_age_ms": 2,
+      "pending_seek": false,
+      "player_state": "READY",
+      "operation_id": 3,
+      "classification": "PLAYER_COMPLETION_DELAY",
+      "classification_evidence": "Lag matches preceding seek stopped playback interval within 150 ms; inferred mechanism",
+      "last_seek_operation": 1,
+      "last_seek_completion_sdk_ms": 78186545,
+      "since_last_seek_completion_ms": 3255,
+      "last_seek_completion_latency_ms": 296,
+      "command_latency_ms": 15
+    },
+    {
+      "at_ms": 169228,
+      "buffering": false,
+      "consecutive_samples": 3,
+      "drift_ms": -534,
+      "event": "hard_seek_decision",
+      "generation": 5,
+      "playing": true,
+      "ready": true,
+      "sample_age_ms": 17,
+      "sample_at_ms": 169211,
+      "seeking": false,
+      "sequence": 19,
+      "target_ms": 128907,
+      "reported_position_age_ms": 17,
+      "pending_seek": false,
+      "player_state": "READY",
+      "operation_id": 20,
+      "classification": "SNAPSHOT_RECOVERY",
+      "classification_evidence": "Snapshot reconciliation operation",
+      "last_seek_operation": 18,
+      "last_seek_completion_sdk_ms": 78313316,
+      "since_last_seek_completion_ms": 1460,
+      "last_seek_completion_latency_ms": 288,
+      "command_latency_ms": 11
+    }
+  ],
+  "classification_status": "INFERRED from MEASURED timestamps; OTHER preserved",
+  "clock_relation": "Rust process Instant and Kotlin elapsedRealtime bracket; no raw cross-origin subtraction",
+  "raw_event_counts": {
+    "authoritative_received": 148,
+    "driver_observation": 878,
+    "seek_lifecycle": 42,
+    "timeline_changed": 6,
+    "playback_state_changed": 20,
+    "drift_observation": 1182,
+    "scheduler_planned": 6,
+    "effect_received": 30,
+    "media3_call": 30,
+    "position_discontinuity": 9,
+    "media3_return": 30,
+    "native_dispatch": 30,
+    "seek_ready_candidate": 8,
+    "seek_loss_measured": 8,
+    "native_seek_ready": 8,
+    "first_stable_position": 8,
+    "stable_observation_delivered": 8,
+    "playing_completed": 7,
+    "native_playing_changed": 14,
+    "hard_seek_decision": 2,
+    "playing_changed": 7,
+    "rate_completed": 10,
+    "resources_after_rust_destroy": 1
+  }
+}

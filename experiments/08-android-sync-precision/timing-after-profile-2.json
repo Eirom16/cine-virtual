@@ -1,0 +1,195 @@
+{
+  "driver_wall_time_percent": {
+    "driver_cost_ns": 3.8606252600693516,
+    "jni_cost_ns": 2.406997171745799,
+    "source_cost_ns": 0.5427120640504134
+  },
+  "wall_time_is_not_thread_cpu": true,
+  "thread_cpu_percent_one_core_lower_bound": {
+    "main": 20.63883702320619,
+    "other": 8.06048279541211,
+    "flutter_raster": 7.493664977327287,
+    "media3": 22.147572686049614,
+    "rust_owner": 3.6843158175513464,
+    "codec_audio": 7.6853827687383305
+  },
+  "thread_cpu_limitation": "Exited threads disappear from group counters; lower bound, not exhaustive attribution",
+  "rejected_completion_callbacks": [
+    {
+      "event": "playing_completed",
+      "sdk_ms": 75541090,
+      "operation_id": 5,
+      "generation": 3,
+      "sequence": 12,
+      "media_revision": 1,
+      "action": "pause",
+      "reason": "scheduled",
+      "playing": false,
+      "position_ms": 24204,
+      "rejection": "superseded_by_opposing_command"
+    },
+    {
+      "event": "playing_completed",
+      "sdk_ms": 75541322,
+      "operation_id": 8,
+      "generation": 3,
+      "sequence": 14,
+      "media_revision": 1,
+      "action": "play",
+      "reason": "scheduled",
+      "playing": true,
+      "position_ms": 24213,
+      "rejection": "duplicate_completion"
+    }
+  ],
+  "schema_version": 1,
+  "timing_ms": {
+    "network_runtime": {
+      "p50_ms": 12,
+      "p95_ms": 116,
+      "p99_ms": 116,
+      "max_ms": 116,
+      "count": 6
+    },
+    "scheduler_lateness": {
+      "p50_ms": 1,
+      "p95_ms": 2,
+      "p99_ms": 2,
+      "max_ms": 2,
+      "count": 10
+    },
+    "effect_queue": {
+      "p50_ms": 12,
+      "p95_ms": 71,
+      "p99_ms": 71,
+      "max_ms": 71,
+      "count": 18
+    },
+    "poll_lateness": {
+      "p50_ms": 0,
+      "p95_ms": 40,
+      "p99_ms": 65,
+      "max_ms": 202,
+      "count": 171
+    },
+    "jni_roundtrip": {
+      "p50_ms": 1,
+      "p95_ms": 2,
+      "p99_ms": 3,
+      "max_ms": 4,
+      "count": 171
+    },
+    "jni_parse_and_registry": {
+      "p50_ms": 0.199,
+      "p95_ms": 0.338,
+      "p99_ms": 0.603,
+      "max_ms": 0.6729229999999999,
+      "count": 171
+    },
+    "source_timestamp_relabel_error": {
+      "p50_ms": 1,
+      "p95_ms": 1,
+      "p99_ms": 3,
+      "max_ms": 3,
+      "count": 171
+    },
+    "media3_call": {
+      "p50_ms": 10,
+      "p95_ms": 15,
+      "p99_ms": 15,
+      "max_ms": 15,
+      "count": 18
+    },
+    "media3_first_callback": {
+      "p50_ms": 8,
+      "p95_ms": 13,
+      "p99_ms": 13,
+      "max_ms": 13,
+      "count": 17
+    },
+    "playing_completion": {
+      "p50_ms": 6,
+      "p95_ms": 13,
+      "p99_ms": 13,
+      "max_ms": 13,
+      "count": 2
+    },
+    "paused_completion": {
+      "p50_ms": 11,
+      "p95_ms": 12,
+      "p99_ms": 12,
+      "max_ms": 12,
+      "count": 2
+    },
+    "rate_completion": {
+      "p50_ms": 7,
+      "p95_ms": 11,
+      "p99_ms": 11,
+      "max_ms": 11,
+      "count": 8
+    },
+    "seek_ready": {
+      "p50_ms": 247,
+      "p95_ms": 366,
+      "p99_ms": 366,
+      "max_ms": 366,
+      "count": 5
+    },
+    "seek_loss": {
+      "p50_ms": 243,
+      "p95_ms": 370,
+      "p99_ms": 370,
+      "max_ms": 370,
+      "count": 5
+    },
+    "seek_stable": {
+      "p50_ms": 319,
+      "p95_ms": 425,
+      "p99_ms": 425,
+      "max_ms": 425,
+      "count": 5
+    },
+    "observation_return": {
+      "p50_ms": 1,
+      "p95_ms": 1,
+      "p99_ms": 3,
+      "max_ms": 3,
+      "count": 171
+    }
+  },
+  "hard_seek_classifications": {
+    "LEGITIMATE": 0,
+    "TRANSIENT_AFTER_SEEK": 0,
+    "STALE_SAMPLE": 0,
+    "SCHEDULER_DELAY": 0,
+    "PLAYER_COMPLETION_DELAY": 0,
+    "SNAPSHOT_RECOVERY": 0,
+    "OTHER": 0
+  },
+  "hard_seek_decisions": [],
+  "classification_status": "INFERRED from MEASURED timestamps; OTHER preserved",
+  "clock_relation": "Rust process Instant and Kotlin elapsedRealtime bracket; no raw cross-origin subtraction",
+  "raw_event_counts": {
+    "driver_observation": 171,
+    "authoritative_received": 41,
+    "seek_lifecycle": 26,
+    "timeline_changed": 3,
+    "playback_state_changed": 12,
+    "drift_observation": 198,
+    "scheduler_planned": 6,
+    "effect_received": 18,
+    "media3_call": 18,
+    "position_discontinuity": 5,
+    "media3_return": 18,
+    "native_dispatch": 18,
+    "seek_ready_candidate": 5,
+    "seek_loss_measured": 5,
+    "native_seek_ready": 5,
+    "first_stable_position": 5,
+    "stable_observation_delivered": 5,
+    "playing_completed": 6,
+    "native_playing_changed": 6,
+    "rate_completed": 8,
+    "resources_after_rust_destroy": 1
+  }
+}
