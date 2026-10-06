@@ -660,6 +660,12 @@ impl<P: ApplicationPlayer + Send + 'static> Client<P> {
         .await?;
         Ok(())
     }
+    /// Read-only UI projection; no credentials or device handles.
+    pub fn presentation_summary(&self) -> Value {
+        let s = self.session.lock().unwrap();
+        json!({"member_id":s.replica.member_id,
+            "room":s.replica.state.as_ref().map(cine_protocol::StateDto::from)})
+    }
     pub fn state_summary(&self) -> Value {
         let s = self.state();
         let p = self.player();

@@ -299,7 +299,7 @@ impl Network {
                 loop { tokio::select! {
                     _=stopped.changed()=>break,
                     _=tick.tick()=>{
-                        if let Some(c)=&client {let mut v=published.lock().unwrap();v["state"]=c.state_summary();v["sync"]=c.sync_summary();v["media"]=c.media_summary();
+                        if let Some(c)=&client {let mut v=published.lock().unwrap();v["state"]=c.state_summary();v["sync"]=c.sync_summary();v["media"]=c.media_summary();v["presentation"]=c.presentation_summary();
                             v["connected"]=json!(c.connected());v["executions"]=json!(c.executions().iter().map(|e|json!({"sequence":e.sequence,"expected_server_ms":e.expected_server_ms,"actual_server_ms":e.actual_server_ms,"lateness_ms":e.lateness_ms})).collect::<Vec<_>>());}
                     },
                     cmd=rx.recv()=>{
@@ -402,7 +402,7 @@ async fn ready_when_usable(
         }
     }
 }
-fn safe_error(e: &str) -> &'static str {
+pub(crate) fn safe_error(e: &str) -> &'static str {
     match e {
         "NOT_AUTHORIZED" => "NOT_AUTHORIZED",
         "OPERATION_CANCELLED" => "OPERATION_CANCELLED",
@@ -411,6 +411,15 @@ fn safe_error(e: &str) -> &'static str {
         "MEDIA_MISMATCH" => "MEDIA_MISMATCH",
         "MEDIA_NOT_READY" => "MEDIA_NOT_READY",
         "ROOM_NOT_FOUND" => "ROOM_NOT_FOUND",
+        "INVITE_INVALID" => "INVITE_INVALID",
+        "ROOM_FULL" => "ROOM_FULL",
+        "ROOM_CLOSED" => "ROOM_CLOSED",
+        "RESUME_EXPIRED" => "RESUME_EXPIRED",
+        "PROTOCOL_VERSION_UNSUPPORTED" => "PROTOCOL_VERSION_UNSUPPORTED",
+        "CONTROL_PENDING" => "CONTROL_PENDING",
+        "INVALID_STATE" => "INVALID_STATE",
+        "STALE_MEDIA" => "STALE_MEDIA",
+        "STALE_AUTHORITY" => "STALE_AUTHORITY",
         "CLOCK_UNCERTAIN" => "CLOCK_UNTRUSTED",
         "OUT_OF_SEQUENCE" => "OUT_OF_SEQUENCE",
         _ if e.contains("deadline has elapsed") => "NETWORK_TIMEOUT",

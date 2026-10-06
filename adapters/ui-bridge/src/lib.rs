@@ -1,6 +1,7 @@
 //! Experimental Application boundary: DTOs, never a Rust struct ABI or SDK object.
 #[cfg(target_os = "android")]
 mod android;
+mod desktop;
 pub mod network;
 mod seek_timing;
 use cine_core::{
@@ -35,6 +36,7 @@ pub struct Request {
 pub enum Command {
     State,
     Network(network::Intent),
+    DesktopNetwork(desktop::DesktopIntent),
     Configure(PlayerCapabilities),
     Sample(Sample),
     Play,
@@ -132,6 +134,7 @@ pub struct Application {
     deadline: Option<u64>,
     job: Option<HashJob>,
     network: Option<network::Network>,
+    desktop: Option<desktop::Desktop>,
     started: Instant,
     attached_generation: Option<u64>,
 }
@@ -150,6 +153,7 @@ impl Default for Application {
             deadline: None,
             job: None,
             network: None,
+            desktop: None,
             started: Instant::now(),
             attached_generation: None,
         }
@@ -189,13 +193,19 @@ impl Application {
             sample: self.sample,
             capabilities: self.caps,
             effects,
-            network: self.network.as_ref().map(|n| n.status()),
+            network: self.network_status(),
             hash: self
                 .job
                 .as_ref()
                 .map(|j| j.status.lock().unwrap().clone())
                 .unwrap_or_default(),
         }
+    }
+    fn network_status(&self) -> Option<serde_json::Value> {
+        self.network
+            .as_ref()
+            .map(|n| n.status())
+            .or_else(|| self.desktop.as_ref().map(|n| n.status()))
     }
     fn effect(&self, action: &'static str, value: f64) -> Effect {
         Effect {
@@ -217,7 +227,7 @@ impl Application {
         if request.generation != self.generation {
             return self.reply(now, vec![], Some("STALE_GENERATION"));
         }
-        if self.network.is_some()
+        if (self.network.is_some() || self.desktop.is_some())
             && matches!(
                 request.command,
                 Command::Play
@@ -244,7 +254,23 @@ impl Application {
                     }
                 }
             }
+            Command::DesktopNetwork(intent) => {
+                if self.network.is_some() || cfg!(target_os = "android") || cfg!(target_os = "ios")
+                {
+                    return self.reply(now, vec![], Some("INVALID_DESKTOP_INTENT"));
+                }
+                if self.desktop.is_none() {
+                    match desktop::Desktop::new(self.started) {
+                        Ok(n) => self.desktop = Some(n),
+                        Err(e) => return self.reply(now, vec![], Some(e)),
+                    }
+                }
+                error = self.desktop.as_ref().unwrap().enqueue(intent).err();
+            }
             Command::Network(intent) => {
+                if self.desktop.is_some() {
+                    return self.reply(now, vec![], Some("NETWORK_INTENT_REQUIRED"));
+                }
                 if self.network.is_none() {
                     match network::Network::new(
                         self.started,
@@ -362,6 +388,14 @@ impl Application {
                         network::Intent::Foreground
                     };
                     error = n.enqueue(intent, self.generation, None).err();
+                }
+                if let Some(n) = &self.desktop {
+                    let intent = if self.suspended {
+                        network::Intent::Suspend
+                    } else {
+                        network::Intent::Foreground
+                    };
+                    error = n.enqueue(desktop::DesktopIntent::Room(intent)).err();
                 }
                 self.clock = ClockFilter::default();
                 self.last_clock = None;
@@ -553,6 +587,7 @@ impl Drop for Instance {
     fn drop(&mut self) {
         // Stop/cancel/join the networking owner before releasing local workers.
         self.app.network.take();
+        self.app.desktop.take();
         self.app.job.take();
     }
 }
@@ -613,8 +648,7 @@ pub unsafe extern "C" fn cine_bridge_call(
     };
     let now = instance.started.elapsed().as_millis() as u64;
     let mut reply = instance.app.dispatch(bytes, now);
-    if let Some(n) = &instance.app.network {
-        let status = n.status();
+    if let Some(status) = instance.app.network_status() {
         reply.clock_trusted =
             status["sync"]["clock_trusted"].as_bool().unwrap_or(false) && !reply.suspended;
         reply.snapshot_required = !status["connected"].as_bool().unwrap_or(false)
