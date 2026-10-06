@@ -44,6 +44,10 @@ pub extern "system" fn Java_dev_cinevirtual_cine_1mobile_1spike_MainActivity_nat
         let rate=value["rate"].as_f64()?;
         if !rate.is_finite() || !(0.5..=2.0).contains(&rate){return None;}
         let n=i.app.network.as_ref()?;
+        if let (Some(g),Some(op),Some(loss)) = (value["seek_loss"]["generation"].as_u64(),
+            value["seek_loss"]["operation_id"].as_u64(),value["seek_loss"]["loss_ms"].as_u64()) {
+            n.player.seek_loss(g,op,loss);
+        }
         if !i.app.suspended {
             i.app.caps.playback_rate=value["supports_rate"].as_bool().unwrap_or(false);
             i.app.sample=s;

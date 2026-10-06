@@ -20,6 +20,8 @@ pub struct ControlMark {
     pub received_at_ms: u64,
     pub deadline_local_ms: f64,
     pub wake_at_ms: u64,
+    pub target_at_ms: u64,
+    pub playing: bool,
 }
 #[derive(Clone, Default)]
 pub struct PlayerView {

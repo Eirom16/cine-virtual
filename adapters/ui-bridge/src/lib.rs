@@ -2,6 +2,7 @@
 #[cfg(target_os = "android")]
 mod android;
 pub mod network;
+mod seek_timing;
 use cine_core::{
     clock::{ClockFilter, ClockSample},
     sync::{Correction, Observation, SyncConfig, SyncEngine},

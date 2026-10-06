@@ -395,3 +395,87 @@ fn suspension_invalidates_clock_and_deadlines_until_new_samples_and_snapshot() {
     );
     assert_eq!(replica.clock_diagnostics()["discarded"], 1);
 }
+
+#[test]
+fn pending_seek_and_stale_samples_do_not_correct_then_fresh_drift_does() {
+    use cine_client::player_backend::{ApplicationPlayer, PlayerView};
+    use cine_core::{player::PlayerError, sync::Correction};
+    struct DelayedPlayer {
+        view: PlayerView,
+        seeks: usize,
+    }
+    impl Player for DelayedPlayer {
+        fn play(&mut self) -> Result<(), PlayerError> {
+            self.view.playing = true;
+            Ok(())
+        }
+        fn pause(&mut self) -> Result<(), PlayerError> {
+            self.view.playing = false;
+            Ok(())
+        }
+        fn seek(&mut self, _: u64) -> Result<(), PlayerError> {
+            self.seeks += 1;
+            self.view.seeking = true;
+            Ok(())
+        }
+        fn position(&self) -> Result<u64, PlayerError> {
+            Ok(self.view.position_ms)
+        }
+        fn duration(&self) -> Result<u64, PlayerError> {
+            Ok(self.view.duration_ms)
+        }
+        fn supports_playback_rate(&self) -> bool {
+            true
+        }
+        fn set_playback_rate(&mut self, rate: f64) -> Result<(), PlayerError> {
+            self.view.rate = rate;
+            Ok(())
+        }
+    }
+    impl ApplicationPlayer for DelayedPlayer {
+        fn tick(&mut self, _: u64) {}
+        fn configure_duration(&mut self, _: u64) {}
+        fn view(&self) -> PlayerView {
+            self.view.clone()
+        }
+        fn asynchronous(&self) -> bool {
+            true
+        }
+    }
+    let s = state();
+    let mut r = Replica::with_player(DelayedPlayer {
+        view: PlayerView {
+            ready: true,
+            rate: 1.0,
+            duration_ms: 300_000,
+            ..Default::default()
+        },
+        seeks: 0,
+    });
+    clock(&mut r);
+    r.member_id = Some(s.host_id);
+    r.install(s, true, 10);
+    r.player.view.position_ms = 1000;
+    r.player.view.seeking = true;
+    for now in [500, 1000, 1500, 2000] {
+        r.player.view.sampled_at_ms = now;
+        assert_eq!(r.correct_drift(now), Correction::None);
+    }
+    assert_eq!(r.player.seeks, 0);
+    r.player.view.seeking = false;
+    for now in [2500, 3000, 3500] {
+        r.player.view.sampled_at_ms = now - 101;
+        assert_eq!(r.correct_drift(now), Correction::None);
+    }
+    for now in [4000, 4500] {
+        r.player.view.sampled_at_ms = now;
+        assert_eq!(r.correct_drift(now), Correction::None);
+    }
+    r.player.view.sampled_at_ms = 5000;
+    assert!(matches!(r.correct_drift(5000), Correction::Seek(0)));
+    assert_eq!(r.player.seeks, 1);
+    r.player.view.seeking = false;
+    r.player.view.position_ms = 0;
+    r.player.view.sampled_at_ms = 5500;
+    assert_eq!(r.correct_drift(5500), Correction::None);
+}

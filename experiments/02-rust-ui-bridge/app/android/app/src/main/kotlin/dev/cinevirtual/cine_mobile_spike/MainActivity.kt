@@ -64,6 +64,19 @@ class MainActivity : FlutterActivity() {
     private var settledSample: Pair<Long, Long>? = null
     private var stableReported = true
     private var stableDelivered = true
+    private var seekLoss: org.json.JSONObject? = null
+    private var seekAdvanceReported = true
+    private var seekLifecycle = "IDLE"
+    private fun lifecycle(next: String) {
+        seekLifecycle = next
+        trace("seek_lifecycle", mapOf("state" to next), seekOperation)
+    }
+    private fun recordSeekLoss(loss: Long, source: String) {
+        val operation = seekOperation ?: return
+        seekLoss = org.json.JSONObject(mapOf("generation" to operation.optLong("generation"),
+            "operation_id" to operation.optLong("operation_id"), "loss_ms" to loss.coerceAtLeast(0)))
+        trace("seek_loss_measured", mapOf("loss_ms" to loss.coerceAtLeast(0), "source" to source), operation)
+    }
     private fun trace(event: String, values: Map<String, Any?> = emptyMap(), operation: org.json.JSONObject? = null) {
         if (!diagnostic) return
         val fields = mutableMapOf<String, Any?>("event" to event, "sdk_ms" to SystemClock.elapsedRealtime())
@@ -76,16 +89,23 @@ class MainActivity : FlutterActivity() {
         driver.postDelayed(drive, delay)
     }
     private fun observeStable(sample: Map<String, Any>) {
-        if (stableReported || seeking || sample["loaded"] != true || sample["buffering"] == true) return
+        if (seeking || sample["loaded"] != true || sample["buffering"] == true) return
         val t = (sample["sample_monotonic_ms"] as Number).toLong()
         val pos = (sample["position_ms"] as Number).toLong()
+        if (!seekAdvanceReported && sample["playing"] == true && pos > seekTarget) {
+            recordSeekLoss(t - seekDispatch - ((pos - seekTarget) / (sample["rate"] as Double)).toLong(), "first_advance")
+            seekAdvanceReported = true
+        }
+        // A paused stable position does not finish measuring a seek that will resume playing.
+        if (stableReported) return
         val previous = settledSample
         if (previous != null && t > previous.first) {
             val expected = if (sample["playing"] == true) (t - previous.first) * (sample["rate"] as Double) else 0.0
-            if (kotlin.math.abs((pos - previous.second) - expected) <= 35) {
+            if (kotlin.math.abs((pos - previous.second) - expected) <= 35 && (sample["playing"] != true || pos > previous.second)) {
                 trace("first_stable_position", mapOf("position_ms" to pos, "previous_position_ms" to previous.second,
                     "sample_delta_ms" to t - previous.first, "playing" to sample["playing"]), seekOperation)
                 stableReported = true
+                lifecycle("IDLE")
             }
         }
         settledSample = Pair(t, pos)
@@ -112,9 +132,10 @@ class MainActivity : FlutterActivity() {
                 val biasedPosition = ((sdkState["position_ms"] as Number).toLong() + diagnosticBias).coerceIn(0, (sdkState["duration_ms"] as Number).toLong())
                 val observed = org.json.JSONObject(mapOf("sample" to mapOf("position_ms" to biasedPosition, "duration_ms" to sdkState["duration_ms"],
                     "playing" to sdkState["playing"], "loaded" to sdkState["loaded"], "buffering" to sdkState["buffering"], "seeking" to sdkState["seeking"], "age_ms" to 0),
-                    "source_mapped_at_ms" to mapped, "supports_rate" to sdkState["supports_rate"], "rate" to sdkState["rate"], "failed" to (failure != null)))
+                    "seek_loss" to seekLoss, "source_mapped_at_ms" to mapped, "supports_rate" to sdkState["supports_rate"], "rate" to sdkState["rate"], "failed" to (failure != null)))
                 val jniStart = SystemClock.elapsedRealtimeNanos()
                 val result = org.json.JSONObject(nativeDrive(rustOwner, observed.toString()))
+                seekLoss = null
                 val jniEnd = SystemClock.elapsedRealtime()
                 val rustNow = result.optLong("now_ms")
                 jniCostNs += SystemClock.elapsedRealtimeNanos() - jniStart
@@ -130,7 +151,7 @@ class MainActivity : FlutterActivity() {
                 for (i in 0 until list.length()) {
                     val e = list.getJSONObject(i)
                     operations[e.getString("action")] = e
-                    if (e.getString("action") == "seek") { seekOperation = e; stableReported = false; stableDelivered = false; settledSample = null }
+                    if (e.getString("action") == "seek") { seekOperation = e; stableReported = false; stableDelivered = false; settledSample = null; seekAdvanceReported = !e.optBoolean("advance_target"); lifecycle("SEEK_REQUESTED") }
                     controlOffset = e.optDouble("offset_ms"); controlSequence = e.optLong("sequence"); controlDeadline = e.optLong("deadline_server_ms")
                     trace("effect_received", mapOf("rust_received_ms" to rustNow, "enqueued_ms" to e.optLong("enqueued_ms"),
                         "received_at_ms" to e.optLong("received_at_ms"), "deadline_local_ms" to e.optDouble("deadline_local_ms"),
@@ -140,9 +161,12 @@ class MainActivity : FlutterActivity() {
                         "source_mapped_at_ms" to mapped, "sample_assigned_at_ms" to result.optLong("sample_assigned_at_ms"),
                         "clock_bracket_ms" to clockAfter - clockBefore), e)
                     val dispatch = SystemClock.elapsedRealtime()
+                    val value = if (e.getString("action") == "seek" && e.optBoolean("advance_target")) {
+                        (e.getDouble("value") + (dispatch - jniEnd)).coerceAtMost((player?.duration ?: 0).toDouble())
+                    } else e.getDouble("value")
                     trace("media3_call", mapOf("position_ms" to player?.currentPosition, "playback_state" to player?.playbackState,
-                        "seeking" to seeking, "target_ms" to e.optLong("target_ms"), "value" to e.optDouble("value")), e)
-                    applyEffect(e.getString("action"), e.getDouble("value"), e.getLong("generation"))
+                        "seeking" to seeking, "target_ms" to e.optLong("target_ms"), "value" to value, "seek_lead_ms" to e.optLong("seek_lead_ms")), e)
+                    applyEffect(e.getString("action"), value, e.getLong("generation"))
                     trace("media3_return", mapOf("command_latency_ms" to SystemClock.elapsedRealtime() - dispatch), e)
                     val deadline = e.optLong("deadline_server_ms")
                     val dispatched = rustNow + dispatch - before
@@ -169,7 +193,7 @@ class MainActivity : FlutterActivity() {
             "play" -> current.play()
             "pause" -> current.pause()
             "rate" -> { require(value in 0.5..2.0) { "INVALID_RATE" }; current.playbackParameters = PlaybackParameters(value.toFloat(),1f) }
-            "seek" -> { require(value >= 0 && value <= current.duration) { "SEEK_OUT_OF_RANGE" }; seeking = true; seekDispatch = SystemClock.elapsedRealtime(); seekTarget = value.toLong(); current.seekTo(value.toLong()) }
+            "seek" -> { require(value >= 0 && value <= current.duration) { "SEEK_OUT_OF_RANGE" }; seeking = true; seekDispatch = SystemClock.elapsedRealtime(); seekTarget = value.toLong(); lifecycle("SEEK_DISPATCHED"); current.seekTo(value.toLong()) }
             else -> throw IllegalArgumentException("INVALID_EFFECT")
         }
     }
@@ -197,12 +221,16 @@ class MainActivity : FlutterActivity() {
             override fun onPlayerError(error: PlaybackException) { if (alive) failure = "PLAYER_LOAD_ERROR" }
             override fun onIsPlayingChanged(isPlaying: Boolean) {
                 if (!alive) return
-                trace("playing_completed", mapOf("playing" to isPlaying,"position_ms" to sdk.currentPosition), operations[if (isPlaying) "play" else "pause"])
+                val operation = if (isPlaying || !sdk.playWhenReady) operations.remove(if (isPlaying) "play" else "pause") else null
+                trace(if (operation != null) "playing_completed" else "playing_changed",
+                    mapOf("playing" to isPlaying,"position_ms" to sdk.currentPosition,"play_when_ready" to sdk.playWhenReady,
+                        "playback_state" to sdk.playbackState), operation ?: seekOperation)
                 android.util.Log.i("CineRoom", org.json.JSONObject(mapOf("event" to "native_playing_changed", "playing" to isPlaying, "sequence" to controlSequence,
                     "position_ms" to sdk.currentPosition, "server_ms" to rustAnchor + SystemClock.elapsedRealtime() - sdkAnchor + controlOffset,
                     "deadline_server_ms" to controlDeadline)).toString())
             }
             override fun onPositionDiscontinuity(old: Player.PositionInfo, new: Player.PositionInfo, reason: Int) {
+                if (reason == Player.DISCONTINUITY_REASON_SEEK && seeking) lifecycle("SEEK_IN_PROGRESS")
                 trace("position_discontinuity", mapOf("reason_code" to reason,"old_position_ms" to old.positionMs,"position_ms" to new.positionMs), seekOperation)
             }
             override fun onPlaybackStateChanged(state: Int) {
@@ -222,6 +250,8 @@ class MainActivity : FlutterActivity() {
                         trace("seek_ready_candidate", mapOf("playback_state" to p.playbackState,"position_ms" to p.currentPosition, "latency_ms" to SystemClock.elapsedRealtime() - seekDispatch,
                             "events" to (0 until events.size()).map { events.get(it) }), seekOperation)
                         seeking = false
+                        lifecycle("SEEK_SETTLED")
+                        if (seekOperation?.optBoolean("advance_target") != true) recordSeekLoss(SystemClock.elapsedRealtime() - seekDispatch, "paused_ready")
                         android.util.Log.i("CineRoom", org.json.JSONObject(mapOf("event" to "native_seek_ready", "sequence" to controlSequence,
                             "latency_ms" to SystemClock.elapsedRealtime() - seekDispatch, "target_ms" to seekTarget, "position_ms" to p.currentPosition,
                             "server_ms" to rustAnchor + SystemClock.elapsedRealtime() - sdkAnchor + controlOffset)).toString())
@@ -297,7 +327,7 @@ class MainActivity : FlutterActivity() {
                     "load" -> {
                         val uri = selected ?: throw IllegalStateException("INVALID_URI")
                         require(uri.scheme == "content") { "INVALID_URI" }
-                        failure = null; firstFrame = false; loadMs = 0; loadStart = SystemClock.elapsedRealtime()
+                        failure = null; firstFrame = false; seekLoss = null; seekOperation = null; seekAdvanceReported = true; stableReported = true; lifecycle("IDLE"); loadMs = 0; loadStart = SystemClock.elapsedRealtime()
                         sdk.trackSelectionParameters = sdk.trackSelectionParameters.buildUpon()
                             .setTrackTypeDisabled(C.TRACK_TYPE_AUDIO, call.argument<Boolean>("disable_audio") == true).build()
                         sdk.pause(); sdk.setMediaItem(MediaItem.fromUri(uri)); sdk.prepare(); reply.success(null)

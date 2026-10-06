@@ -233,6 +233,8 @@ impl<P: ApplicationPlayer> Replica<P> {
                         offset_ms: self.estimate().map_or(0.0, |e| e.offset_ms),
                         target_ms: timeline.position_at(server_now as i64),
                         reason: "snapshot",
+                        target_at_ms: now,
+                        playing: timeline.status == PlaybackStatus::Playing,
                         media_revision: s.media.as_ref().map_or(0, |m| m.media_revision),
                         ..Default::default()
                     });
@@ -319,6 +321,8 @@ impl<P: ApplicationPlayer> Replica<P> {
                 deadline_local_ms: p.execute_at_ms as f64
                     - self.estimate().map_or(0.0, |e| e.offset_ms),
                 wake_at_ms: now,
+                target_at_ms: now,
+                playing: false,
             });
             let _ = self.player.seek(p.timeline_after.position_ms);
         }
@@ -364,6 +368,8 @@ impl<P: ApplicationPlayer> Replica<P> {
             received_at_ms: self.pending_received_at_ms,
             deadline_local_ms: deadline,
             wake_at_ms: now,
+            target_at_ms: now,
+            playing: p.timeline_after.status == PlaybackStatus::Playing,
         });
         self.apply_timeline(p.timeline_after, now);
         self.sync.reset();
@@ -411,6 +417,14 @@ impl<P: ApplicationPlayer> Replica<P> {
         if view.seeking || !view.ready {
             return Correction::None;
         }
+        let (prior_samples, prior_sign) = self.sync.diagnostic_streak();
+        let target = timeline.position_at(self.server_now(sample_time).unwrap() as i64);
+        let sign = (view.position_ms as i128 - target as i128).signum() as i8;
+        let consecutive_samples = if sign == prior_sign {
+            prior_samples.saturating_add(1)
+        } else {
+            1
+        };
         let correction = self.sync.observe(Observation {
             target_ms: timeline.position_at(self.server_now(sample_time).unwrap() as i64),
             actual_ms: view.position_ms,
@@ -425,6 +439,8 @@ impl<P: ApplicationPlayer> Replica<P> {
             sequence: self.state.as_ref().map_or(0, |s| s.sequence),
             target_ms: timeline.position_at(self.server_now(sample_time).unwrap() as i64),
             reason: "correction",
+            target_at_ms: sample_time,
+            playing: timeline.status == PlaybackStatus::Playing,
             media_revision: self
                 .state
                 .as_ref()
@@ -434,7 +450,7 @@ impl<P: ApplicationPlayer> Replica<P> {
             ..Default::default()
         });
         if let Correction::Seek(target) = correction {
-            self.player.diagnostic(serde_json::json!({"event":"hard_seek_decision","at_ms":now,
+            self.player.diagnostic(serde_json::json!({"event":"hard_seek_decision","at_ms":now,"consecutive_samples":consecutive_samples,
                 "sample_at_ms":sample_time,"sample_age_ms":now.saturating_sub(sample_time),
                 "drift_ms":view.position_ms as i64 - target as i64,"target_ms":target,
                 "seeking":view.seeking,"buffering":view.buffering,"ready":view.ready,"playing":view.playing,

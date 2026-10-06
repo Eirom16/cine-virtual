@@ -62,6 +62,9 @@ pub struct NativeEffect {
     received_at_ms: u64,
     deadline_local_ms: f64,
     wake_at_ms: u64,
+    advance_target: bool,
+    target_at_ms: u64,
+    seek_lead_ms: u64,
 }
 struct NativeState {
     view: PlayerView,
@@ -72,6 +75,8 @@ struct NativeState {
     next_operation: u64,
     diagnostics: VecDeque<Value>,
     diagnostics_dropped: u64,
+    seek_timing: crate::seek_timing::SeekTiming,
+    last_seek: Option<(u64, u64)>,
 }
 #[derive(Clone)]
 pub struct MobilePlayer {
@@ -94,6 +99,8 @@ impl MobilePlayer {
                 next_operation: 0,
                 diagnostics: VecDeque::new(),
                 diagnostics_dropped: 0,
+                seek_timing: crate::seek_timing::SeekTiming::default(),
+                last_seek: None,
             })),
             boot,
             mark: ControlMark::default(),
@@ -120,6 +127,7 @@ impl MobilePlayer {
         let generation = s.generation;
         s.next_operation += 1;
         let operation_id = s.next_operation;
+        let seek_lead_ms = s.seek_timing.estimate();
         s.effects.push_back(NativeEffect {
             action,
             value,
@@ -135,9 +143,13 @@ impl MobilePlayer {
             received_at_ms: self.mark.received_at_ms,
             deadline_local_ms: self.mark.deadline_local_ms,
             wake_at_ms: self.mark.wake_at_ms,
+            advance_target: self.mark.playing && self.mark.reason != "prepare",
+            target_at_ms: self.mark.target_at_ms,
+            seek_lead_ms,
         });
         if action == "seek" {
             s.view.seeking = true;
+            s.last_seek = Some((generation, operation_id));
         }
         Ok(())
     }
@@ -154,17 +166,44 @@ impl MobilePlayer {
         s.supports_rate = supports_rate;
     }
     pub fn drain(&self) -> Vec<NativeEffect> {
-        self.shared.lock().unwrap().effects.drain(..).collect()
+        let mut s = self.shared.lock().unwrap();
+        let now = self.boot.elapsed().as_millis() as u64;
+        let duration = s.view.duration_ms;
+        s.effects
+            .drain(..)
+            .map(|mut e| {
+                if e.action == "seek" && e.advance_target {
+                    e.value = crate::seek_timing::project_target(
+                        e.value as u64,
+                        e.target_at_ms,
+                        now,
+                        e.seek_lead_ms,
+                        true,
+                        duration,
+                    ) as f64;
+                    e.target_at_ms = now;
+                }
+                e
+            })
+            .collect()
     }
     pub fn drain_diagnostics(&self) -> (Vec<Value>, u64) {
         let mut s = self.shared.lock().unwrap();
         (s.diagnostics.drain(..).collect(), s.diagnostics_dropped)
+    }
+    pub fn seek_loss(&self, generation: u64, operation: u64, loss_ms: u64) {
+        let mut s = self.shared.lock().unwrap();
+        if s.generation == generation && s.last_seek == Some((generation, operation)) {
+            s.seek_timing.observe(loss_ms);
+        }
     }
     fn reset(&self, generation: u64) {
         let mut s = self.shared.lock().unwrap();
         s.generation = generation;
         s.effects.clear();
         s.diagnostics.clear();
+        s.seek_timing = crate::seek_timing::SeekTiming::default();
+        s.last_seek = None;
         s.view = PlayerView {
             rate: 1.0,
             ..Default::default()
@@ -409,6 +448,49 @@ mod tests {
         assert_eq!(records[0]["at_ms"], 44);
         assert_eq!(records[0]["generation"], 2);
         assert!(p.drain_diagnostics().0.is_empty());
+    }
+    #[test]
+    fn completion_measurements_cannot_cross_operation_or_generation() {
+        let mut p = MobilePlayer::new(Instant::now(), 1, true);
+        p.seek(100).unwrap();
+        let first = p.drain().remove(0);
+        p.seek_loss(1, first.operation_id, 400);
+        assert_eq!(p.shared.lock().unwrap().seek_timing.estimate(), 400);
+        p.reset(2);
+        p.seek_loss(1, first.operation_id, 900);
+        assert_eq!(p.shared.lock().unwrap().seek_timing.estimate(), 0);
+        p.seek(200).unwrap();
+        let second = p.drain().remove(0);
+        p.seek_loss(2, first.operation_id, 900);
+        assert_eq!(p.shared.lock().unwrap().seek_timing.estimate(), 0);
+        p.seek_loss(2, second.operation_id, 300);
+        assert_eq!(p.shared.lock().unwrap().seek_timing.estimate(), 300);
+    }
+    #[test]
+    fn paused_stable_observation_does_not_invalidate_later_playing_seek_measurement() {
+        let mut p = MobilePlayer::new(Instant::now(), 1, true);
+        p.seek(100).unwrap();
+        let effect = p.drain().remove(0);
+        p.sample(
+            PlayerView {
+                position_ms: 100,
+                ready: true,
+                ..Default::default()
+            },
+            true,
+        );
+        assert!(!p.view().seeking);
+        p.sample(
+            PlayerView {
+                position_ms: 110,
+                playing: true,
+                ready: true,
+                ..Default::default()
+            },
+            true,
+        );
+        p.seek_loss(effect.generation, effect.operation_id, 585);
+        assert_eq!(p.shared.lock().unwrap().seek_timing.estimate(), 585);
     }
     #[test]
     fn native_queue_is_bounded_and_generation_reset_discards_old_effects() {

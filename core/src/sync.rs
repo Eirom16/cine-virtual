@@ -57,6 +57,10 @@ pub struct SyncEngine {
 }
 
 impl SyncEngine {
+    /// Read-only instrumentation: observation streak before the next decision.
+    pub fn diagnostic_streak(&self) -> (u32, i8) {
+        (self.outside_count, self.last_sign)
+    }
     pub fn new(config: SyncConfig) -> Result<Self, SyncConfigError> {
         if config.deadband_ms >= config.hard_seek_ms {
             return Err(SyncConfigError::InvalidThresholds);
