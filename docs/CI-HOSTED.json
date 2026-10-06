@@ -1,0 +1,852 @@
+{
+  "schema_version": 1,
+  "repository": "Eirom16/cine-virtual",
+  "status": "HOSTED_BUILD_MATRIX_PASS",
+  "build_is_not_runtime": true,
+  "initial_run": {
+    "id": 37383775762,
+    "commit": "17d1a3881769a34201c1d1f8ecb0d87cbb4e7689",
+    "conclusion": "failure",
+    "url": "https://github.com/Eirom16/cine-virtual/actions/runs/37383775762",
+    "jobs": [
+      {
+        "id": 112011935594,
+        "name": "Rust, Flutter and documentation gate",
+        "conclusion": "success",
+        "first_failed_step": null
+      },
+      {
+        "id": 112012801260,
+        "name": "linux / build",
+        "conclusion": "failure",
+        "first_failed_step": "Real libmpv headless SDK tests (no visual/audio validation)"
+      },
+      {
+        "id": 112012801321,
+        "name": "ios / build (device)",
+        "conclusion": "success",
+        "first_failed_step": null
+      },
+      {
+        "id": 112012801342,
+        "name": "ios / build (simulator)",
+        "conclusion": "failure",
+        "first_failed_step": "Build Flutter (ios)"
+      },
+      {
+        "id": 112012801364,
+        "name": "windows / build",
+        "conclusion": "failure",
+        "first_failed_step": "Compile Rust (windows)"
+      },
+      {
+        "id": 112012801404,
+        "name": "macos / build (macos-15-intel, x64)",
+        "conclusion": "success",
+        "first_failed_step": null
+      },
+      {
+        "id": 112012801405,
+        "name": "macos / build (macos-15, arm64)",
+        "conclusion": "failure",
+        "first_failed_step": "Build Flutter (macos)"
+      },
+      {
+        "id": 112012801512,
+        "name": "android / build (armeabi-v7a)",
+        "conclusion": "success",
+        "first_failed_step": null
+      },
+      {
+        "id": 112012801521,
+        "name": "android / build (arm64-v8a)",
+        "conclusion": "success",
+        "first_failed_step": null
+      },
+      {
+        "id": 112012801539,
+        "name": "android / build (x86_64)",
+        "conclusion": "success",
+        "first_failed_step": null
+      },
+      {
+        "id": 112015441061,
+        "name": "summary",
+        "conclusion": "success",
+        "first_failed_step": null
+      }
+    ]
+  },
+  "correction_run": {
+    "id": 37386898978,
+    "commit": "eed611fb6788e14e6c6d438fd7cbff2d8cb2bd85",
+    "status": "completed",
+    "conclusion": "failure",
+    "jobs": [
+      {
+        "id": 112022265762,
+        "name": "Rust, Flutter and documentation gate",
+        "conclusion": "success",
+        "first_failed_step": null
+      },
+      {
+        "id": 112022914761,
+        "name": "macos / build (macos-15, arm64)",
+        "conclusion": "success",
+        "first_failed_step": null
+      },
+      {
+        "id": 112022914816,
+        "name": "macos / build (macos-15-intel, x64)",
+        "conclusion": "success",
+        "first_failed_step": null
+      },
+      {
+        "id": 112022914835,
+        "name": "ios / build (simulator)",
+        "conclusion": "failure",
+        "first_failed_step": "Assemble experimental artifact and SHA-256"
+      },
+      {
+        "id": 112022914849,
+        "name": "ios / build (device)",
+        "conclusion": "success",
+        "first_failed_step": null
+      },
+      {
+        "id": 112022914916,
+        "name": "linux / build",
+        "conclusion": "failure",
+        "first_failed_step": "Real libmpv headless SDK tests (no visual/audio validation)"
+      },
+      {
+        "id": 112022914991,
+        "name": "android / build (armeabi-v7a)",
+        "conclusion": "success",
+        "first_failed_step": null
+      },
+      {
+        "id": 112022915052,
+        "name": "windows / build",
+        "conclusion": "success",
+        "first_failed_step": null
+      },
+      {
+        "id": 112022915210,
+        "name": "android / build (arm64-v8a)",
+        "conclusion": "success",
+        "first_failed_step": null
+      },
+      {
+        "id": 112022915604,
+        "name": "android / build (x86_64)",
+        "conclusion": "success",
+        "first_failed_step": null
+      },
+      {
+        "id": 112025653447,
+        "name": "summary",
+        "conclusion": "success",
+        "first_failed_step": null
+      }
+    ]
+  },
+  "corrections": [
+    {
+      "commit": "2d4c183",
+      "scope": "Linux SDK corpus duration/container rounding and actual-duration bounds"
+    },
+    {
+      "commit": "ae900ae",
+      "scope": "Windows file ID/change metadata and deterministic mutation test"
+    },
+    {
+      "commit": "eed611f",
+      "scope": "Explicit macOS architecture and simulator process C ABI layout"
+    },
+    {
+      "commit": "b344a72",
+      "scope": "Remaining exact duration assertion in client SDK test"
+    },
+    {
+      "commit": "c206eae",
+      "scope": "Reject certificates, remove automatic simulator linker ad-hoc signature, recheck unsigned app"
+    },
+    {
+      "commit": "d1a87a1",
+      "scope": "Integration fixture waits for host to observe MEMBER_JOINED before media control; protocol unchanged"
+    },
+    {
+      "commit": "860df65",
+      "scope": "Manual platform selection through registered CI workflow"
+    },
+    {
+      "commit": "d22127a",
+      "scope": "Artifact source status records generated changes honestly"
+    }
+  ],
+  "runtime": {
+    "windows": "NOT TESTED",
+    "macos": "NOT TESTED",
+    "android": "NOT TESTED by hosted builds; prior physical evidence separate",
+    "ios": "NOT TESTED; PLAYER NOT IMPLEMENTED"
+  },
+  "publishing": false,
+  "apple_signing": false,
+  "second_correction_run": {
+    "id": 37387906249,
+    "commit": "c206eae9ec5fdca1c1c1a8a37d530d973aacefaa",
+    "status": "completed",
+    "conclusion": "failure",
+    "jobs": [
+      {
+        "id": 112025764283,
+        "name": "Rust, Flutter and documentation gate",
+        "conclusion": "success",
+        "first_failed_step": null
+      },
+      {
+        "id": 112026387653,
+        "name": "linux / build",
+        "conclusion": "success",
+        "first_failed_step": null
+      },
+      {
+        "id": 112026387747,
+        "name": "ios / build (device)",
+        "conclusion": "success",
+        "first_failed_step": null
+      },
+      {
+        "id": 112026387748,
+        "name": "windows / build",
+        "conclusion": "success",
+        "first_failed_step": null
+      },
+      {
+        "id": 112026387788,
+        "name": "macos / build (macos-15, arm64)",
+        "conclusion": "success",
+        "first_failed_step": null
+      },
+      {
+        "id": 112026387824,
+        "name": "macos / build (macos-15-intel, x64)",
+        "conclusion": "failure",
+        "first_failed_step": "Compile Rust (macos)"
+      },
+      {
+        "id": 112026387826,
+        "name": "ios / build (simulator)",
+        "conclusion": "success",
+        "first_failed_step": null
+      },
+      {
+        "id": 112026388414,
+        "name": "android / build (x86_64)",
+        "conclusion": "success",
+        "first_failed_step": null
+      },
+      {
+        "id": 112026388516,
+        "name": "android / build (armeabi-v7a)",
+        "conclusion": "success",
+        "first_failed_step": null
+      },
+      {
+        "id": 112026388656,
+        "name": "android / build (arm64-v8a)",
+        "conclusion": "success",
+        "first_failed_step": null
+      },
+      {
+        "id": 112028139930,
+        "name": "summary",
+        "conclusion": "success",
+        "first_failed_step": null
+      }
+    ]
+  },
+  "manual_dispatch": {
+    "direct_reusable_workflow": "BLOCKED: GitHub workflow API returned 404 for build-linux.yml on default branch master",
+    "registered_workflow": "CI",
+    "fallback": "workflow_dispatch input platform; base gate preserved"
+  },
+  "timestamp_utc": "2026-10-06T00:47:28.094651+00:00",
+  "verified_build_run": {
+    "id": 37389305915,
+    "commit": "d22127a2e1737185996b5a4ddf485bc5cf0e922e",
+    "url": "https://github.com/Eirom16/cine-virtual/actions/runs/37389305915",
+    "status": "completed",
+    "conclusion": "success",
+    "jobs": [
+      {
+        "id": 112030310225,
+        "name": "Rust, Flutter and documentation gate",
+        "conclusion": "success",
+        "first_failed_step": null
+      },
+      {
+        "id": 112030797040,
+        "name": "windows / build",
+        "conclusion": "success",
+        "first_failed_step": null
+      },
+      {
+        "id": 112030797087,
+        "name": "android / build (x86_64)",
+        "conclusion": "success",
+        "first_failed_step": null
+      },
+      {
+        "id": 112030797206,
+        "name": "android / build (arm64-v8a)",
+        "conclusion": "success",
+        "first_failed_step": null
+      },
+      {
+        "id": 112030797248,
+        "name": "ios / build (device)",
+        "conclusion": "success",
+        "first_failed_step": null
+      },
+      {
+        "id": 112030797277,
+        "name": "android / build (armeabi-v7a)",
+        "conclusion": "success",
+        "first_failed_step": null
+      },
+      {
+        "id": 112030797284,
+        "name": "macos / build (macos-15, arm64)",
+        "conclusion": "success",
+        "first_failed_step": null
+      },
+      {
+        "id": 112030797288,
+        "name": "linux / build",
+        "conclusion": "success",
+        "first_failed_step": null
+      },
+      {
+        "id": 112030797312,
+        "name": "ios / build (simulator)",
+        "conclusion": "success",
+        "first_failed_step": null
+      },
+      {
+        "id": 112030797340,
+        "name": "macos / build (macos-15-intel, x64)",
+        "conclusion": "success",
+        "first_failed_step": null
+      },
+      {
+        "id": 112033026565,
+        "name": "summary",
+        "conclusion": "success",
+        "first_failed_step": null
+      }
+    ]
+  },
+  "manual_selection_run": {
+    "id": 37391359366,
+    "commit": "d22127a2e1737185996b5a4ddf485bc5cf0e922e",
+    "url": "https://github.com/Eirom16/cine-virtual/actions/runs/37391359366",
+    "status": "completed",
+    "conclusion": "success",
+    "jobs": [
+      {
+        "id": 112036948467,
+        "name": "Rust, Flutter and documentation gate",
+        "conclusion": "success",
+        "first_failed_step": null
+      },
+      {
+        "id": 112037395459,
+        "name": "linux / build",
+        "conclusion": "success",
+        "first_failed_step": null
+      },
+      {
+        "id": 112037396031,
+        "name": "macos",
+        "conclusion": "skipped",
+        "first_failed_step": null
+      },
+      {
+        "id": 112037396119,
+        "name": "windows",
+        "conclusion": "skipped",
+        "first_failed_step": null
+      },
+      {
+        "id": 112037396255,
+        "name": "android",
+        "conclusion": "skipped",
+        "first_failed_step": null
+      },
+      {
+        "id": 112037396480,
+        "name": "ios",
+        "conclusion": "skipped",
+        "first_failed_step": null
+      },
+      {
+        "id": 112038468981,
+        "name": "summary",
+        "conclusion": "success",
+        "first_failed_step": null
+      }
+    ],
+    "requested_platform": "linux",
+    "unrequested_platforms": "skipped by explicit selection, not passed/ignored failures"
+  },
+  "artifacts": [
+    {
+      "name": "cine-virtual-android-arm64-v8a-d22127a",
+      "commit": "d22127a2e1737185996b5a4ddf485bc5cf0e922e",
+      "platform": "android",
+      "architecture": "arm64-v8a",
+      "variant": null,
+      "archive": "cine-virtual-android-arm64-v8a-d22127a.zip",
+      "size_bytes": 44626834,
+      "sha256": "54db6f98736a6f7cf925648a83bcf1ebff87da9aa6c002fd97b8f37b2c4eedd9",
+      "checksum": "PASS",
+      "metadata_consistent": "PASS",
+      "working_tree_dirty": false,
+      "source_status": [],
+      "contents": {
+        "lib/arm64-v8a/libflutter.so": "PRESENT",
+        "lib/arm64-v8a/libcine_ui_bridge.so": "PRESENT"
+      },
+      "runtime": "NOT TESTED by hosted build",
+      "player": "Media3 Android provisional",
+      "toolchains": {
+        "runner_os": "Linux",
+        "runner_arch": "X64",
+        "os_version": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+        "rust_version": "rustc 1.99.0 (b940084d7 2026-09-28)",
+        "android_ndk": "28.2.13676358",
+        "android_api": "36",
+        "android_build_tools": "36.0.0",
+        "jdk_version": "21"
+      },
+      "flutter_version": "3.47.6",
+      "dart_version": "3.13.5",
+      "github_artifact_id": 11380801381,
+      "uploaded_size_bytes": 44629049
+    },
+    {
+      "name": "cine-virtual-android-armeabi-v7a-d22127a",
+      "commit": "d22127a2e1737185996b5a4ddf485bc5cf0e922e",
+      "platform": "android",
+      "architecture": "armeabi-v7a",
+      "variant": null,
+      "archive": "cine-virtual-android-armeabi-v7a-d22127a.zip",
+      "size_bytes": 39310521,
+      "sha256": "68bfb585a8696478041edc238d9eec42d0372789fb2999fb428b9acd9c12eae9",
+      "checksum": "PASS",
+      "metadata_consistent": "PASS",
+      "working_tree_dirty": false,
+      "source_status": [],
+      "contents": {
+        "lib/armeabi-v7a/libflutter.so": "PRESENT",
+        "lib/armeabi-v7a/libcine_ui_bridge.so": "PRESENT"
+      },
+      "runtime": "NOT TESTED by hosted build",
+      "player": "Media3 Android provisional",
+      "toolchains": {
+        "runner_os": "Linux",
+        "runner_arch": "X64",
+        "os_version": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+        "rust_version": "rustc 1.99.0 (b940084d7 2026-09-28)",
+        "android_ndk": "28.2.13676358",
+        "android_api": "36",
+        "android_build_tools": "36.0.0",
+        "jdk_version": "21"
+      },
+      "flutter_version": "3.47.6",
+      "dart_version": "3.13.5",
+      "github_artifact_id": 11380885952,
+      "uploaded_size_bytes": 39312744
+    },
+    {
+      "name": "cine-virtual-android-x86_64-d22127a",
+      "commit": "d22127a2e1737185996b5a4ddf485bc5cf0e922e",
+      "platform": "android",
+      "architecture": "x86_64",
+      "variant": null,
+      "archive": "cine-virtual-android-x86_64-d22127a.zip",
+      "size_bytes": 40756158,
+      "sha256": "f2f03c8015a4e1ea5c1f1f5f0c38c43703c42c94ae3ad943370478c0d81fce19",
+      "checksum": "PASS",
+      "metadata_consistent": "PASS",
+      "working_tree_dirty": false,
+      "source_status": [],
+      "contents": {
+        "lib/x86_64/libflutter.so": "PRESENT",
+        "lib/x86_64/libcine_ui_bridge.so": "PRESENT"
+      },
+      "runtime": "NOT TESTED by hosted build",
+      "player": "Media3 Android provisional",
+      "toolchains": {
+        "runner_os": "Linux",
+        "runner_arch": "X64",
+        "os_version": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+        "rust_version": "rustc 1.99.0 (b940084d7 2026-09-28)",
+        "android_ndk": "28.2.13676358",
+        "android_api": "36",
+        "android_build_tools": "36.0.0",
+        "jdk_version": "21"
+      },
+      "flutter_version": "3.47.6",
+      "dart_version": "3.13.5",
+      "github_artifact_id": 11380801270,
+      "uploaded_size_bytes": 40758361
+    },
+    {
+      "name": "cine-virtual-ios-unsigned-arm64-device-d22127a",
+      "commit": "d22127a2e1737185996b5a4ddf485bc5cf0e922e",
+      "platform": "ios",
+      "architecture": "arm64",
+      "variant": "device",
+      "archive": "cine-virtual-ios-unsigned-arm64-device-d22127a.tar.gz",
+      "size_bytes": 14874624,
+      "sha256": "d11eb90417505b1cc49cee32e70def38918602dc9de8f23c76a55f9c825dbbeb",
+      "checksum": "PASS",
+      "metadata_consistent": "PASS",
+      "working_tree_dirty": false,
+      "source_status": [],
+      "contents": {
+        "Runner.app/Runner": "arm64",
+        "macho_platform": "iOS device",
+        "C ABI symbols after packaging": "PASS (4)",
+        "main executable unsigned": "PASS"
+      },
+      "runtime": "NOT TESTED by hosted build",
+      "player": "IOS PLAYER RUNTIME NOT IMPLEMENTED",
+      "toolchains": {
+        "runner_os": "macOS",
+        "runner_arch": "ARM64",
+        "os_version": "macOS-15.7.9-arm64-arm-64bit",
+        "rust_version": "rustc 1.99.0 (b940084d7 2026-09-28)",
+        "xcode_version": "Xcode 16.4\nBuild version 16F6"
+      },
+      "flutter_version": "3.47.6",
+      "dart_version": "3.13.5",
+      "signed": false,
+      "github_artifact_id": 11380746457,
+      "uploaded_size_bytes": 14876643
+    },
+    {
+      "name": "cine-virtual-ios-unsigned-arm64-simulator-d22127a",
+      "commit": "d22127a2e1737185996b5a4ddf485bc5cf0e922e",
+      "platform": "ios",
+      "architecture": "arm64",
+      "variant": "simulator",
+      "archive": "cine-virtual-ios-unsigned-arm64-simulator-d22127a.tar.gz",
+      "size_bytes": 40935753,
+      "sha256": "d4e0631a89138428e478fcd706aa3a7b220101149e1bb26c29d8765ddfcecb71",
+      "checksum": "PASS",
+      "metadata_consistent": "PASS",
+      "working_tree_dirty": false,
+      "source_status": [],
+      "contents": {
+        "Runner.app/Runner": "arm64",
+        "macho_platform": "iOS Simulator",
+        "C ABI symbols after packaging": "PASS (4)",
+        "main executable unsigned": "PASS"
+      },
+      "runtime": "NOT TESTED by hosted build",
+      "player": "IOS PLAYER RUNTIME NOT IMPLEMENTED",
+      "toolchains": {
+        "runner_os": "macOS",
+        "runner_arch": "ARM64",
+        "os_version": "macOS-15.7.9-arm64-arm-64bit",
+        "rust_version": "rustc 1.99.0 (b940084d7 2026-09-28)",
+        "xcode_version": "Xcode 16.4\nBuild version 16F6"
+      },
+      "flutter_version": "3.47.6",
+      "dart_version": "3.13.5",
+      "signed": false,
+      "github_artifact_id": 11380621499,
+      "uploaded_size_bytes": 40937785
+    },
+    {
+      "name": "cine-virtual-linux-x64-d22127a",
+      "commit": "d22127a2e1737185996b5a4ddf485bc5cf0e922e",
+      "platform": "linux",
+      "architecture": "x64",
+      "variant": null,
+      "archive": "cine-virtual-linux-x64-d22127a.tar.gz",
+      "size_bytes": 12537432,
+      "sha256": "3e8f0011f290c8d652a40c36356e13cfbf69468998a51d283a6755c367376bf7",
+      "checksum": "PASS",
+      "metadata_consistent": "PASS",
+      "working_tree_dirty": false,
+      "source_status": [],
+      "contents": {
+        "cli/cine-server": "x64",
+        "cli/cine-client": "x64",
+        "cli/cine-player-spike": "x64",
+        "flutter/lib/libcine_ui_bridge.so": "x64"
+      },
+      "runtime": "NOT TESTED by hosted build",
+      "player": "libmpv adapter compiled; desktop Flutter surface not integrated",
+      "toolchains": {
+        "runner_os": "Linux",
+        "runner_arch": "X64",
+        "os_version": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+        "rust_version": "rustc 1.99.0 (b940084d7 2026-09-28)"
+      },
+      "flutter_version": "3.47.6",
+      "dart_version": "3.13.5",
+      "github_artifact_id": 11380721788,
+      "uploaded_size_bytes": 12539249
+    },
+    {
+      "name": "cine-virtual-macos-arm64-d22127a",
+      "commit": "d22127a2e1737185996b5a4ddf485bc5cf0e922e",
+      "platform": "macos",
+      "architecture": "arm64",
+      "variant": null,
+      "archive": "cine-virtual-macos-arm64-d22127a.tar.gz",
+      "size_bytes": 11212458,
+      "sha256": "6c0db7e8f0a0b92046bf5ccf36338cc9fef98c74263099779edd875cd2a85f71",
+      "checksum": "PASS",
+      "metadata_consistent": "PASS",
+      "working_tree_dirty": false,
+      "source_status": [],
+      "contents": {
+        "cli/cine-server": "arm64",
+        "cli/cine-client": "arm64",
+        "cli/cine-player-spike": "arm64",
+        "cine_mobile_spike.app/Contents/Frameworks/libcine_ui_bridge.dylib": "arm64"
+      },
+      "runtime": "NOT TESTED by hosted build",
+      "player": "libmpv adapter compiled; desktop Flutter surface not integrated",
+      "toolchains": {
+        "runner_os": "macOS",
+        "runner_arch": "ARM64",
+        "os_version": "macOS-15.7.9-arm64-arm-64bit",
+        "rust_version": "rustc 1.99.0 (b940084d7 2026-09-28)",
+        "xcode_version": "Xcode 16.4\nBuild version 16F6"
+      },
+      "flutter_version": "3.47.6",
+      "dart_version": "3.13.5",
+      "github_artifact_id": 11380326935,
+      "uploaded_size_bytes": 11214321
+    },
+    {
+      "name": "cine-virtual-macos-x64-d22127a",
+      "commit": "d22127a2e1737185996b5a4ddf485bc5cf0e922e",
+      "platform": "macos",
+      "architecture": "x64",
+      "variant": null,
+      "archive": "cine-virtual-macos-x64-d22127a.tar.gz",
+      "size_bytes": 12187119,
+      "sha256": "e2b0b8a01409bf583a902dfd7b0ebbfbfb174aa90b256e00f2ee0d9dcc1e7465",
+      "checksum": "PASS",
+      "metadata_consistent": "PASS",
+      "working_tree_dirty": false,
+      "source_status": [],
+      "contents": {
+        "cli/cine-server": "x64",
+        "cli/cine-client": "x64",
+        "cli/cine-player-spike": "x64",
+        "cine_mobile_spike.app/Contents/Frameworks/libcine_ui_bridge.dylib": "x64"
+      },
+      "runtime": "NOT TESTED by hosted build",
+      "player": "libmpv adapter compiled; desktop Flutter surface not integrated",
+      "toolchains": {
+        "runner_os": "macOS",
+        "runner_arch": "X64",
+        "os_version": "macOS-15.7.9-x86_64-i386-64bit",
+        "rust_version": "rustc 1.99.0 (b940084d7 2026-09-28)",
+        "xcode_version": "Xcode 16.4\nBuild version 16F6"
+      },
+      "flutter_version": "3.47.6",
+      "dart_version": "3.13.5",
+      "github_artifact_id": 11380876605,
+      "uploaded_size_bytes": 12188974
+    },
+    {
+      "name": "cine-virtual-windows-x64-d22127a",
+      "commit": "d22127a2e1737185996b5a4ddf485bc5cf0e922e",
+      "platform": "windows",
+      "architecture": "x64",
+      "variant": null,
+      "archive": "cine-virtual-windows-x64-d22127a.zip",
+      "size_bytes": 13701137,
+      "sha256": "0945f1aa80599dfc88c201ecde12de0da4c29a48a9208cfbde8b918ee5ac4f7f",
+      "checksum": "PASS",
+      "metadata_consistent": "PASS",
+      "working_tree_dirty": true,
+      "source_status": [
+        "M experiments/02-rust-ui-bridge/app/linux/flutter/generated_plugin_registrant.cc",
+        " M experiments/02-rust-ui-bridge/app/linux/flutter/generated_plugin_registrant.h",
+        " M experiments/02-rust-ui-bridge/app/linux/flutter/generated_plugins.cmake",
+        " M experiments/02-rust-ui-bridge/app/macos/Flutter/GeneratedPluginRegistrant.swift",
+        " M experiments/02-rust-ui-bridge/app/windows/flutter/generated_plugin_registrant.cc",
+        " M experiments/02-rust-ui-bridge/app/windows/flutter/generated_plugin_registrant.h",
+        " M experiments/02-rust-ui-bridge/app/windows/flutter/generated_plugins.cmake"
+      ],
+      "contents": {
+        "cli/cine-server.exe": "x64",
+        "cli/cine-client.exe": "x64",
+        "cli/cine-player-spike.exe": "x64",
+        "flutter/cine_ui_bridge.dll": "x64"
+      },
+      "runtime": "NOT TESTED by hosted build",
+      "player": "libmpv adapter compiled; desktop Flutter surface not integrated",
+      "toolchains": {
+        "runner_os": "Windows",
+        "runner_arch": "X64",
+        "os_version": "Windows-2025Server-10.0.26100-SP0",
+        "rust_version": "rustc 1.99.0 (b940084d7 2026-09-28)"
+      },
+      "flutter_version": "3.47.6",
+      "dart_version": "3.13.5",
+      "github_artifact_id": 11380751831,
+      "uploaded_size_bytes": 13703600
+    }
+  ],
+  "artifact_verification": {
+    "downloaded": 9,
+    "checksums": "PASS",
+    "metadata": "PASS",
+    "desktop_binary_architectures": "PASS",
+    "android_native_abi_libraries": "PASS",
+    "ios_platform_and_c_abi_symbols_after_packaging": "PASS",
+    "ios_main_executable_unsigned": "PASS",
+    "download_issue": "One bulk download timed out; missing artifacts downloaded individually and verified",
+    "execution_of_downloaded_binaries": false
+  },
+  "platforms": [
+    {
+      "platform": "android",
+      "architecture": "arm64-v8a",
+      "variant": null,
+      "commit": "d22127a2e1737185996b5a4ddf485bc5cf0e922e",
+      "run_id": 37389305915,
+      "core_or_bridge_build": "PASS",
+      "flutter_build": "PASS",
+      "player_build": "PASS compile (Media3)",
+      "package": "PASS",
+      "artifact": "cine-virtual-android-arm64-v8a-d22127a",
+      "runtime": "NOT TESTED by compilation; Linux headless SDK separate"
+    },
+    {
+      "platform": "android",
+      "architecture": "armeabi-v7a",
+      "variant": null,
+      "commit": "d22127a2e1737185996b5a4ddf485bc5cf0e922e",
+      "run_id": 37389305915,
+      "core_or_bridge_build": "PASS",
+      "flutter_build": "PASS",
+      "player_build": "PASS compile (Media3)",
+      "package": "PASS",
+      "artifact": "cine-virtual-android-armeabi-v7a-d22127a",
+      "runtime": "NOT TESTED by compilation; Linux headless SDK separate"
+    },
+    {
+      "platform": "android",
+      "architecture": "x86_64",
+      "variant": null,
+      "commit": "d22127a2e1737185996b5a4ddf485bc5cf0e922e",
+      "run_id": 37389305915,
+      "core_or_bridge_build": "PASS",
+      "flutter_build": "PASS",
+      "player_build": "PASS compile (Media3)",
+      "package": "PASS",
+      "artifact": "cine-virtual-android-x86_64-d22127a",
+      "runtime": "NOT TESTED by compilation; Linux headless SDK separate"
+    },
+    {
+      "platform": "ios",
+      "architecture": "arm64",
+      "variant": "device",
+      "commit": "d22127a2e1737185996b5a4ddf485bc5cf0e922e",
+      "run_id": 37389305915,
+      "core_or_bridge_build": "PASS",
+      "flutter_build": "PASS",
+      "player_build": "NOT IMPLEMENTED",
+      "package": "PASS",
+      "artifact": "cine-virtual-ios-unsigned-arm64-device-d22127a",
+      "runtime": "NOT TESTED by compilation; Linux headless SDK separate"
+    },
+    {
+      "platform": "ios",
+      "architecture": "arm64",
+      "variant": "simulator",
+      "commit": "d22127a2e1737185996b5a4ddf485bc5cf0e922e",
+      "run_id": 37389305915,
+      "core_or_bridge_build": "PASS",
+      "flutter_build": "PASS",
+      "player_build": "NOT IMPLEMENTED",
+      "package": "PASS",
+      "artifact": "cine-virtual-ios-unsigned-arm64-simulator-d22127a",
+      "runtime": "NOT TESTED by compilation; Linux headless SDK separate"
+    },
+    {
+      "platform": "linux",
+      "architecture": "x64",
+      "variant": null,
+      "commit": "d22127a2e1737185996b5a4ddf485bc5cf0e922e",
+      "run_id": 37389305915,
+      "core_or_bridge_build": "PASS",
+      "flutter_build": "PASS",
+      "player_build": "PASS compile (loader); SDK headless PASS",
+      "package": "PASS",
+      "artifact": "cine-virtual-linux-x64-d22127a",
+      "runtime": "NOT TESTED by compilation; Linux headless SDK separate"
+    },
+    {
+      "platform": "macos",
+      "architecture": "arm64",
+      "variant": null,
+      "commit": "d22127a2e1737185996b5a4ddf485bc5cf0e922e",
+      "run_id": 37389305915,
+      "core_or_bridge_build": "PASS",
+      "flutter_build": "PASS",
+      "player_build": "PASS compile (loader); SDK runtime not provisioned",
+      "package": "PASS",
+      "artifact": "cine-virtual-macos-arm64-d22127a",
+      "runtime": "NOT TESTED by compilation; Linux headless SDK separate"
+    },
+    {
+      "platform": "macos",
+      "architecture": "x64",
+      "variant": null,
+      "commit": "d22127a2e1737185996b5a4ddf485bc5cf0e922e",
+      "run_id": 37389305915,
+      "core_or_bridge_build": "PASS",
+      "flutter_build": "PASS",
+      "player_build": "PASS compile (loader); SDK runtime not provisioned",
+      "package": "PASS",
+      "artifact": "cine-virtual-macos-x64-d22127a",
+      "runtime": "NOT TESTED by compilation; Linux headless SDK separate"
+    },
+    {
+      "platform": "windows",
+      "architecture": "x64",
+      "variant": null,
+      "commit": "d22127a2e1737185996b5a4ddf485bc5cf0e922e",
+      "run_id": 37389305915,
+      "core_or_bridge_build": "PASS",
+      "flutter_build": "PASS",
+      "player_build": "PASS compile (loader); SDK runtime not provisioned",
+      "package": "PASS",
+      "artifact": "cine-virtual-windows-x64-d22127a",
+      "runtime": "NOT TESTED by compilation; Linux headless SDK separate"
+    }
+  ],
+  "remaining_limitations": [
+    "iOS Player runtime NOT IMPLEMENTED; no iPhone/Simulator runtime",
+    "Windows/macOS libmpv SDK packaging/runtime not validated",
+    "Android physical runtime evidence remains separate; precision not tuned",
+    "Direct reusable workflow API discovery returns 404; CI platform input works",
+    "Windows SDK rewrites seven generated plugin registrants; metadata preserves dirty source status",
+    "This is a snapshot before the documentation commit; that final run is reviewed separately"
+  ]
+}

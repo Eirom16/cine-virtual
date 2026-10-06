@@ -131,5 +131,27 @@
     "Core dependencies",
     "license decision"
   ],
-  "publication": "NONE"
+  "publication": "NONE",
+  "hosted_followup_local_validation": {
+    "timestamp_utc": "2026-10-05T23:21:37.896118+00:00",
+    "code_commit": "d22127a2e1737185996b5a4ddf485bc5cf0e922e",
+    "rust_tests_passed": 90,
+    "sdk_opt_in_passed": 6,
+    "flutter_tests_passed": 6,
+    "ci_script_tests_passed": 6,
+    "fmt": "PASS",
+    "clippy": "PASS",
+    "rust_build": "PASS",
+    "flutter_analyze": "PASS",
+    "docs": "PASS",
+    "ci_structure": "PASS",
+    "fake_demo": "PASS",
+    "linux_real_smoke": "PASS (25 seconds; pair p95 68 ms)",
+    "windows_gnu_local_media_compile_clippy": "PASS; not MSVC/runtime",
+    "hosted_evidence": "docs/CI-HOSTED.json",
+    "note": "Original fields above describe the earlier local-only task, not current GitHub status.",
+    "websocket_ordering_test_repetitions": 5,
+    "actionlint": "PASS (without ShellCheck)"
+  },
+  "scope": "Original fields describe historical local-only validation; hosted follow-up is separate in CI-HOSTED.json."
 }

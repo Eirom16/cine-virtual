@@ -259,7 +259,7 @@ si se prioriza adopción permisiva. No aplicar modelo mixto sin revisión explí
 y aplicar textos/headers/manifest. Esta es la única decisión inmediata de política
 que requiere al titular; tecnología y tuning se resuelven con experimentos.
 
-## ADR-010 — CI de compilación multiplataforma (Implementada, GitHub pendiente)
+## ADR-010 — CI de compilación multiplataforma (Hosted build validado)
 
 **Context:** runtime Linux/Android ya tiene evidencia; falta descubrir blockers
 Windows/macOS/iOS sin convertir build en soporte/runtime ni preparar una release.
@@ -272,5 +272,23 @@ bridge estático y compila device/simulator sin firma; Player Unsupported explí
 duplicados, publicación/signing inmediata. Se prefieren etapas diagnosticables.
 
 **Consequences:** primeros runners pueden fallar; no continue-on-error, no secrets,
-no push ni stores. Core/protocolo/SyncEngine y stacks provisionales no cambian.
-Build/runtime y evidencia local/remota se separan en [CI](CI.md).
+pushes de diagnóstico autorizados, sin stores. Core/protocolo/SyncEngine y stacks
+provisionales no cambian. Build/runtime y evidencia local/remota se separan en
+[CI](CI.md).
+
+**Evidence:** run 37389305915/d22127a: base y nueve variantes PASS. Los artifacts
+se inspeccionan con checksums/metadata y arquitectura; iOS main app unsigned y
+Player NOT IMPLEMENTED. Historial causal en [CI-HOSTED](CI-HOSTED.json): tests SDK
+no deben asumir duración exacta entre builds FFmpeg; Windows necesita file ID;
+macOS debe pedir arm64, no arm64e; Simulator debe conservar C ABI en el proceso.
+El fixture de Join/control espera la secuencia autoritativa, sin tocar el runtime.
+
+**Operational follow-up:** GitHub solo registró CI y devuelve 404 al despacho
+individual reusable, aunque sus archivos están en master. Input platform de CI
+permite diagnóstico independiente con base gate. Un linker Simulator puede añadir
+firma ad-hoc automática: solo se retira esa firma, se rechazan certificados y
+se vuelve a comprobar unsigned. No se crea ninguna firma.
+
+**Remaining risks:** compile PASS no valida Player desktop Windows/macOS ni iOS
+runtime. Metadata muestra cambios generados sin falsificar clean. Stack/licencia,
+packaging multimedia y precisión Android continúan pendientes.

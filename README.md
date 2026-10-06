@@ -63,9 +63,9 @@ Empieza por [PRODUCT](docs/PRODUCT.md), [ARCHITECTURE](docs/ARCHITECTURE.md) y
 
 ## CI y portabilidad
 
-Workflows GitHub Actions implementados para Linux, Windows, macOS, Android e iOS
-unsigned; todavía no ejecutados en GitHub. Builds no equivalen a runtime ni
-aprueban releases. Herramientas, artifacts y límites en [CI](docs/CI.md).
+GitHub Actions compila Linux, Windows, macOS ARM64/Intel, Android tres ABIs e iOS
+device/Simulator unsigned; la matriz hosted pasó. Build no equivale a runtime:
+iOS Player sigue sin implementarse y no se publican releases. Herramientas, artifacts y límites en [CI](docs/CI.md).
 
 ## Validación local
 

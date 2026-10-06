@@ -1,10 +1,12 @@
 # CI multiplataforma — pre-v0.1
 
-**IMPLEMENTED, NOT EXECUTED ON GITHUB.** Esta pasada se realizó en Linux, sin
-remoto Git configurado, push, secrets, signing Apple ni publicación. GitHub-hosted
-runner disponible no significa build/runtime Cine Virtual aprobado. El gate de
-precisión Android del [slice 2](../experiments/07-linux-android-room/RESULTS.md)
-queda intacto; este trabajo no modifica SyncEngine, Media3 timing o protocolo.
+**IMPLEMENTED AND EXECUTED ON GITHUB.** La primera ejecución hosted se analizó
+mediante GitHub CLI en `Eirom16/cine-virtual`; su evidencia y las ejecuciones de
+corrección se registran en [CI-HOSTED](CI-HOSTED.json). Build y runtime son gates
+separados. El gate de precisión Android del
+[slice 2](../experiments/07-linux-android-room/RESULTS.md) queda intacto: este
+trabajo no modifica SyncEngine, Media3 timing ni protocolo. No signing Apple,
+secrets, stores o releases; los pushes de diagnóstico fueron autorizados.
 
 ## Workflows y triggers
 
@@ -13,14 +15,18 @@ queda intacto; este trabajo no modifica SyncEngine, Media3 timing o protocolo.
 hace fmt/clippy/tests/build Rust, documentación, validación CI, pruebas de scripts,
 Flutter pub get/analyze/test; **los builds costosos requieren base PASS**.
 
-Cinco workflows separados son reutilizables (`workflow_call`) y manuales
-(`workflow_dispatch`): [Linux](../.github/workflows/build-linux.yml),
+Cinco workflows separados declaran `workflow_call` y `workflow_dispatch`: [Linux](../.github/workflows/build-linux.yml),
 [Windows](../.github/workflows/build-windows.yml),
 [macOS](../.github/workflows/build-macos.yml),
 [Android](../.github/workflows/build-android.yml) e
 [iOS](../.github/workflows/build-ios.yml). No tienen otros triggers automáticos,
-por lo que no duplican el orquestador. Ejecución manual de una plataforma no corre
-la base global: sirve para diagnosticar su build, no sustituye el gate completo.
+por lo que no duplican el orquestador. El despacho directo declarado en cada reusable no incluye el gate global;
+la ruta manual operativa mediante CI/platform sí conserva la base.
+El API hosted solo registró CI: view/dispatch directo de build-linux.yml devolvió
+404 aunque el archivo existe en master. Por ello CI expone input manual `platform`
+(all/linux/windows/macos/android/ios). Esa ruta usa el workflow registrado y
+conserva el gate base; los no solicitados se muestran NOT APPLICABLE, nunca PASS.
+No se alteraron settings para forzar registro de los workflows reutilizables.
 Concurrency cancela runs obsoletos de esa rama/PR; matrices fail-fast=false dejan
 visibles las arquitecturas restantes. No hay continue-on-error ni deployments.
 
@@ -87,7 +93,7 @@ multimedia auditado. Compile PASS no prueba load/video. No se deshabilita el
 adapter para esconder un blocker; runtime mpv fallaría explícitamente sin SDK.
 
 macOS usa dos VMs nativas separadas, arm64/x64, compila workspace/tests y app
-Flutter con dylib Rust en Contents/Frameworks. ARCHS=native y verificación lipo
+Flutter con dylib Rust en Contents/Frameworks. ARCHS explícito arm64/x86_64 y verificación lipo
 impiden etiquetar un universal binary no demostrado. Homebrew documenta mpv para
 ambas arquitecturas, pero **este CI no lo instala**: no hay runtime/packaging
 multimedia Apple validado y no hace falta para compilar el loader. App Flutter
@@ -114,16 +120,63 @@ El Xcode project enlaza la staticlib con force_load/exported C ABI symbols. Dart
 usa DynamicLibrary.process(), nunca intenta cargar una .so Android. Se comprueban
 los cuatro símbolos C en el ejecutable. `CODE_SIGNING_ALLOWED=NO`, sin team,
 certificado, perfil, Apple ID, notarization, fastlane o secrets. El empaquetador
-rechaza un .app firmado bajo una etiqueta unsigned.
+rechaza firmas con certificado. Si el linker Simulator genera una firma ad-hoc
+automática, la retira y comprueba de nuevo que la app quedó unsigned; metadata
+registra esa retirada. No se aplica ninguna firma ni se usa identidad Apple.
 
 **IOS PLAYER RUNTIME NOT IMPLEMENTED** se muestra explícitamente; no botones de
 playback ni FakePlayer presentado como vídeo. AVPlayer sigue candidato investigado.
-La pantalla solamente consulta el bridge. Estos scripts/scaffolds **no han sido
-compilados por nosotros en Xcode**; el primer runner puede revelar blockers reales.
+La pantalla solamente consulta el bridge. La evidencia de compile/linking hosted se registra por target en CI-HOSTED;
+no se ha ejecutado la aplicación en iPhone ni Simulator.
 
 Artifact contiene Runner.app compilado y staticlib, no .ipa, xcarchive ni IPA
 instalable. Device .app sin firma no implica instalación posible en iPhone. No se
 arranca Simulator; simulator build comprueba compile/linking, no runtime.
+
+## Diagnóstico del primer run hosted
+
+Run `37383775762`, commit `17d1a38`: base, Android tres ABIs, macOS Intel e iOS
+device pasaron. Linux, Windows, macOS ARM64 e iOS Simulator fallaron; los logs
+completos se leyeron con gh antes de corregir. No se ocultaron failures.
+
+- Linux ya compilaba Rust/Flutter. Los tests SDK asumían duración exacta de
+  30000/620000 ms (incluida otra aserción en el SDK del cliente que el primer
+  run no alcanzó a ejecutar); el corpus Ubuntu reportó 30021/620021 ms por redondeo de
+  contenedor/AAC. Se conserva una tolerancia acotada de frames y se comprueba
+  SeekOutOfRange contra duration real + 1, sin modificar thresholds de sync.
+- Windows compilaba Rust, pero el guard de metadata/test dependía de actualización
+  inmediata del timestamp. El adapter ahora lee file ID, volumen y ChangeTime
+  mediante Win32; el test fija explícitamente una modificación observable.
+  Los timestamps no son identidad ni garantía contra escrituras adversariales:
+  SHA-256 completo continúa siendo la identidad final. Error al consultar metadata
+  Windows falla explícitamente. Se validó compile GNU local y el gate MSVC hosted
+  sigue siendo la evidencia nativa relevante.
+- macOS ARM64 heredaba NATIVE_ARCH_ACTUAL=arm64e, ausente en FlutterMacOS.
+  El script pasa FLUTTER_XCODE_ARCHS=arm64 o x86_64; lipo conserva la comprobación
+  estricta de app, bridge y CLI. El default local es ARCHS_STANDARD.
+- Xcode terminó la app Simulator pero faltaban símbolos en Runner. Su layout
+  debug dylib mueve código fuera del ejecutable principal. Se desactiva ese layout
+  mediante FLUTTER_XCODE_ENABLE_DEBUG_DYLIB=NO para el bridge in-process; los cuatro
+  símbolos se siguen comprobando, sin confundir device con Simulator ni firmar.
+  El siguiente run reveló una firma ad-hoc automática al empaquetar Simulator:
+  solo se retira si está identificada como ad-hoc sin Authority/Team, luego se
+  comprueba unsigned de nuevo. Firmas device/certificado o errores fallan.
+
+Fuentes del diagnóstico: [metadata Win32](https://learn.microsoft.com/en-us/windows/win32/api/winbase/ns-winbase-file_basic_info),
+[layout debug Xcode](https://developer.apple.com/documentation/xcode/understanding-build-product-layout-changes)
+y fuente flutter_tools fijada (environmentVariablesAsXcodeBuildSettings acepta
+FLUTTER_XCODE_*). La evidencia por run y los artifacts se conserva en CI-HOSTED.
+
+Una regresión intermitente Intel del run 37387906249 rechazó MEDIA_SELECT_REQUEST
+con OUT_OF_SEQUENCE: el fixture enviaba el control antes de que Host recibiera
+MEMBER_JOINED. Se añadió wait_state sobre la secuencia de Join, sin retries ni
+cambios de protocolo/runtime. El test pasó cinco repeticiones locales completas.
+La metadata registra source_status con nombres relativos al repositorio para
+hacer visibles cambios generados: el paquete Windows de c206eae declaró dirty,
+no se falsificó ese campo ni se presentó como build hermético. El status del
+run d22127a identifica siete registrantes de plugins generados por Flutter
+(Linux/macOS/Windows), no cambios en Core o protocolo. Normalizar/auditar esos
+outputs es deuda de reproducibilidad, no evidencia de runtime Windows.
 
 ## Artifacts, integridad y metadata
 
@@ -134,7 +187,8 @@ ZIP por ABI que contiene APK debug. iOS: tar.gz unsigned device/simulator con .a
 + staticlib. No se redistribuyen libmpv/FFmpeg ni corpus en artifacts.
 
 Cada archivo final tiene CHECKSUMS.txt SHA-256 y metadata.json: commit completo,
-runner OS/arch/version, Rust/Flutter/Dart, Xcode o Android SDK/NDK/JDK, modo y
+runner OS/arch/version, Rust/Flutter/Dart, Xcode o Android SDK/NDK/JDK, modo,
+source_status relativo al repositorio (no contenido/diff) y
 signed=false iOS. Paths de SDK se eliminan de metadata. SHA de artifact no tiene
 relación con la identidad multimedia de salas. Tar conserva modos/symlinks Apple;
 Actions no se usa para publicar GitHub Releases ni stores.
@@ -167,27 +221,37 @@ No significa Player/runtime, precisión, distribución, firma o aprobación de s
 FAIL y BLOCKED permanecen visibles. Per-stage summaries separan Core/bridge,
 Flutter, Player compile, package y Runtime NOT TESTED.
 
-| Plataforma | Rust Core/bridge build nuestro | Flutter build nuestro | Player build nuestro | Runtime | Artifact de Actions |
+Snapshot hosted: run `37389305915`, commit `d22127a`, **todos los builds PASS**.
+La evidencia machine-readable conserva también los runs fallidos anteriores.
+
+| Plataforma | Rust Core/bridge | Flutter | Player build | Package | Runtime |
 | --- | --- | --- | --- | --- | --- |
-| Linux x64 | PASS local | PASS local | libmpv PASS local | Linux real previo; no visual CI | NOT EXECUTED ON GITHUB |
-| Windows x64 | NOT TESTED | NOT TESTED | Loader no validado en Windows | NOT TESTED | NOT EXECUTED ON GITHUB |
-| macOS arm64/x64 | NOT TESTED | NOT TESTED | Loader no validado en macOS | NOT TESTED | NOT EXECUTED ON GITHUB |
-| Android 3 ABIs | Bridge PASS local | APK debug PASS local (3 ABIs) | Media3 compila; físico previo armv7 | NOT TESTED esta pasada; Android 9 previo | NOT EXECUTED ON GITHUB |
-| iOS arm64 device/sim | NOT TESTED | NOT TESTED | NOT IMPLEMENTED | NOT TESTED | NOT EXECUTED ON GITHUB |
+| Linux x64 | PASS hosted | PASS hosted | Loader PASS; seis SDK headless PASS | PASS hosted | SDK headless; display/audio NOT TESTED por CI |
+| Windows x64 | PASS hosted | PASS hosted | Loader COMPILE PASS; SDK no bundled | PASS hosted | NOT TESTED |
+| macOS arm64/x64 | PASS hosted ambos | PASS hosted ambos | Loader COMPILE PASS; SDK no bundled | PASS hosted ambos | NOT TESTED |
+| Android 3 ABIs | Bridge PASS hosted | APK debug PASS hosted | Media3 COMPILE PASS | PASS hosted x3 | NOT TESTED por CI; físico previo separado |
+| iOS arm64 device/sim | Bridge PASS hosted ambos | PASS hosted ambos | NOT IMPLEMENTED | Unsigned PASS hosted ambos | NOT TESTED |
 
-Localmente: 90 tests Rust, seis SDK opt-in, seis Flutter (cinco anteriores +
-Unsupported explícito), tres tests de scripts CI; YAML y actionlint aprobados.
-Linux release + APK debug de las tres ABIs construidos/empacados con integridad
-verificada. Bootstrap Flutter probado desde clon SDK limpio; se corrigió el
-parser porque el primer arranque escribe progreso antes del JSON --machine.
-Windows/macOS/iOS y GitHub siguen NOT TESTED; no teléfono autorizado en esta pasada.
-Los artifacts locales registran commit base + working_tree_dirty=true; no son
-builds del commit final ni prueba de un runner GitHub.
+Localmente en diagnóstico: 90 tests Rust, seis SDK opt-in, seis Flutter y seis
+tests de scripts CI; fmt/clippy/docs/check_ci/actionlint y demos FakePlayer/Linux
+real pasaron. El test WebSocket que falló por ordering se repitió cinco veces.
+Compile/clippy de LocalMedia Windows GNU desde Linux pasó; el runner Windows
+MSVC es la evidencia nativa de workspace y Flutter, no ese cross-check.
 
-Estado de herramientas/builds locales de esta pasada en
-[CI-LOCAL](CI-LOCAL.json), sin sustituir evidencia histórica de experimentos.
+[CI-LOCAL](CI-LOCAL.json) conserva la pasada local histórica y añade las
+verificaciones de diagnóstico. [CI-HOSTED](CI-HOSTED.json) registra commit/run,
+plataforma, paquete, checksums y runtime separado. Los artifacts originales
+locales de 17d1a38 no se relabelan como builds hosted.
 
 ## Reproducir y ejecutar manualmente
+
+```sh
+# Ruta registrada y comprobable; default all si se omite el input.
+gh workflow run ci.yml -f platform=linux
+gh run list --limit 5
+gh run view RUN_ID
+```
+
 
 ```sh
 python3 -m venv /tmp/cine-ci-tools
@@ -208,11 +272,11 @@ se suministran al reutilizar Android scripts. Apple requiere Mac/Xcode y Windows
 su SDK/Visual Studio real; no emular su PASS desde Linux.
 
 Después del push autorizado por el propietario: Actions → CI → Run workflow, o
-Build plataforma → Run workflow para diagnóstico individual. Workflows deben
-existir en rama por defecto para despacho UI. No se hizo push ni configuración
-remota en esta tarea. No hay badge porque no hay URL de repositorio configurada.
+CI → Run workflow → platform para diagnóstico individual. Workflows deben
+existir en rama por defecto para despacho UI. El remoto fue conectado por el propietario y los pushes de diagnóstico están
+autorizados. No se configura publicación ni settings sensibles del repositorio.
 
-Checklist del primer run:
+Checklist de cada nueva ejecución:
 
 1. Base: fmt/clippy/90 tests/seis Flutter/docs/check_ci verdes; locks sin modificaciones.
 2. Linux: apt, seis SDK tests headless, tar/checksums/metadata/bundle.
