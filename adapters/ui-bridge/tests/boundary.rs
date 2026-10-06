@@ -225,3 +225,42 @@ fn network_boundary_rejects_invalid_intents_and_offline_control_in_network_mode(
         "NETWORK_INTENT_REQUIRED"
     );
 }
+
+#[test]
+fn desktop_intents_validate_paths_and_cannot_use_offline_or_mobile_truth() {
+    let mut app = Application::default();
+    for payload in [
+        json!({"action":"select"}),
+        json!({"action":"select","path":4}),
+        json!({"action":"select","path":"fixture.mp4","token":"unexpected"}),
+    ] {
+        assert_eq!(
+            command(&mut app, 1, "desktop_network", payload, 0)
+                .error
+                .unwrap()
+                .code,
+            "INVALID_DTO"
+        );
+    }
+    assert!(
+        command(
+            &mut app,
+            1,
+            "desktop_network",
+            json!({"action":"disconnect"}),
+            0
+        )
+        .ok
+    );
+    assert_eq!(
+        simple(&mut app, 1, "snapshot", 0).error.unwrap().code,
+        "NETWORK_INTENT_REQUIRED"
+    );
+    assert_eq!(
+        command(&mut app, 1, "network", json!({"action":"disconnect"}), 0)
+            .error
+            .unwrap()
+            .code,
+        "NETWORK_INTENT_REQUIRED"
+    );
+}
