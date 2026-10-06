@@ -1,17 +1,26 @@
-# Cine Mobile Spike — pantalla de ingeniería
+# Cine Virtual — Flutter client
 
-Prototipo aislado de Spike C, no UI de producto ni cliente de sala.
-Flutter presenta snapshots; Rust decide SyncEngine/lifecycle; Media3 y SAF viven
-en Kotlin/main Looper. Fuente/evidencia en [experimento](../README.md).
+Entrada normal: UI de producto Home → Create/Join → Lobby → archivo real →
+Ready → Player. Flutter presenta snapshots/envía intents; Rust conserva sala,
+autoridad y sincronización. Media3/SAF permanecen en Kotlin. Arquitectura en
+[UI](../../../docs/UI.md), evidencia en [Phase 1](../../09-product-ui/RESULTS.md).
+
+Desde la raíz del repositorio:
 
 ```sh
-# Desde la raíz: compila el C ABI; Flutter requiere la variable local del .so.
 cargo build -p cine-ui-bridge
-python3 scripts/demo_mobile_ui.py --platform linux
-python3 scripts/demo_mobile_ui.py --platform android
+cd experiments/02-rust-ui-bridge/app
+CINE_BRIDGE_LIBRARY="$PWD/../../../target/debug/libcine_ui_bridge.so" flutter run -d linux
 ```
 
-Manual Android: build sin SPIKE_AUTORUN y flutter run; seleccionar mediante SAF,
-Play/Pause/Seek +5s. Resultados automáticos omiten URI/nombre/digest/serial.
-Linux solo conecta Rust, sin vídeo embebido. iOS no está generado ni validado.
-No servicios background, permisos de almacenamiento globales ni servidor remoto.
+Linux necesita libmpv y ffprobe; selección por diálogo GTK, vídeo en ventana
+nativa independiente. Android necesita bridge para ABI y build APK mediante
+`scripts/build_mobile_bridge.py`; selección SAF, sin paths manuales ni permiso
+global de almacenamiento. Servidor en Configuración avanzada o CINE_SERVER.
+
+Diagnósticos en menú Developer. Las pantallas de ingeniería siguen disponibles
+con `--dart-define=SPIKE_AUTORUN=true` o `ROOM_AUTORUN=true` para scripts de
+regresión; no son la experiencia normal. No publicar invitaciones/resume tokens.
+
+Windows/macOS UI compila en CI, reproducción NOT TESTED/deshabilitada. iOS
+compila unsigned, Player NOT IMPLEMENTED. libmpv y Media3 PROVISIONAL.

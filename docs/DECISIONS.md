@@ -302,3 +302,18 @@ se vuelve a comprobar unsigned. No se crea ninguna firma.
 **Remaining risks:** compile PASS no valida Player desktop Windows/macOS ni iOS
 runtime. Metadata muestra cambios generados sin falsificar clean. Stack/licencia,
 packaging multimedia y precisión Android continúan pendientes.
+
+## Seguimiento UI Product Phase 1 — aplicación de ADR-007
+
+IMPLEMENTED: la entrada normal Flutter pasa de ingeniería a producto, usando
+Application/Client reales, proyecciones de estado, ThemeData y Navigator. Sin
+nuevo framework de estado ni otro protocolo de start-room. Se conserva la UI
+de ingeniería por autoruns explícitos y se separa Developer. El owner desktop
+expone intents del Client/libmpv existente; Android reutiliza SAF/Media3/driver.
+No se cambian decisiones de sync ni candidaturas provisionales de Player.
+
+La superficie Linux permanece en ventana libmpv independiente; embedding y
+fullscreen requieren la siguiente pasada. iOS Player NOT IMPLEMENTED;
+Windows/macOS runtime NOT TESTED. Arquitectura y auditoría en [UI](UI.md),
+validación física y screenshots en [experimento 09](../experiments/09-product-ui/RESULTS.md).
+No se crea un ADR para cambios de estilo/presentación.

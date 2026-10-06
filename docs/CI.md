@@ -310,3 +310,14 @@ certificados, serial/URI/path personal ni secretos. No ocultar fallos experiment
   [FFI legacy/static linking](https://docs.flutter.dev/platform-integration/legacy-ffi-plugin).
 - [Rust Apple iOS targets](https://doc.rust-lang.org/rustc/platform-support/apple-ios.html).
 - [Homebrew mpv](https://formulae.brew.sh/formula/mpv): posibilidad técnica, no runtime probado aquí.
+
+## Product UI Phase 1
+
+La entrada normal del mismo app Flutter es ahora CineVirtualApp; los autoruns
+SPIKE_AUTORUN/ROOM_AUTORUN conservan la ingeniería. El gate Flutter cubre el
+producto y las pruebas FFI previas con CINE_BRIDGE_LIBRARY. ROOM_MODE usado por
+builds anteriores es compatible y ya no cambia la entrada normal. El nuevo
+owner desktop reutiliza Client/libmpv; no se cambia la matriz ni sus permisos.
+Resultados locales/físicos y run final en
+[Product UI Phase 1](../experiments/09-product-ui/RESULTS.md). Build Windows/macOS
+no valida multimedia; iOS permanece unsigned con Player NOT IMPLEMENTED.
