@@ -299,6 +299,12 @@ class ReadinessStatus extends StatelessWidget {
         CineTokens.accent,
         Icons.task_alt,
       ),
+      Readiness.cancelled => (
+        'Verificación cancelada',
+        'Selecciona el archivo para volver a verificarlo.',
+        CineTokens.muted,
+        Icons.pause_circle_outline,
+      ),
       Readiness.error => (
         'No se pudo preparar',
         'Vuelve a seleccionar un archivo local válido.',

@@ -27,6 +27,7 @@ class TestGateway implements SessionGateway {
   final intents = <String>[];
   final Map<String, dynamic> snapshot = {
     'generation': 1,
+    'hash': {'state': 'complete'},
     'network': {
       'connected': true,
       'busy': false,
@@ -492,5 +493,19 @@ void main() {
     expect(value, isNot(contains('password')));
     expect(value, isNot(contains('token=private')));
     expect(value, isNot(contains('#secret')));
+  });
+  testWidgets('Cancelled verification never enables Ready', (tester) async {
+    final c = await fixture(tester);
+    final g = c.gateway as TestGateway;
+    g.sync['room_ready'] = false;
+    g.snapshot['hash'] = {'state': 'cancelled'};
+    c.poll();
+    expect(c.view.canReady, false);
+    expect(c.view.readiness, Readiness.cancelled);
+    await screen(
+      tester,
+      ReadinessStatus(view: c.view, progress: c.hashProgress),
+    );
+    expect(find.text('Verificación cancelada'), findsOneWidget);
   });
 }

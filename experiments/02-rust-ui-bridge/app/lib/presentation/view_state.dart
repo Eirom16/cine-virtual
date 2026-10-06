@@ -22,6 +22,7 @@ enum Readiness {
   ready,
   waiting,
   error,
+  cancelled,
 }
 
 class MemberView {
@@ -76,6 +77,7 @@ class RoomView {
       connected &&
       !busy &&
       hasMedia &&
+      hashState == 'complete' &&
       media['identity_match'] == true &&
       sync['ready'] == true &&
       sync['buffering'] != true &&
@@ -119,6 +121,8 @@ class RoomView {
     if (media['identity_match'] == false || error == 'MEDIA_MISMATCH') {
       return Readiness.mismatch;
     }
+    if (hashState == 'cancelled') return Readiness.cancelled;
+    if (sync['failed'] == true) return Readiness.error;
     if (hashState == 'running' || hashState == 'hashing') {
       return Readiness.hashing;
     }

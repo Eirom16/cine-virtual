@@ -9,11 +9,14 @@ import android.os.SystemClock
 import android.provider.OpenableColumns
 import android.view.SurfaceView
 import android.view.View
+import android.view.Gravity
+import android.widget.FrameLayout
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.Player
+import androidx.media3.common.VideoSize
 import androidx.media3.exoplayer.SeekParameters
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.analytics.AnalyticsListener
@@ -269,10 +272,33 @@ class MainActivity : FlutterActivity() {
                 check(alive && player != null) { "PLAYER_DESTROYED" }
                 val surface = SurfaceView(context)
                 surface.keepScreenOn = true
+                // Presentation geometry only: keep decoded video in its native aspect ratio.
+                val frame = FrameLayout(context)
+                frame.setBackgroundColor(android.graphics.Color.BLACK)
+                frame.addView(surface, FrameLayout.LayoutParams(1, 1, Gravity.CENTER))
+                fun fitVideo() {
+                    val size = sdk.videoSize
+                    if (frame.width <= 0 || frame.height <= 0 || size.width <= 0 || size.height <= 0) return
+                    val ratio = size.width * size.pixelWidthHeightRatio / size.height
+                    val width = minOf(frame.width, (frame.height * ratio).toInt()).coerceAtLeast(1)
+                    val height = (width / ratio).toInt().coerceAtLeast(1)
+                    val current = surface.layoutParams
+                    if (current.width != width || current.height != height) {
+                        surface.layoutParams = FrameLayout.LayoutParams(width, height, Gravity.CENTER)
+                    }
+                }
+                frame.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ -> fitVideo() }
+                val geometry = object : Player.Listener {
+                    override fun onVideoSizeChanged(videoSize: VideoSize) { fitVideo() }
+                }
+                sdk.addListener(geometry)
                 sdk.setVideoSurfaceView(surface)
                 return object : PlatformView {
-                    override fun getView(): View = surface
-                    override fun dispose() { player?.clearVideoSurfaceView(surface) }
+                    override fun getView(): View = frame
+                    override fun dispose() {
+                        sdk.removeListener(geometry)
+                        player?.clearVideoSurfaceView(surface)
+                    }
                 }
             }
         })
