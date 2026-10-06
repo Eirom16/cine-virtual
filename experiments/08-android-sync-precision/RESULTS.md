@@ -34,6 +34,8 @@ MEASURED: poll_lateness p95 debug antes 134/después 130 ms; profile antes 9 ms.
 
 ## 9. Media3
 
+MEASURED adicional: primera llamada SDK del tipo del control, reloj calibrado, p95 152,5 ms frente a legacy 273 ms (n=6). Legacy selecciona último effect por sequence y puede incluir el Play posterior al seek. El miss inicial de Play sigue abierto; no se atribuyen esos 273 ms íntegros al Looper.
+
 API CONTRACT: [eventos oficiales](https://developer.android.com/media/media3/exoplayer/listening-to-player-events) distinguen discontinuidad directa de seek, posibles cambios de estado, READY e isPlaying; no prometen tiempo de completion. MEASURED: seek→READY p95 antes debug 411/profile 467 ms; llamadas SDK p95 15/16 ms. Ensayo final V2 READY p95 470 ms, loss 406 ms, estable 517 ms; llamada SDK 15 ms. Mismo Media3 1.11.1 y SeekParameters.EXACT; no se cambió de motor.
 
 ## 10. Position observations
@@ -86,7 +88,9 @@ IMPLEMENTED: correlación/clock bracket, costes JNI/driver/source, Looper post/e
 
 ## 22. Tests añadidos
 
-TESTED: target playing con edad/cola y seek lento no deja lag fijo; paused exacto/duration; mediana sin delay inventado; completion de otra operación/generation rechazado; pending/stale no corrigen y fresh vuelve a corregir; cola/sink acotados; análisis de relojes distintos y OTHER. Tests con tiempo numérico, sin sleeps largos nuevos. Siete tests Rust nuevos y tres Python; suite Rust 97 PASS, seis SDK opt-in PASS serializados. Un test comprueba que una observación pausada estable no invalida la medida posterior de seek al reanudar Play.
+TESTED: target playing con edad/cola y seek lento no deja lag fijo; paused exacto/duration; mediana sin delay inventado; completion de otra operación/generation rechazado; pending/stale no corrigen y fresh vuelve a corregir; cola/sink acotados; análisis de relojes distintos y OTHER. Tests con tiempo numérico, sin sleeps largos nuevos. Siete tests Rust nuevos y cuatro Python; suite Rust 97 PASS, seis SDK opt-in PASS serializados. Un test comprueba que una observación pausada estable no invalida la medida posterior de seek al reanudar Play.
+
+IMPLEMENTED/TESTED: el analyzer distingue dispatch inicial del control de effects al completar seek; un test determinista con clocks diferentes evita confundir el Play posterior con el seek programado. Suite Python final: diez tests.
 
 ## 23. Resultado diagnóstico corto antes
 
@@ -126,7 +130,7 @@ MEASURED: {"network_resume_ms": 13195.230364999588, "network_post_ready_converge
 
 ## 32. Regresiones
 
-TESTED: FakePlayer demo, Linux real dos libmpv, Flutter Linux smoke y seis SDK tests opt-in. Android local smoke se documenta con su propio JSON. Un test de FDs falló al ejecutarlo en paralelo con otro Player; serializado pasó 4/4, sin cambiar test ni SDK. Rust fmt/clippy/tests/build, docs/check_ci, nueve Python y Flutter analyze/seis tests pasan; resultados-verification conserva alcance. Sandbox bloqueó sockets y un rerun Flutter omitió CINE_BRIDGE_LIBRARY: repetidos con entorno documentado pasaron; intentos preservados en results-verification. Android local smoke PASS (SAF/hash/frame/Play/Pause/Seek/rate/lifecycle/destroy; landing error 0 ms en tres seeks, bridge p95 0,236 ms). No se cambia CI.
+TESTED: FakePlayer demo, Linux real dos libmpv, Flutter Linux smoke y seis SDK tests opt-in. Android local smoke se documenta con su propio JSON. Un test de FDs falló al ejecutarlo en paralelo con otro Player; serializado pasó 4/4, sin cambiar test ni SDK. Rust fmt/clippy/tests/build, docs/check_ci, diez Python y Flutter analyze/seis tests pasan; resultados-verification conserva alcance. Sandbox bloqueó sockets y un rerun Flutter omitió CINE_BRIDGE_LIBRARY: repetidos con entorno documentado pasaron; intentos preservados en results-verification. Android local smoke PASS (SAF/hash/frame/Play/Pause/Seek/rate/lifecycle/destroy; landing error 0 ms en tres seeks, bridge p95 0,236 ms). No se cambia CI.
 
 ## 33. GitHub Actions
 
@@ -156,7 +160,7 @@ IMPLEMENTED/TESTED experimental; **PROVISIONAL FOR ANDROID**. No se abandona ni 
 
 ## 39. Commits
 
-IMPLEMENTED: 81f5cff `diag: instrument android playback timing`; 155299a `fix: compensate android seek completion loss`; ddeb7e7 `docs: record android sync precision diagnosis`. Cierre adicional `fix: freeze diagnostic metric sample boundary`, hash desde git log. Su cambio es del harness; no altera la implementación física probada.
+IMPLEMENTED: 81f5cff `diag: instrument android playback timing`; 155299a `fix: compensate android seek completion loss`; ddeb7e7 `docs: record android sync precision diagnosis`. 324d4d8 `fix: freeze diagnostic metric sample boundary`; cierre `diag: distinguish initial scheduled control dispatch`, hash desde git log. Su cambio es del harness; no altera la implementación física probada.
 
 ## 40. Estado Git final
 

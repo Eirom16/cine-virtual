@@ -171,6 +171,12 @@ La cifra legacy dispatch mantiene la fórmula del experimento 07 para comparaci�
 su ancla antes de JNI puede añadir el pequeño coste de JNI dos veces. El análisis
 de scheduler/queue/SDK usa timestamps separados y calibración; no se presenta la
 cifra legacy como latencia de seek ni como medida exacta de frame/audio.
+Además toma el último effect scheduled por sequence: un Seek playing también
+emite Play al completar. Ese Play posterior reemplazaba al seek inicial en el
+agregado. scheduled_control_first_dispatch selecciona la primera llamada SDK
+del tipo del control y usa el bracket source para convertirla a Rust. En V2
+p95 inicial 152,5 ms (seis controles) frente a legacy 273 ms; aún hay miss inicial
+de Play y no se presenta como deadline corregido por completo.
 
 ## Auditoría independiente de agregados
 

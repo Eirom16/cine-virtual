@@ -17,6 +17,13 @@
   "rejected_completion_callbacks": [],
   "schema_version": 1,
   "timing_ms": {
+    "scheduled_control_first_dispatch": {
+      "p50_ms": 10,
+      "p95_ms": 152.5,
+      "p99_ms": 152.5,
+      "max_ms": 152.5,
+      "count": 6
+    },
     "network_runtime": {
       "p50_ms": 35.5,
       "p95_ms": 99.5,

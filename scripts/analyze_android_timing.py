@@ -37,7 +37,18 @@ def analyze(report):
     first_callbacks = {}
     for e in callbacks:
         first_callbacks.setdefault(e['operation_id'], e)
+    control_dispatch = []
+    for control in report.get('controls', []):
+        candidates = [e for e in receives if e['sequence'] == control['sequence']
+                      and e['action'] == control['command'].split()[0] and e['reason'] == 'scheduled'
+                      and e['operation_id'] in calls]
+        if candidates:
+            e = candidates[0]
+            # Map the SDK call with its bracketed source clock, not a JNI return anchor.
+            control_dispatch.append(calls[e['operation_id']]['sdk_ms'] + e['source_mapped_at_ms']
+                                    - e['sample_source_sdk_ms'] - e['deadline_local_ms'])
     metrics = {
+        'scheduled_control_first_dispatch': control_dispatch,
         'network_runtime': [e['at_ms']+offsets[e['sequence']]-e['sent_at_server_ms'] for e in events
                             if e['event']=='authoritative_received' and e['kind'] in ['PLAY','PAUSE','SEEK'] and e['sequence'] in offsets],
         'scheduler_lateness': [e['wake_at_ms'] - e['deadline_local_ms'] for e in receives if e['reason'] == 'scheduled' and e['deadline_local_ms'] > 0],

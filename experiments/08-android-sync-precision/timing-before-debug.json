@@ -514,6 +514,13 @@
   ],
   "schema_version": 1,
   "timing_ms": {
+    "scheduled_control_first_dispatch": {
+      "p50_ms": 14.5,
+      "p95_ms": 243.5,
+      "p99_ms": 243.5,
+      "max_ms": 243.5,
+      "count": 6
+    },
     "network_runtime": {
       "p50_ms": 15,
       "p95_ms": 110,

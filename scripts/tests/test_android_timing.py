@@ -40,6 +40,17 @@ class AndroidTimingTests(unittest.TestCase):
         self.assertEqual(report['timing_ms']['playing_completion']['p50_ms'], 10)
         self.assertEqual(report['rejected_completion_callbacks'][0]['operation_id'], 1)
 
+    def test_seek_dispatch_does_not_use_play_after_seek_completion(self):
+        seek = dict(event='effect_received', sequence=3, action='seek', reason='scheduled', operation_id=1,
+                    wake_at_ms=1005, deadline_local_ms=1005, enqueued_ms=1005, rust_received_ms=1007,
+                    sample_source_sdk_ms=5000, source_mapped_at_ms=1000)
+        play = dict(seek, action='play', operation_id=2, rust_received_ms=1290,
+                    source_mapped_at_ms=1290, sample_source_sdk_ms=5290)
+        events = [seek, dict(event='media3_call', action='seek', operation_id=1, sdk_ms=5010),
+                  play, dict(event='media3_call', action='play', operation_id=2, sdk_ms=5300)]
+        result = analyze({'android_events':events, 'controls':[dict(sequence=3, command='seek 9000')]})
+        self.assertEqual(result['timing_ms']['scheduled_control_first_dispatch']['p95_ms'], 5)
+
 
 if __name__ == '__main__':
     unittest.main()
