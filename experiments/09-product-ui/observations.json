@@ -1,0 +1,420 @@
+{
+  "source": "Read-only observations of ApplicationController snapshots after actual UI actions",
+  "sampling": "Sequential, not a cross-device precision measurement",
+  "mock": false,
+  "observations": {
+    "linux_host_play": {
+      "session": true,
+      "error": "",
+      "connected": true,
+      "room_ready": true,
+      "ready": true,
+      "position_ms": 1933,
+      "playing": true,
+      "clock_trusted": true,
+      "snapshot_required": false
+    },
+    "linux_host_pause": {
+      "pause": {
+        "session": true,
+        "error": "",
+        "connected": true,
+        "room_ready": true,
+        "ready": true,
+        "position_ms": 74267,
+        "playing": false,
+        "clock_trusted": true,
+        "snapshot_required": false
+      },
+      "pause_stable": {
+        "session": true,
+        "error": "",
+        "connected": true,
+        "room_ready": true,
+        "ready": true,
+        "position_ms": 74267,
+        "playing": false,
+        "clock_trusted": true,
+        "snapshot_required": false
+      }
+    },
+    "linux_host_seek": {
+      "session": true,
+      "error": "",
+      "connected": true,
+      "room_ready": true,
+      "ready": true,
+      "position_ms": 84267,
+      "playing": false,
+      "clock_trusted": true,
+      "snapshot_required": false
+    },
+    "android_host_controls": {
+      "seek": {
+        "session": true,
+        "error": "",
+        "connected": true,
+        "room_ready": true,
+        "ready": true,
+        "position_ms": 472828,
+        "playing": false,
+        "clock_trusted": true,
+        "snapshot_required": false
+      },
+      "play": {
+        "session": true,
+        "error": "",
+        "connected": true,
+        "room_ready": true,
+        "ready": true,
+        "position_ms": 473934,
+        "playing": true,
+        "clock_trusted": true,
+        "snapshot_required": false
+      },
+      "pause": {
+        "session": true,
+        "error": "",
+        "connected": true,
+        "room_ready": true,
+        "ready": true,
+        "position_ms": 497827,
+        "playing": false,
+        "clock_trusted": true,
+        "snapshot_required": false
+      },
+      "pause_stable": {
+        "session": true,
+        "error": "",
+        "connected": true,
+        "room_ready": true,
+        "ready": true,
+        "position_ms": 497827,
+        "playing": false,
+        "clock_trusted": true,
+        "snapshot_required": false
+      }
+    },
+    "android_host_lifecycle": {
+      "before": {
+        "session": true,
+        "error": "",
+        "connected": true,
+        "room_ready": true,
+        "ready": true,
+        "position_ms": 497827,
+        "playing": false,
+        "clock_trusted": true,
+        "snapshot_required": false
+      },
+      "background": {
+        "session": true,
+        "error": "",
+        "connected": true,
+        "room_ready": false,
+        "ready": false,
+        "position_ms": 0,
+        "playing": false,
+        "clock_trusted": false,
+        "snapshot_required": false
+      },
+      "observations": [
+        {
+          "session": true,
+          "error": "",
+          "connected": true,
+          "room_ready": false,
+          "ready": false,
+          "position_ms": 0,
+          "playing": false,
+          "clock_trusted": false,
+          "snapshot_required": false
+        },
+        {
+          "session": true,
+          "error": "",
+          "connected": true,
+          "room_ready": true,
+          "ready": true,
+          "position_ms": 0,
+          "playing": false,
+          "clock_trusted": true,
+          "snapshot_required": false
+        }
+      ]
+    },
+    "android_participant_resume": {
+      "disconnected": {
+        "session": true,
+        "error": "",
+        "connected": false,
+        "room_ready": false,
+        "ready": true,
+        "position_ms": 84267,
+        "playing": false,
+        "clock_trusted": true,
+        "snapshot_required": true
+      },
+      "resumed": {
+        "session": true,
+        "error": "",
+        "connected": true,
+        "room_ready": true,
+        "ready": true,
+        "position_ms": 84267,
+        "playing": false,
+        "clock_trusted": true,
+        "snapshot_required": false
+      }
+    },
+    "shared_play": {
+      "linux": {
+        "session": true,
+        "error": "",
+        "connected": true,
+        "room_ready": true,
+        "ready": true,
+        "position_ms": 86067,
+        "playing": true,
+        "clock_trusted": true,
+        "snapshot_required": false
+      },
+      "android": {
+        "session": true,
+        "error": "",
+        "connected": true,
+        "room_ready": true,
+        "ready": true,
+        "position_ms": 87161,
+        "playing": true,
+        "clock_trusted": true,
+        "snapshot_required": false
+      },
+      "linux_participant": {
+        "session": true,
+        "error": "",
+        "connected": true,
+        "room_ready": true,
+        "ready": true,
+        "position_ms": 88374,
+        "playing": true,
+        "clock_trusted": true,
+        "snapshot_required": false
+      }
+    },
+    "shared_pause": {
+      "linux": {
+        "session": true,
+        "error": "",
+        "connected": true,
+        "room_ready": true,
+        "ready": true,
+        "position_ms": 171733,
+        "playing": false,
+        "clock_trusted": true,
+        "snapshot_required": false
+      },
+      "android": {
+        "session": true,
+        "error": "",
+        "connected": true,
+        "room_ready": true,
+        "ready": true,
+        "position_ms": 171762,
+        "playing": false,
+        "clock_trusted": true,
+        "snapshot_required": false
+      },
+      "linux_participant": {
+        "session": true,
+        "error": "",
+        "connected": true,
+        "room_ready": true,
+        "ready": true,
+        "position_ms": 171762,
+        "playing": false,
+        "clock_trusted": true,
+        "snapshot_required": false
+      }
+    },
+    "shared_seek": {
+      "linux": {
+        "session": true,
+        "error": "",
+        "connected": true,
+        "room_ready": true,
+        "ready": true,
+        "position_ms": 181733,
+        "playing": false,
+        "clock_trusted": true,
+        "snapshot_required": false
+      },
+      "android": {
+        "session": true,
+        "error": "",
+        "connected": true,
+        "room_ready": true,
+        "ready": true,
+        "position_ms": 181733,
+        "playing": false,
+        "clock_trusted": true,
+        "snapshot_required": false
+      },
+      "linux_participant": {
+        "session": true,
+        "error": "",
+        "connected": true,
+        "room_ready": true,
+        "ready": true,
+        "position_ms": 181733,
+        "playing": false,
+        "clock_trusted": true,
+        "snapshot_required": false
+      }
+    },
+    "android_api28_final_play": {
+      "session": true,
+      "error": "",
+      "connected": true,
+      "room_ready": true,
+      "ready": true,
+      "position_ms": 3281,
+      "playing": true,
+      "clock_trusted": true,
+      "snapshot_required": false
+    },
+    "android_api28_final_controls": {
+      "pause": {
+        "session": true,
+        "error": "",
+        "connected": true,
+        "room_ready": true,
+        "ready": true,
+        "position_ms": 31949,
+        "playing": false,
+        "clock_trusted": true,
+        "snapshot_required": false
+      },
+      "pause_stable": {
+        "session": true,
+        "error": "",
+        "connected": true,
+        "room_ready": true,
+        "ready": true,
+        "position_ms": 31949,
+        "playing": false,
+        "clock_trusted": true,
+        "snapshot_required": false
+      },
+      "seek": {
+        "session": true,
+        "error": "",
+        "connected": true,
+        "room_ready": true,
+        "ready": true,
+        "position_ms": 403939,
+        "playing": false,
+        "clock_trusted": true,
+        "snapshot_required": false
+      }
+    }
+  },
+  "screenshots": {
+    "android-home-portrait.png": {
+      "width": 720,
+      "height": 1280
+    },
+    "android-lobby-portrait.png": {
+      "width": 720,
+      "height": 1280
+    },
+    "android-lobby-ready-portrait.png": {
+      "width": 720,
+      "height": 1280
+    },
+    "android-modern-home-portrait.png": {
+      "width": 1080,
+      "height": 2408
+    },
+    "android-modern-lobby-empty-portrait.png": {
+      "width": 1080,
+      "height": 2408
+    },
+    "android-modern-lobby-prepared-portrait.png": {
+      "width": 1080,
+      "height": 2408
+    },
+    "android-modern-lobby-ready-portrait.png": {
+      "width": 1080,
+      "height": 2408
+    },
+    "android-modern-player-landscape.png": {
+      "width": 2408,
+      "height": 1080
+    },
+    "android-modern-player-portrait.png": {
+      "width": 1080,
+      "height": 2408
+    },
+    "android-old-player-landscape.png": {
+      "width": 1280,
+      "height": 720
+    },
+    "android-old-player-portrait.png": {
+      "width": 720,
+      "height": 1280
+    },
+    "android-participant-player-landscape.png": {
+      "width": 2408,
+      "height": 1080
+    },
+    "android-participant-player-portrait.png": {
+      "width": 1080,
+      "height": 2408
+    },
+    "android-reconnect-portrait.png": {
+      "width": 1080,
+      "height": 2408
+    },
+    "linux-create-1366.png": {
+      "width": 1366,
+      "height": 768
+    },
+    "linux-home-1366.png": {
+      "width": 1366,
+      "height": 768
+    },
+    "linux-home-1920.png": {
+      "width": 1920,
+      "height": 1080
+    },
+    "linux-join-physical.png": {
+      "width": 1366,
+      "height": 700
+    },
+    "linux-lobby-empty-1366.png": {
+      "width": 1366,
+      "height": 768
+    },
+    "linux-lobby-prepared-1366.png": {
+      "width": 1366,
+      "height": 768
+    },
+    "linux-lobby-ready-1366.png": {
+      "width": 1366,
+      "height": 768
+    },
+    "linux-native-video.png": {
+      "width": 960,
+      "height": 540
+    },
+    "linux-player-1366.png": {
+      "width": 1366,
+      "height": 768
+    },
+    "linux-player-physical.png": {
+      "width": 1280,
+      "height": 700
+    }
+  }
+}
