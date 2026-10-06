@@ -1,0 +1,67 @@
+{
+  "classification": "TESTED hosted build",
+  "conclusion": "success",
+  "jobs": [
+    {
+      "conclusion": "success",
+      "name": "Rust, Flutter and documentation gate",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "name": "android / build (x86_64)",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "name": "android / build (arm64-v8a)",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "name": "windows / build",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "name": "macos / build (macos-15, arm64)",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "name": "android / build (armeabi-v7a)",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "name": "macos / build (macos-15-intel, x64)",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "name": "ios / build (device)",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "name": "linux / build",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "name": "ios / build (simulator)",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "name": "summary",
+      "status": "completed"
+    }
+  ],
+  "run_id": 37417007455,
+  "schema_version": 1,
+  "scope": "Compilation/packages on matrix; Linux SDK headless runtime; physical Android evidence stored separately; iOS Player NOT IMPLEMENTED",
+  "source_commit": "fde7c7b",
+  "status": "completed",
+  "url": "https://github.com/Eirom16/cine-virtual/actions/runs/37417007455"
+}

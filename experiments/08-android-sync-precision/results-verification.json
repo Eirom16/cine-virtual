@@ -35,5 +35,6 @@
   "android_local_smoke": "PASS: SAF/hash/first frame/Play/Pause/Seek/rate/lifecycle/errors/destroy; API28 ARMv7",
   "linux_android_final_smoke": "PASS functional; final 600.16 s precision gates Android120/cross57; 2 hard seeks",
   "aggregate_audit": "PASS all published quantiles/max/cross-pair aggregates reproduced; 3 runs have 1 extra terminal raw sample; harness boundary fixed; originals preserved",
-  "control_dispatch_audit": "PASS: calibrated initial command p95 152.5 ms vs legacy last-effect 273 ms; no claim of fully fixed deadlines"
+  "control_dispatch_audit": "PASS: calibrated initial command p95 152.5 ms vs legacy last-effect 273 ms; no claim of fully fixed deadlines",
+  "hosted_matrix": "PASS source fde7c7b run 37417007455; 11 jobs; see results-ci.json"
 }

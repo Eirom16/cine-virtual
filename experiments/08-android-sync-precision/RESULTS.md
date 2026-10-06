@@ -134,7 +134,7 @@ TESTED: FakePlayer demo, Linux real dos libmpv, Flutter Linux smoke y seis SDK t
 
 ## 33. GitHub Actions
 
-TESTED: estado inicial matriz completa PASS, run 37395948312. El push del commit de cierre ejecuta la matriz existente; se observa con gh y el resultado/run concreto se informa al finalizar. No se confunde compilación hosted con runtime físico. Este archivo se versiona antes del resultado asíncrono de ese push.
+TESTED: matriz completa del código/análisis fde7c7b PASS, 11 jobs verdes, [run 37417007455](https://github.com/Eirom16/cine-virtual/actions/runs/37417007455). Base, Linux con SDK headless, Windows, macOS ARM64/x64, Android x86_64/arm64-v8a/armeabi-v7a e iOS device/simulator. [Evidencia machine-readable](results-ci.json). Runtime físico es evidencia separada; iOS Player NOT IMPLEMENTED. Los dos runs intermedios se cancelaron por pushes posteriores, no por fallo de tests. El registro final es un commit documental sin cambio de implementación y también se observa su CI.
 
 ## 34. Bugs encontrados
 
@@ -160,11 +160,11 @@ IMPLEMENTED/TESTED experimental; **PROVISIONAL FOR ANDROID**. No se abandona ni 
 
 ## 39. Commits
 
-IMPLEMENTED: 81f5cff `diag: instrument android playback timing`; 155299a `fix: compensate android seek completion loss`; ddeb7e7 `docs: record android sync precision diagnosis`. 324d4d8 `fix: freeze diagnostic metric sample boundary`; cierre `diag: distinguish initial scheduled control dispatch`, hash desde git log. Su cambio es del harness; no altera la implementación física probada.
+IMPLEMENTED: 81f5cff `diag: instrument android playback timing`; 155299a `fix: compensate android seek completion loss`; ddeb7e7 `docs: record android sync precision diagnosis`; 324d4d8 `fix: freeze diagnostic metric sample boundary`; fde7c7b `diag: distinguish initial scheduled control dispatch`. Registro final documental `docs: record hosted android precision validation`. Los últimos cambios al harness/analyzer no alteran Android probado; source del CI completo está identificado en results-ci.json.
 
 ## 40. Estado Git final
 
-Se verifica con git status/branch/upstream tras commit y push; el resultado concreto figura en el informe final conversacional. No force push, ramas borradas, secrets, releases o cambios de visibilidad.
+TESTED: master con upstream origin/master, implementación y evidencia publicadas, árbol limpio al verificar fde7c7b y tras los pushes previos. El registro documental final referencia ese punto comprobado; su identidad aparece en git log. No force push, ramas borradas, secrets, releases o cambios de visibilidad. El HEAD documental y su nuevo run se comprueban otra vez antes de cerrar la sesión.
 
 ## 41. Próximo paso recomendado
 
