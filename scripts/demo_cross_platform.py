@@ -34,16 +34,23 @@ def main():
     parser=argparse.ArgumentParser()
     parser.add_argument('--seconds',type=float,default=600)
     parser.add_argument('--no-build',action='store_true')
+    parser.add_argument('--build-mode',choices=['debug','profile','release'],default='debug')
+    parser.add_argument('--output-dir',type=Path,default=OUT)
+    parser.add_argument('--label',default=None)
+    parser.add_argument('--diagnostic',action='store_true')
+    parser.add_argument('--controls-only',action='store_true',help='Short diagnostic: controls only; lifecycle belongs to the full slice')
+    parser.add_argument('--faults-only',action='store_true',help='Separate synthetic observation bias test; never precision validation')
     parser.add_argument('--mismatch-only',action='store_true',help='Real Android hash of clip + one appended byte; expect MEDIA_MISMATCH')
     parser.add_argument('--port',type=int,default=8765,help='Explicit LAN port; firewall must already allow it')
     parser.add_argument('--server-address',help='Host LAN IPv4 (kept out of evidence)')
     args=parser.parse_args()
     if args.seconds < 25 or args.seconds > 600: raise SystemExit('seconds must be 25..600')
-    OUT.mkdir(parents=True,exist_ok=True)
+    out=args.output_dir
+    out.mkdir(parents=True,exist_ok=True)
     report={'schema_version':1,'scenario':'linux-android-room','timestamp_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),
             'requested_wall_seconds':args.seconds,'passed':False,'network':'controlled Wi-Fi/LAN ws; no tunnel',
-            'source_base_commit':subprocess.check_output(['git','rev-parse','--short','HEAD'],cwd=ROOT,text=True).strip()}
-    output=OUT/('results-mismatch.json' if args.mismatch_only else 'results-lan.json' if args.seconds>=590 else 'results-smoke.json')
+            'controls_only':args.controls_only,'faults_requested':args.faults_only,'build_mode':args.build_mode,'diagnostic':args.diagnostic,'source_base_commit':subprocess.check_output(['git','rev-parse','--short','HEAD'],cwd=ROOT,text=True).strip()}
+    output=out/('results-'+args.label+'.json' if args.label else 'results-mismatch.json' if args.mismatch_only else 'results-lan.json' if args.seconds>=590 else 'results-smoke.json')
     def save():
         data=json.dumps(report,indent=2)
         if re.search(r'/home/|content://|[a-f0-9]{64}|(?:\d{1,3}\.){3}\d{1,3}',data):raise RuntimeError('Sensitive data in evidence')
@@ -107,7 +114,7 @@ def main():
             subprocess.run(['cargo','build','--workspace'],cwd=ROOT,check=True,stdout=subprocess.DEVNULL)
             subprocess.run(['python3','scripts/build_mobile_bridge.py','--abi',abi],cwd=ROOT,env=env,check=True,stdout=subprocess.DEVNULL)
             target={'armeabi-v7a':'android-arm','arm64-v8a':'android-arm64','x86_64':'android-x64'}[abi]
-            subprocess.run(['flutter','build','apk','--debug','--target-platform='+target,'--dart-define=ROOM_MODE=true','--dart-define=ROOM_AUTORUN=true'],cwd=APP,env=env,check=True,stdout=subprocess.DEVNULL)
+            subprocess.run(['flutter','build','apk','--'+args.build_mode,'--target-platform='+target,'--dart-define=ROOM_MODE=true','--dart-define=ROOM_AUTORUN=true'],cwd=APP,env=env,check=True,stdout=subprocess.DEVNULL)
         media=ROOT/'test-media/long-duration.mp4'
         if not media.exists():subprocess.run(['python3','scripts/generate_test_media.py'],cwd=ROOT,check=True)
         if subprocess.run([adb,'-s',online[0],'shell','test','-e',FIXTURE],capture_output=True).returncode==0:raise RuntimeError('FIXTURE_ALREADY_EXISTS_REFUSE_OVERWRITE')
@@ -120,7 +127,7 @@ def main():
             phone_media=modified_fixture
         fixture_owned=True;device('push',str(phone_media),FIXTURE)
         device('shell','am','broadcast','-a','android.intent.action.MEDIA_SCANNER_SCAN_FILE','-d','file://'+FIXTURE)
-        device('install','-r',str(APP/'build/app/outputs/flutter-apk/app-debug.apk'));installed=True
+        device('install','-r',str(APP/('build/app/outputs/flutter-apk/app-'+args.build_mode+'.apk')));installed=True
         server=Process([str(ROOT/'target/debug/cine-server'),'--bind',f'0.0.0.0:{args.port}','--allow-lan']);processes.append(server)
         wait(lambda:bool(fields(server,'server_started')),5)
         port=int(fields(server,'server_started')[0]['bind'].rsplit(':',1)[1])
@@ -139,7 +146,7 @@ def main():
         print('phase=android_start',flush=True)
         device('shell','input','keyevent','KEYCODE_WAKEUP')
         # Extras contain private invitation, never printed/exported. No adb tunnel.
-        device('shell','am','start','-n',PACKAGE+'/.MainActivity','--es','cine_server',f'ws://{address}:{port}','--es','cine_invite',shlex.quote(json.dumps(private,separators=(',',':'))),'--es','cine_run_id',run_id)
+        device('shell','am','start','-n',PACKAGE+'/.MainActivity','--es','cine_server',f'ws://{address}:{port}','--es','cine_invite',shlex.quote(json.dumps(private,separators=(',',':'))),'--es','cine_run_id',run_id,'--ez','cine_diagnostic',str(args.diagnostic).lower())
         selected=False;deadline=time.monotonic()+180
         while time.monotonic()<deadline and not any(x.startswith('READY') for x in markers):
             if args.mismatch_only and any(x.startswith('FAILURE MEDIA_MISMATCH') for x in markers):break
@@ -187,12 +194,18 @@ def main():
             wait(lambda:any(x.get('sequence')==reply['sequence'] and x.get('reason')=='scheduled' for x in android_events),10)
             controls.append({'command':command,'sequence':reply['sequence'],'execute_at_server_ms':e['expected_server_ms'],'linux_scheduler_lateness_ms':e['lateness_ms']})
         control('play 5000');began=time.monotonic();actions=set();recovery={};resource_samples=[];last_progress=-1
-        while (elapsed:=time.monotonic()-began)<args.seconds or len(actions)<4:
+        while (elapsed:=time.monotonic()-began)<args.seconds or len(actions)<(2 if args.controls_only else 4):
             if elapsed>=min(10,args.seconds*.15) and 'paused_seek' not in actions:
                 control('pause');control('seek 10000');control('play 10000');actions.add('paused_seek')
             if elapsed>=min(35,args.seconds*.25) and 'playing_seek' not in actions:
                 current=host.command('sync-state')['position_ms'];control('seek '+str(current+3000));actions.add('playing_seek')
-            if elapsed>=min(120,args.seconds*.4) and 'background' not in actions:
+            if args.faults_only:
+                for threshold,bias in [(15,120),(32,700),(49,1000)]:
+                    key='fault_'+str(bias)
+                    if elapsed>=threshold and key not in actions:
+                        device('shell','am','start','-n',PACKAGE+'/.MainActivity','--el','cine_fault_ms',str(bias))
+                        actions.add(key)
+            if not args.controls_only and elapsed>=min(120,args.seconds*.4) and 'background' not in actions:
                 count=sum(x.startswith('RECOVERED') for x in markers)
                 resume_samples=len(android_samples)
                 device('shell','input','keyevent','KEYCODE_HOME');wait(lambda:any(x.startswith('SUSPENDED') for x in markers),5)
@@ -203,7 +216,7 @@ def main():
                 recovered_samples=[x['sync'] for x in android_samples[resume_samples:] if valid(x.get('sync'))]
                 recovery['foreground_initial_drift_ms']=recovered_samples[0]['drift_ms'] if recovered_samples else None
                 actions.add('background')
-            if elapsed>=min(240,args.seconds*.65) and 'disconnect' not in actions:
+            if not args.controls_only and elapsed>=min(240,args.seconds*.65) and 'disconnect' not in actions:
                 # UI buttons must be reachable; use scroll if necessary on small phone.
                 device('shell','input','swipe','250','800','250','250','300');tap('disconnect')
                 wait_state(host,lambda s:any(not m['connected'] for m in s['members']))
@@ -253,8 +266,8 @@ def main():
             'android':resource_summary(android_resources,'pss_after_hash_and_load_kib','sample_monotonic_ms',android_resources[0].get('clock_ticks_per_second',100) if android_resources else 100)}
         report['metrics_policy']={'all_loaded_trusted_samples':'Includes room-not-ready recovery/preparation transients; excludes clock untrusted, seek/buffer, stale SDK samples','steady_room_ready':'Additional subset only; does not replace primary metrics or hide recovery','convergence_goal_ms':150,'convergence_requires_samples':3,'convergence_timeout_seconds':20}
         report['p95_goal_met']=all(report[k]['p95_ms'] is not None and report[k]['p95_ms']<=150 for k in ['linux_drift','android_drift'])
-        report['passed']=bool(a and bs and pairs and len(actions)==4);report['status']='PASS' if report['passed'] else 'FAIL'
-        OUT.joinpath('results-background.json' if args.seconds>=590 else 'results-background-smoke.json').write_text(json.dumps({'schema_version':1,'executed':True,'session_wall_seconds':report['real_wall_seconds'],'recovery':recovery,'background_markers_count':sum(x.startswith('SUSPENDED') for x in markers)},indent=2)+'\n')
+        report['passed']=bool(a and bs and pairs and len(actions)==((2 if args.controls_only else 4)+(3 if args.faults_only else 0)));report['status']='PASS' if report['passed'] else 'FAIL'
+        out.joinpath('results-'+args.label+'-background.json' if args.label else 'results-background.json' if args.seconds>=590 else 'results-background-smoke.json').write_text(json.dumps({'schema_version':1,'executed':True,'session_wall_seconds':report['real_wall_seconds'],'recovery':recovery,'background_markers_count':sum(x.startswith('SUSPENDED') for x in markers)},indent=2)+'\n')
     except (RuntimeError,AssertionError,subprocess.SubprocessError,KeyError) as e:
         report.update(status='FAIL',failure=str(e) if isinstance(e,RuntimeError) else type(e).__name__,runtime_executed=bool(android_samples),android_samples=android_samples[-50:],android_events=android_events)
         # Never propagate adb command/serial, private arguments or full SDK errors.

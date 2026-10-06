@@ -6,6 +6,18 @@ use jni::{
     sys::{jlong, jstring},
 };
 #[unsafe(no_mangle)]
+pub extern "system" fn Java_dev_cinevirtual_cine_1mobile_1spike_MainActivity_nativeClock(
+    _env: JNIEnv,
+    _this: JObject,
+    handle: jlong,
+) -> jlong {
+    registry()
+        .lock()
+        .unwrap()
+        .get(&(handle as u64))
+        .map_or(-1, |i| i.started.elapsed().as_millis() as jlong)
+}
+#[unsafe(no_mangle)]
 pub extern "system" fn Java_dev_cinevirtual_cine_1mobile_1spike_MainActivity_nativeDestroy(
     _env: JNIEnv,
     _this: JObject,
@@ -20,6 +32,7 @@ pub extern "system" fn Java_dev_cinevirtual_cine_1mobile_1spike_MainActivity_nat
     handle: jlong,
     sample: JString,
 ) -> jstring {
+    let entry = std::time::Instant::now();
     let response=(||{
         let data:String=env.get_string(&sample).ok()?.into();
         if data.len()>4096{return None;}
@@ -37,7 +50,10 @@ pub extern "system" fn Java_dev_cinevirtual_cine_1mobile_1spike_MainActivity_nat
             n.player.sample(cine_client::player_backend::PlayerView { position_ms:s.position_ms,duration_ms:s.duration_ms,playing:s.playing,ready:s.loaded,buffering:s.buffering,seeking:s.seeking,
                 sampled_at_ms:now.saturating_sub(s.age_ms),rate,failed:value["failed"].as_bool().unwrap_or(false)},i.app.caps.playback_rate);
         }
-        Some(serde_json::json!({"generation":i.app.generation,"now_ms":now,"effects":n.player.drain()}))
+        let (diagnostics,dropped)=n.player.drain_diagnostics();
+        Some(serde_json::json!({"generation":i.app.generation,"now_ms":now,"effects":n.player.drain(),"diagnostics":diagnostics,
+            "diagnostics_dropped":dropped,"jni_to_lock_ms":entry.elapsed().as_secs_f64()*1000.0,
+            "source_mapped_at_ms":value["source_mapped_at_ms"],"sample_assigned_at_ms":now.saturating_sub(s.age_ms)}))
     })().unwrap_or_else(||serde_json::json!({"effects":[]}));
     env.new_string(response.to_string())
         .map(|s| s.into_raw())

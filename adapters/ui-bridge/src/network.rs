@@ -57,6 +57,11 @@ pub struct NativeEffect {
     target_ms: u64,
     reason: &'static str,
     enqueued_ms: u64,
+    operation_id: u64,
+    media_revision: u64,
+    received_at_ms: u64,
+    deadline_local_ms: f64,
+    wake_at_ms: u64,
 }
 struct NativeState {
     view: PlayerView,
@@ -64,6 +69,9 @@ struct NativeState {
     generation: u64,
     active: bool,
     supports_rate: bool,
+    next_operation: u64,
+    diagnostics: VecDeque<Value>,
+    diagnostics_dropped: u64,
 }
 #[derive(Clone)]
 pub struct MobilePlayer {
@@ -83,6 +91,9 @@ impl MobilePlayer {
                 generation,
                 active: true,
                 supports_rate,
+                next_operation: 0,
+                diagnostics: VecDeque::new(),
+                diagnostics_dropped: 0,
             })),
             boot,
             mark: ControlMark::default(),
@@ -107,6 +118,8 @@ impl MobilePlayer {
             return Ok(());
         }
         let generation = s.generation;
+        s.next_operation += 1;
+        let operation_id = s.next_operation;
         s.effects.push_back(NativeEffect {
             action,
             value,
@@ -117,6 +130,11 @@ impl MobilePlayer {
             target_ms: self.mark.target_ms,
             reason: self.mark.reason,
             enqueued_ms: self.boot.elapsed().as_millis() as u64,
+            operation_id,
+            media_revision: self.mark.media_revision,
+            received_at_ms: self.mark.received_at_ms,
+            deadline_local_ms: self.mark.deadline_local_ms,
+            wake_at_ms: self.mark.wake_at_ms,
         });
         if action == "seek" {
             s.view.seeking = true;
@@ -138,10 +156,15 @@ impl MobilePlayer {
     pub fn drain(&self) -> Vec<NativeEffect> {
         self.shared.lock().unwrap().effects.drain(..).collect()
     }
+    pub fn drain_diagnostics(&self) -> (Vec<Value>, u64) {
+        let mut s = self.shared.lock().unwrap();
+        (s.diagnostics.drain(..).collect(), s.diagnostics_dropped)
+    }
     fn reset(&self, generation: u64) {
         let mut s = self.shared.lock().unwrap();
         s.generation = generation;
         s.effects.clear();
+        s.diagnostics.clear();
         s.view = PlayerView {
             rate: 1.0,
             ..Default::default()
@@ -191,6 +214,15 @@ impl ApplicationPlayer for MobilePlayer {
     }
     fn mark(&mut self, m: ControlMark) {
         self.mark = m;
+    }
+    fn diagnostic(&self, mut value: Value) {
+        let mut s = self.shared.lock().unwrap();
+        if s.diagnostics.len() == 256 {
+            s.diagnostics.pop_front();
+            s.diagnostics_dropped += 1;
+        }
+        value["generation"] = json!(s.generation);
+        s.diagnostics.push_back(value);
     }
     fn asynchronous(&self) -> bool {
         true
@@ -351,6 +383,33 @@ fn safe_error(e: &str) -> &'static str {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn timing_correlation_is_unique_across_generation_and_sink_is_bounded() {
+        let mut p = MobilePlayer::new(Instant::now(), 1, true);
+        p.mark(ControlMark {
+            sequence: 7,
+            media_revision: 3,
+            ..Default::default()
+        });
+        p.seek(100).unwrap();
+        let first = p.drain().remove(0);
+        assert_eq!(first.sequence, 7);
+        assert_eq!(first.media_revision, 3);
+        p.reset(2);
+        p.seek(200).unwrap();
+        let second = p.drain().remove(0);
+        assert!(second.operation_id > first.operation_id);
+        assert_eq!(second.generation, 2);
+        for at in 0..300 {
+            p.diagnostic(json!({"event":"fixture","at_ms":at}));
+        }
+        let (records, dropped) = p.drain_diagnostics();
+        assert_eq!(records.len(), 256);
+        assert_eq!(dropped, 44);
+        assert_eq!(records[0]["at_ms"], 44);
+        assert_eq!(records[0]["generation"], 2);
+        assert!(p.drain_diagnostics().0.is_empty());
+    }
     #[test]
     fn native_queue_is_bounded_and_generation_reset_discards_old_effects() {
         let mut p = MobilePlayer::new(Instant::now(), 1, true);

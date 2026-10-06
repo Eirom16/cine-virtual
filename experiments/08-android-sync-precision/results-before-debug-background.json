@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "executed": true,
+  "session_wall_seconds": 112.55575480400148,
+  "recovery": {
+    "foreground_ms": 2164.939788999618,
+    "foreground_post_ready_convergence_ms": null,
+    "foreground_initial_drift_ms": -476,
+    "network_resume_ms": 13033.895870001288,
+    "network_post_ready_convergence_ms": null,
+    "same_member_after_resume": true
+  },
+  "background_markers_count": 2
+}

@@ -284,6 +284,9 @@ impl<P: ApplicationPlayer + Send + 'static> Client<P> {
                             _=>{
                                 let Ok(Some(state))=state_from_message(&message) else{break};
                                 let snapshot=message.kind=="ROOM_STATE"||message.kind=="SYNC_STATE";
+                                shared.lock().unwrap().replica.player.diagnostic(json!({"event":"authoritative_received","kind":message.kind,"at_ms":t4,
+                                    "sent_at_server_ms":message.sent_at_ms,"sequence":state.sequence,"media_revision":state.media.as_ref().map(|m|m.media_revision),
+                                    "deadline_server_ms":state.playback.as_ref().and_then(|p|p.pending.as_ref()).map(|p|p.execute_at_ms)}));
                                 if snapshot {
                                     if message.kind=="ROOM_STATE" && message.payload["clock_epoch"].as_str()!=shared.lock().unwrap().replica.clock_epoch.map(|id|id.to_string()).as_deref(){break;}
                                     gap_requested=false;

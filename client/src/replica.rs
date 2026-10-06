@@ -42,6 +42,7 @@ pub struct Replica<P: ApplicationPlayer = FakePlayer> {
     pub local_reverification_required: bool,
     discarded_samples: usize,
     clock_generation: u64,
+    pending_received_at_ms: u64,
 }
 impl Default for Replica<FakePlayer> {
     fn default() -> Self {
@@ -71,6 +72,7 @@ impl<P: ApplicationPlayer> Replica<P> {
             local_reverification_required: false,
             discarded_samples: 0,
             clock_generation: 0,
+            pending_received_at_ms: 0,
         }
     }
     pub fn clock_generation(&self) -> u64 {
@@ -188,6 +190,26 @@ impl<P: ApplicationPlayer> Replica<P> {
             gate.event(&epoch, state.sequence)
         };
         if result == Delivery::Apply {
+            if state
+                .playback
+                .as_ref()
+                .and_then(|p| p.pending.as_ref())
+                .map(|p| p.sequence)
+                != self
+                    .state
+                    .as_ref()
+                    .and_then(|s| s.playback.as_ref())
+                    .and_then(|p| p.pending.as_ref())
+                    .map(|p| p.sequence)
+            {
+                self.pending_received_at_ms = now;
+                if let Some(p) = state.playback.as_ref().and_then(|p| p.pending.as_ref()) {
+                    self.player.diagnostic(serde_json::json!({"event":"scheduler_planned",
+                        "at_ms":now,"sequence":p.sequence,"media_revision":p.media_revision,
+                        "deadline_local_ms":self.estimate().map(|e|p.execute_at_ms as f64-e.offset_ms),
+                        "deadline_server_ms":p.execute_at_ms}));
+                }
+            }
             self.recovering = false;
             let changed = self.state.as_ref().is_none_or(|old| {
                 old.authority_revision != state.authority_revision
@@ -211,6 +233,7 @@ impl<P: ApplicationPlayer> Replica<P> {
                         offset_ms: self.estimate().map_or(0.0, |e| e.offset_ms),
                         target_ms: timeline.position_at(server_now as i64),
                         reason: "snapshot",
+                        media_revision: s.media.as_ref().map_or(0, |m| m.media_revision),
                         ..Default::default()
                     });
                     self.apply_timeline(timeline, now);
@@ -291,6 +314,11 @@ impl<P: ApplicationPlayer> Replica<P> {
                 offset_ms: self.estimate().map_or(0.0, |e| e.offset_ms),
                 target_ms: p.timeline_after.position_ms,
                 reason: "prepare",
+                media_revision: p.media_revision,
+                received_at_ms: self.pending_received_at_ms,
+                deadline_local_ms: p.execute_at_ms as f64
+                    - self.estimate().map_or(0.0, |e| e.offset_ms),
+                wake_at_ms: now,
             });
             let _ = self.player.seek(p.timeline_after.position_ms);
         }
@@ -332,6 +360,10 @@ impl<P: ApplicationPlayer> Replica<P> {
             offset_ms: self.estimate()?.offset_ms,
             target_ms: p.timeline_after.position_ms,
             reason: "scheduled",
+            media_revision: p.media_revision,
+            received_at_ms: self.pending_received_at_ms,
+            deadline_local_ms: deadline,
+            wake_at_ms: now,
         });
         self.apply_timeline(p.timeline_after, now);
         self.sync.reset();
@@ -362,6 +394,11 @@ impl<P: ApplicationPlayer> Replica<P> {
             return Correction::None;
         };
         let view = self.player.view();
+        self.player.diagnostic(serde_json::json!({"event":"drift_observation","at_ms":now,
+            "sample_at_ms":view.sampled_at_ms,"sample_age_ms":now.saturating_sub(view.sampled_at_ms),
+            "position_ms":view.position_ms,"target_ms":self.target_position(view.sampled_at_ms),
+            "seeking":view.seeking,"buffering":view.buffering,"ready":view.ready,"playing":view.playing,
+            "sequence":self.state.as_ref().map(|s|s.sequence),"required_consecutive_samples":3}));
         let sample_time = if self.player.asynchronous() {
             view.sampled_at_ms
         } else {
@@ -388,9 +425,21 @@ impl<P: ApplicationPlayer> Replica<P> {
             sequence: self.state.as_ref().map_or(0, |s| s.sequence),
             target_ms: timeline.position_at(self.server_now(sample_time).unwrap() as i64),
             reason: "correction",
+            media_revision: self
+                .state
+                .as_ref()
+                .and_then(|s| s.media.as_ref())
+                .map_or(0, |m| m.media_revision),
             offset_ms: self.estimate().map_or(0.0, |e| e.offset_ms),
             ..Default::default()
         });
+        if let Correction::Seek(target) = correction {
+            self.player.diagnostic(serde_json::json!({"event":"hard_seek_decision","at_ms":now,
+                "sample_at_ms":sample_time,"sample_age_ms":now.saturating_sub(sample_time),
+                "drift_ms":view.position_ms as i64 - target as i64,"target_ms":target,
+                "seeking":view.seeking,"buffering":view.buffering,"ready":view.ready,"playing":view.playing,
+                "sequence":self.state.as_ref().map(|s|s.sequence)}));
+        }
         match correction {
             Correction::None => {}
             Correction::SetRate(rate) => {

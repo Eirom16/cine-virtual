@@ -43,6 +43,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--platform', choices=['linux', 'android'], required=True)
     parser.add_argument('--no-build', action='store_true')
+    parser.add_argument('--output', type=Path)
     args = parser.parse_args()
     parts = {}
     env = os.environ.copy()
@@ -176,6 +177,7 @@ def main():
             device('shell', 'rm', '/sdcard/cine-ui.xml', '/sdcard/Download/cine-spike.mp4', check=False)
         output = EXP/('results-android.json' if online[0].startswith('emulator-')
                       else 'results-android-device.json')
+    if args.output: output=args.output
     output.write_text(json.dumps(value, indent=2)+'\n')
     print(json.dumps(value, indent=2))
     if not value.get('passed'):

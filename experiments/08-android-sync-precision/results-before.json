@@ -1,0 +1,100 @@
+{
+  "status": "MEASURED historical, recomputed/read this session",
+  "source": "../07-linux-android-room/results-lan.json",
+  "real_wall_seconds": 600.0837354700052,
+  "linux_drift": {
+    "p50_ms": 3,
+    "p95_ms": 36,
+    "p99_ms": 47,
+    "max_ms": 5000,
+    "count": 1306
+  },
+  "android_drift": {
+    "p50_ms": 33,
+    "p95_ms": 514,
+    "p99_ms": 7230,
+    "max_ms": 12742,
+    "count": 1126
+  },
+  "cross_device_difference": {
+    "p50_ms": 29.0,
+    "p95_ms": 462.0,
+    "p99_ms": 541.0,
+    "max_ms": 600.0,
+    "count": 1099
+  },
+  "corrections": {
+    "linux": {
+      "counts": {
+        "rate": 0,
+        "restore": 0,
+        "seek": 0
+      },
+      "soft_per_minute": 0.0,
+      "hard_per_minute": 0.0
+    },
+    "android": {
+      "counts": {
+        "rate": 7,
+        "restore": 4,
+        "seek": 75
+      },
+      "soft_per_minute": 0.6999023222501477,
+      "hard_per_minute": 7.498953452680155
+    }
+  },
+  "dispatch_lateness": {
+    "linux": {
+      "p50_ms": 0.5,
+      "p95_ms": 2.0,
+      "p99_ms": 2.0,
+      "max_ms": 2.0,
+      "count": 6
+    },
+    "android": {
+      "p50_ms": 26,
+      "p95_ms": 432,
+      "p99_ms": 432,
+      "max_ms": 432,
+      "count": 6
+    },
+    "missed_definition_ms": 50,
+    "linux_missed": 0,
+    "android_missed": 2
+  },
+  "resources_summary": {
+    "linux": {
+      "measured": true,
+      "memory_metric": "rss_kib",
+      "initial_kib": 73196,
+      "final_kib": 73820,
+      "max_kib": 73820,
+      "threads_min": 21,
+      "threads_max": 21,
+      "fds_min": 15,
+      "fds_max": 15,
+      "cpu_percent_one_core": 8.51237362791551
+    },
+    "android": {
+      "measured": true,
+      "memory_metric": "pss_after_hash_and_load_kib",
+      "initial_kib": 194843,
+      "final_kib": 161334,
+      "max_kib": 194843,
+      "threads_min": 40,
+      "threads_max": 51,
+      "fds_min": 110,
+      "fds_max": 175,
+      "cpu_percent_one_core": 90.8396789038156
+    }
+  },
+  "recovery": {
+    "foreground_ms": 2059.953197996947,
+    "foreground_post_ready_convergence_ms": 0.027522000891622156,
+    "foreground_initial_drift_ms": -31,
+    "network_resume_ms": 13310.063960998377,
+    "network_post_ready_convergence_ms": 16557.981801001006,
+    "same_member_after_resume": true
+  },
+  "p95_goal_met": false
+}

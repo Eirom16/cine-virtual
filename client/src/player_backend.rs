@@ -16,6 +16,10 @@ pub struct ControlMark {
     pub offset_ms: f64,
     pub target_ms: u64,
     pub reason: &'static str,
+    pub media_revision: u64,
+    pub received_at_ms: u64,
+    pub deadline_local_ms: f64,
+    pub wake_at_ms: u64,
 }
 #[derive(Clone, Default)]
 pub struct PlayerView {
@@ -57,6 +61,8 @@ pub trait ApplicationPlayer: Player {
     fn configure_duration(&mut self, duration: u64);
     fn view(&self) -> PlayerView;
     fn mark(&mut self, _: ControlMark) {}
+    /// Optional bounded diagnostic sink; no SDK or synchronization policy.
+    fn diagnostic(&self, _: serde_json::Value) {}
     fn asynchronous(&self) -> bool {
         false
     }
