@@ -7,16 +7,15 @@ import 'package:flutter/services.dart';
 
 import 'bridge.dart';
 import 'room.dart';
-import 'unsupported_player.dart';
+import 'product_app.dart';
 
+// Explicit experiment flags retain fixture/autorun tools; normal builds use product UI.
 void main() => runApp(
-  MaterialApp(
-    home: Platform.isIOS
-        ? const UnsupportedPlayerScreen()
-        : const bool.fromEnvironment('ROOM_MODE')
-        ? const RoomScreen()
-        : const SpikeScreen(),
-  ),
+  const bool.fromEnvironment('SPIKE_AUTORUN')
+      ? const MaterialApp(home: SpikeScreen())
+      : const bool.fromEnvironment('ROOM_AUTORUN')
+      ? const MaterialApp(home: RoomScreen())
+      : const CineVirtualApp(),
 );
 
 class SpikeScreen extends StatefulWidget {

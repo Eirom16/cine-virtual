@@ -14,6 +14,36 @@ struct _MyApplication {
 
 G_DEFINE_TYPE(MyApplication, my_application, GTK_TYPE_APPLICATION)
 
+// Native asynchronous file dialog: paths stay in this process and LocalMedia.
+static void file_response(GtkNativeDialog* dialog, gint response, gpointer data) {
+  FlMethodCall* call = FL_METHOD_CALL(data);
+  g_autoptr(FlValue) value = fl_value_new_null();
+  if (response == GTK_RESPONSE_ACCEPT) {
+    g_autofree gchar* path = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
+    if (path != nullptr) {
+      g_autofree gchar* title = g_path_get_basename(path);
+      g_clear_pointer(&value, fl_value_unref);
+      value = fl_value_new_map();
+      fl_value_set_string_take(value, "path", fl_value_new_string(path));
+      fl_value_set_string_take(value, "title", fl_value_new_string(title));
+    }
+  }
+  fl_method_call_respond_success(call, value, nullptr);
+  g_object_unref(call);
+  g_object_unref(dialog);
+}
+static void file_method(FlMethodChannel*, FlMethodCall* call, gpointer data) {
+  if (g_strcmp0(fl_method_call_get_name(call), "select") != 0) {
+    fl_method_call_respond_not_implemented(call, nullptr);
+    return;
+  }
+  GtkFileChooserNative* chooser = gtk_file_chooser_native_new(
+      "Seleccionar película", GTK_WINDOW(data), GTK_FILE_CHOOSER_ACTION_OPEN,
+      "Seleccionar", "Cancelar");
+  g_signal_connect(chooser, "response", G_CALLBACK(file_response), g_object_ref(call));
+  gtk_native_dialog_show(GTK_NATIVE_DIALOG(chooser));
+}
+
 // Called when first Flutter frame received.
 static void first_frame_cb(MyApplication* self, FlView* view) {
   gtk_widget_show(gtk_widget_get_toplevel(GTK_WIDGET(view)));
@@ -45,11 +75,11 @@ static void my_application_activate(GApplication* application) {
   if (use_header_bar) {
     GtkHeaderBar* header_bar = GTK_HEADER_BAR(gtk_header_bar_new());
     gtk_widget_show(GTK_WIDGET(header_bar));
-    gtk_header_bar_set_title(header_bar, "cine_mobile_spike");
+    gtk_header_bar_set_title(header_bar, "Cine Virtual");
     gtk_header_bar_set_show_close_button(header_bar, TRUE);
     gtk_window_set_titlebar(window, GTK_WIDGET(header_bar));
   } else {
-    gtk_window_set_title(window, "cine_mobile_spike");
+    gtk_window_set_title(window, "Cine Virtual");
   }
 
   gtk_window_set_default_size(window, 1280, 720);
@@ -74,6 +104,11 @@ static void my_application_activate(GApplication* application) {
   gtk_widget_realize(GTK_WIDGET(view));
 
   fl_register_plugins(FL_PLUGIN_REGISTRY(view));
+  g_autoptr(FlStandardMethodCodec) codec = fl_standard_method_codec_new();
+  g_autoptr(FlMethodChannel) files = fl_method_channel_new(
+      fl_engine_get_binary_messenger(fl_view_get_engine(view)),
+      "cine.desktop/files", FL_METHOD_CODEC(codec));
+  fl_method_channel_set_method_call_handler(files, file_method, window, nullptr);
 
   gtk_widget_grab_focus(GTK_WIDGET(view));
 }
