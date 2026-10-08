@@ -34,6 +34,7 @@ struct Request {
     reply: oneshot::Sender<WireMessage>,
 }
 struct Session<P: ApplicationPlayer> {
+    social: crate::social::SocialReplica,
     replica: Replica<P>,
     local: Option<LocalMedia>,
     local_descriptor: Option<MediaDescriptor>,
@@ -98,6 +99,7 @@ impl<P: ApplicationPlayer + Send + 'static> Client<P> {
             boot,
             allow_lan,
             session: Arc::new(Mutex::new(Session {
+                social: crate::social::SocialReplica::default(),
                 replica: Replica::with_player(player),
                 local: None,
                 local_descriptor: None,
@@ -158,7 +160,7 @@ impl<P: ApplicationPlayer + Send + 'static> Client<P> {
                 sender_id: None,
                 sequence: None,
                 sent_at_ms: now(),
-                payload: json!({"supported_versions":[1],"client_name":name}),
+                payload: json!({"supported_versions":[1],"client_name":name,"capabilities":["social_v1"]}),
             };
             if ws
                 .send(Message::Text(encode(&hello).unwrap().into()))
@@ -253,6 +255,7 @@ impl<P: ApplicationPlayer + Send + 'static> Client<P> {
                                 let Some(epoch)=message.payload["clock_epoch"].as_str().and_then(|s|Uuid::parse_str(s).ok()) else{break};
                                 let mut s=shared.lock().unwrap();
                                 if s.replica.clock_epoch.is_some_and(|old|old!=epoch){s.credentials=None;}
+                                s.social.supported=message.payload["capabilities"].as_array().is_some_and(|a|a.iter().any(|v|v.as_str()==Some("social_v1")));
                                 s.replica.set_clock_epoch(epoch);negotiated=true;
                             },
                             "TIME_PONG"=>{
@@ -279,6 +282,16 @@ impl<P: ApplicationPlayer + Send + 'static> Client<P> {
                                 if sync_reply.as_ref().is_some_and(|(request,_)|*request==id) {
                                     let (_,tx)=sync_reply.take().unwrap();let _=tx.send(message);
                                 } else if let Some(tx)=pending.remove(&id){let _=tx.send(message);}
+                            },
+                            "SOCIAL_STATE"|"CHAT_MESSAGE"|"REACTION"=>{
+                                let need_snapshot={let mut s=shared.lock().unwrap();
+                                    if !s.social.supported || !s.replica.state.as_ref().is_some_and(|st|message.room_id==Some(st.room_id)&&message.room_epoch==Some(st.room_epoch)){break;}
+                                    match s.social.install(&message,t4){Ok(gap)=>gap,Err(_)=>break}
+                                };
+                                if need_snapshot {
+                                    let request={let s=shared.lock().unwrap();let st=s.replica.state.as_ref().unwrap();WireMessage{protocol_version:1,event_id:Uuid::new_v4(),kind:"SYNC_REQUEST".into(),room_id:Some(st.room_id),room_epoch:Some(st.room_epoch),sender_id:s.replica.member_id.map(|id|id.to_string()),sequence:None,sent_at_ms:now(),payload:json!({"last_sequence":st.sequence,"reason":"gap"})}};
+                                    if ws.send(Message::Text(encode(&request).unwrap().into())).await.is_err(){break;}
+                                }
                             },
                             "ROOM_CLOSED"=>{shared.lock().unwrap().replica.disconnect(now());break;},
                             _=>{
@@ -307,6 +320,7 @@ impl<P: ApplicationPlayer + Send + 'static> Client<P> {
                     }
                 }
             }
+            shared.lock().unwrap().social.disconnected();
             shared.lock().unwrap().replica.disconnect(now());
             notify.notify_waiters();
         }));
@@ -373,6 +387,9 @@ impl<P: ApplicationPlayer + Send + 'static> Client<P> {
             let mut s = self.session.lock().unwrap();
             s.replica.clear_room(self.now());
             s.credentials = None;
+            let supported = s.social.supported;
+            s.social = crate::social::SocialReplica::default();
+            s.social.supported = supported;
         }
         if reply.kind == "ACK"
             && kind != "ROOM_LEAVE"
@@ -676,6 +693,32 @@ impl<P: ApplicationPlayer + Send + 'static> Client<P> {
         Ok(())
     }
     /// Read-only UI projection; no credentials or device handles.
+    pub fn social_summary(&self) -> Value {
+        self.session.lock().unwrap().social.summary(self.now())
+    }
+    pub async fn send_chat(&self, text: &str) -> Result<(), ClientError> {
+        cine_rooms::social::validate_text(text).map_err(|c| c.as_str())?;
+        self.send_social("CHAT_SEND", json!({"text":text})).await
+    }
+    pub async fn send_reaction(&self, emoji: &str) -> Result<(), ClientError> {
+        if !cine_rooms::social::REACTIONS.contains(&emoji) {
+            return Err("INVALID_EVENT".into());
+        }
+        self.send_social("REACTION_SEND", json!({"emoji":emoji}))
+            .await
+    }
+    async fn send_social(&self, kind: &str, payload: Value) -> Result<(), ClientError> {
+        {
+            let s = self.session.lock().unwrap();
+            if !s.replica.connected || s.replica.suspended() {
+                return Err("NETWORK_DISCONNECTED".into());
+            }
+            if !s.social.supported {
+                return Err("FEATURE_NOT_SUPPORTED".into());
+            }
+        }
+        require_ack(&self.request(kind, payload).await?)
+    }
     pub fn presentation_summary(&self) -> Value {
         let s = self.session.lock().unwrap();
         json!({"member_id":s.replica.member_id,

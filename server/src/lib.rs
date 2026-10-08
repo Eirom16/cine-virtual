@@ -17,7 +17,7 @@ use cine_rooms::{
 };
 use serde_json::json;
 use std::{
-    collections::{HashMap, VecDeque},
+    collections::{HashMap, HashSet, VecDeque},
     sync::{Arc, Mutex},
     time::{Duration, Instant},
 };
@@ -36,6 +36,7 @@ pub struct Server {
 }
 struct Hub {
     service: RoomService,
+    social: HashSet<Uuid>,
     senders: HashMap<Uuid, mpsc::Sender<Effect>>,
     boot: Instant,
     clock_epoch: Uuid,
@@ -61,8 +62,12 @@ impl Hub {
                 tracing::info!(event,room_id=%e.state.room_id,sequence=e.state.sequence,event_type=e.kind.as_str());
             }
             for id in delivery.recipients {
+                if matches!(delivery.effect, Effect::Social { .. }) && !self.social.contains(&id) {
+                    continue;
+                }
                 if matches!(delivery.effect, Effect::Close) {
                     self.senders.remove(&id);
+                    self.social.remove(&id);
                     continue;
                 }
                 let failed = self
@@ -79,6 +84,7 @@ impl Hub {
         }
     }
     fn remove(&mut self, id: Uuid) {
+        self.social.remove(&id);
         self.senders.remove(&id);
         let deliveries = self.service.disconnect(id, self.now());
         self.dispatch(deliveries);
@@ -94,6 +100,7 @@ impl Server {
         Self {
             hub: Arc::new(Mutex::new(Hub {
                 service: RoomService::new(config),
+                social: HashSet::new(),
                 senders: HashMap::new(),
                 boot: Instant::now(),
                 clock_epoch: Uuid::new_v4(),
@@ -218,8 +225,10 @@ async fn connection(mut socket: WebSocket, server: Server) {
                         if negotiated && (hello_payload.as_ref()!=Some(&message.payload) || server.hub.lock().unwrap().service.binding(id).is_some()) {
                             if !send(&mut socket,&error_message(Some(message.event_id),ErrorCode::InvalidEvent,t2)).await {break;}continue;
                         }
+                        let social=message.payload.get("capabilities").and_then(|v|v.as_array()).is_some_and(|a|a.iter().any(|v|v.as_str()==Some("social_v1")));
+                        if social {server.hub.lock().unwrap().social.insert(id);}
                         negotiated=true;hello_payload=Some(message.payload);
-                        let response={let h=server.hub.lock().unwrap();WireMessage::server("SESSION_ACCEPT",json!({"selected_version":1,"connection_id":id,"clock_epoch":h.clock_epoch,
+                        let response={let h=server.hub.lock().unwrap();WireMessage::server("SESSION_ACCEPT",json!({"capabilities":if social {vec!["social_v1"]} else {vec![]},"selected_version":1,"connection_id":id,"clock_epoch":h.clock_epoch,
                             "limits":{"max_message_bytes":MAX_MESSAGE_BYTES,"max_members":16,"queue_capacity":QUEUE_CAPACITY,"lease_ms":30_000}}),h.now())};
                         if !send(&mut socket,&response).await {break;}
                     },
@@ -231,6 +240,9 @@ async fn connection(mut socket: WebSocket, server: Server) {
                         if !send(&mut socket,&response).await {break;}
                     },
                     Incoming::Room(request)=>{
+                        if matches!(request.command,cine_rooms::model::Command::Chat{..}|cine_rooms::model::Command::React{..}) && !server.hub.lock().unwrap().social.contains(&id) {
+                            if !send(&mut socket,&error_message(Some(message.event_id),ErrorCode::FeatureNotSupported,t2)).await {break;}continue;
+                        }
                         let created=matches!(request.command,cine_rooms::model::Command::Create{..});
                         let mut h=server.hub.lock().unwrap();let now=h.now();let effects=h.service.execute(id,*request,now);
                         if created && effects.iter().any(|d|matches!(d.effect,Effect::Ack{..})) {tracing::info!(event="room_created",connection_id=%id);}

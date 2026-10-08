@@ -28,6 +28,12 @@ pub enum Intent {
         allow_lan: bool,
     },
     Create,
+    Chat {
+        text: String,
+    },
+    Reaction {
+        emoji: String,
+    },
     Join {
         room_id: Uuid,
         room_epoch: Uuid,
@@ -300,14 +306,14 @@ impl Network {
                 loop { tokio::select! {
                     _=stopped.changed()=>break,
                     _=tick.tick()=>{
-                        if let Some(c)=&client {let mut v=published.lock().unwrap();v["state"]=c.state_summary();v["sync"]=c.sync_summary();v["media"]=c.media_summary();v["presentation"]=c.presentation_summary();
+                        if let Some(c)=&client {let mut v=published.lock().unwrap();v["state"]=c.state_summary();v["sync"]=c.sync_summary();v["media"]=c.media_summary();v["presentation"]=c.presentation_summary();v["social"]=c.social_summary();
                             v["connected"]=json!(c.connected());v["executions"]=json!(c.executions().iter().map(|e|json!({"sequence":e.sequence,"expected_server_ms":e.expected_server_ms,"actual_server_ms":e.actual_server_ms,"lateness_ms":e.lateness_ms})).collect::<Vec<_>>());}
                     },
                     cmd=rx.recv()=>{
                         let Some(cmd)=cmd else{break};
                         if cmd.generation!=*current.lock().unwrap() && !matches!(cmd.intent,Intent::Suspend){continue;}
                         published.lock().unwrap()["busy"]=json!(true);
-                        let intent_name=String::from(match &cmd.intent {Intent::Connect{..}=>"connect",Intent::Create=>"create",Intent::Join{..}=>"join",Intent::Attach=>"attach",Intent::Revalidate=>"revalidate",Intent::Ready=>"ready",Intent::Play=>"play",Intent::Pause=>"pause",Intent::Seek{..}=>"seek",Intent::Disconnect=>"disconnect",Intent::Reconnect=>"reconnect",Intent::Leave=>"leave",Intent::Suspend=>"suspend",Intent::Foreground=>"foreground"});
+                        let intent_name=String::from(match &cmd.intent {Intent::Connect{..}=>"connect",Intent::Create=>"create",Intent::Chat{..}=>"chat",Intent::Reaction{..}=>"reaction",Intent::Join{..}=>"join",Intent::Attach=>"attach",Intent::Revalidate=>"revalidate",Intent::Ready=>"ready",Intent::Play=>"play",Intent::Pause=>"pause",Intent::Seek{..}=>"seek",Intent::Disconnect=>"disconnect",Intent::Reconnect=>"reconnect",Intent::Leave=>"leave",Intent::Suspend=>"suspend",Intent::Foreground=>"foreground"});
                         let operation=async {
                             if let Intent::Connect{url,name,allow_lan}=&cmd.intent {
                                 if let Some(mut old)=client.take(){old.disconnect().await;}
@@ -317,6 +323,8 @@ impl Network {
                             }
                             let c=client.as_mut().ok_or("NETWORK_DISCONNECTED")?;
                             match cmd.intent {
+                                Intent::Chat{text}=>{c.send_chat(&text).await?;Ok(json!({}))},
+                                Intent::Reaction{emoji}=>{c.send_reaction(&emoji).await?;Ok(json!({}))},
                                 Intent::Create=>{let v=c.create().await?;Ok(json!({"room_id":v["room_id"],"room_epoch":v["room_epoch"],"invite_token":v["invite_token"]}))},
                                 Intent::Join{room_id,room_epoch,invite_token}=>{verified_generation=None;c.join(room_id,room_epoch,&invite_token).await?;Ok(json!({}))},
                                 Intent::Attach=>{c.attach_media(cmd.descriptor.ok_or("MEDIA_NOT_READY")?).await?;verified_generation=Some(cmd.generation);Ok(json!({}))},
@@ -406,6 +414,10 @@ async fn ready_when_usable(
 }
 pub(crate) fn safe_error(e: &str) -> &'static str {
     match e {
+        "RATE_LIMITED" => "RATE_LIMITED",
+        "PAYLOAD_TOO_LARGE" => "PAYLOAD_TOO_LARGE",
+        "INVALID_EVENT" => "INVALID_EVENT",
+        "FEATURE_NOT_SUPPORTED" => "FEATURE_NOT_SUPPORTED",
         "NOT_AUTHORIZED" => "NOT_AUTHORIZED",
         "OPERATION_CANCELLED" => "OPERATION_CANCELLED",
         "NETWORK_DISCONNECTED" => "NETWORK_DISCONNECTED",

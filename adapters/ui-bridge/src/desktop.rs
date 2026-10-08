@@ -48,6 +48,7 @@ fn publish(c: &Client<BackendPlayer>, status: &Mutex<Value>) {
     v["media"] = c.media_summary();
     v["presentation"] = c.presentation_summary();
     v["hash"] = c.hash_status();
+    v["social"] = c.social_summary();
 }
 impl Desktop {
     pub fn new(boot: Instant) -> Result<Self, &'static str> {
@@ -71,7 +72,7 @@ impl Desktop {
                             let action = match &cmd {
                                 DesktopIntent::Select(s) => { let _ = &s.action; "select" },
                                 DesktopIntent::Room(i) => match i {
-                                    Intent::Connect{..}=>"connect",Intent::Create=>"create",Intent::Join{..}=>"join",
+                                    Intent::Connect{..}=>"connect",Intent::Create=>"create",Intent::Chat{..}=>"chat",Intent::Reaction{..}=>"reaction",Intent::Join{..}=>"join",
                                     Intent::Ready=>"ready",Intent::Play=>"play",Intent::Pause=>"pause",Intent::Seek{..}=>"seek",
                                     Intent::Disconnect=>"disconnect",Intent::Reconnect=>"reconnect",Intent::Leave=>"leave",
                                     Intent::Suspend=>"suspend",Intent::Foreground=>"foreground",Intent::Attach=>"attach",Intent::Revalidate=>"revalidate",
@@ -97,6 +98,8 @@ impl Desktop {
                                         Ok(json!({}))
                                     },
                                     DesktopIntent::Room(i) => match i {
+                                        Intent::Chat{text} => {c.send_chat(&text).await?;Ok(json!({}))},
+                                        Intent::Reaction{emoji} => {c.send_reaction(&emoji).await?;Ok(json!({}))},
                                         Intent::Create => { let v=c.create().await?; Ok(json!({"room_id":v["room_id"],"room_epoch":v["room_epoch"],"invite_token":v["invite_token"]})) },
                                         Intent::Join{room_id,room_epoch,invite_token} => {c.join(room_id,room_epoch,&invite_token).await?;Ok(json!({}))},
                                         Intent::Ready => {c.ready().await?;Ok(json!({}))},

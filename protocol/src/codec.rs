@@ -258,6 +258,10 @@ enum RequestDto {
         context: AdminDto,
         target_member_id: Uuid,
     },
+    #[serde(rename = "CHAT_SEND")]
+    Chat { text: String },
+    #[serde(rename = "REACTION_SEND")]
+    React { emoji: String },
     #[serde(rename = "SYNC_REQUEST")]
     Sync { last_sequence: u64, reason: String },
 }
@@ -312,10 +316,26 @@ pub fn incoming(message: &WireMessage) -> Result<Incoming, ErrorCode> {
         "SESSION_ACCEPT",
         "TIME_PONG",
         "ROOM_CLOSED",
+        "SOCIAL_STATE",
+        "CHAT_MESSAGE",
+        "REACTION",
     ]
     .contains(&message.kind.as_str())
     {
         return Err(ErrorCode::NotAuthorized);
+    }
+    if matches!(message.kind.as_str(), "CHAT_SEND" | "REACTION_SEND")
+        && (message.payload.as_object().is_none_or(|p| p.len() != 1)
+            || message
+                .payload
+                .get(if message.kind == "CHAT_SEND" {
+                    "text"
+                } else {
+                    "emoji"
+                })
+                .is_none())
+    {
+        return Err(ErrorCode::InvalidEvent);
     }
     let dto: RequestDto =
         serde_json::from_value(json!({"type":message.kind,"payload":message.payload}))
@@ -373,6 +393,16 @@ pub fn incoming(message: &WireMessage) -> Result<Incoming, ErrorCode> {
                 resume_token,
                 last_sequence,
             }
+        }
+        RequestDto::Chat { text } => {
+            cine_rooms::social::validate_text(&text)?;
+            Command::Chat { text }
+        }
+        RequestDto::React { emoji } => {
+            if !cine_rooms::social::REACTIONS.contains(&emoji.as_str()) {
+                return Err(ErrorCode::InvalidEvent);
+            }
+            Command::React { emoji }
         }
         RequestDto::Leave {} => Command::Leave,
         RequestDto::Select {
@@ -487,6 +517,11 @@ pub fn error_message(id: Option<Uuid>, code: ErrorCode, now: u64) -> WireMessage
 }
 pub fn effect_message(effect: &Effect, clock_epoch: Uuid, now: u64) -> Option<WireMessage> {
     let mut message = match effect {
+        Effect::Social {
+            room_id,
+            room_epoch,
+            payload,
+        } => return Some(social_message(*room_id, *room_epoch, payload, now)),
         Effect::Close => return None,
         Effect::Error {
             request_event_id,

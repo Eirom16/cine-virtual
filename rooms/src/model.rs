@@ -151,6 +151,12 @@ pub enum Command {
         context: AdminContext,
         target_member_id: Uuid,
     },
+    Chat {
+        text: String,
+    },
+    React {
+        emoji: String,
+    },
     Sync,
 }
 #[derive(Clone, PartialEq)]
@@ -282,6 +288,11 @@ pub struct RoomEvent {
 }
 #[derive(Clone)]
 pub enum Effect {
+    Social {
+        room_id: Uuid,
+        room_epoch: Uuid,
+        payload: crate::social::SocialPayload,
+    },
     Ack {
         request_event_id: Uuid,
         sequence: Option<u64>,

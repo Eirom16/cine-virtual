@@ -702,3 +702,282 @@ fn dedup_window_is_bounded_and_expiry_releases_capacity() {
         Some(ErrorCode::NoMedia)
     );
 }
+
+fn social_message(deliveries: &[Delivery]) -> &cine_rooms::social::SocialEntry {
+    deliveries
+        .iter()
+        .find_map(|d| match &d.effect {
+            Effect::Social {
+                payload: cine_rooms::social::SocialPayload::Message(e),
+                ..
+            } => Some(e),
+            _ => None,
+        })
+        .unwrap()
+}
+#[test]
+fn social_authority_order_dedup_and_playback_isolation() {
+    let mut f = Fixture::new();
+    let (b, credentials) = f.join();
+    let before = f.state().clone();
+    let request = f.req(Command::Chat {
+        text: "  Hola 😂\nsegunda línea  ".into(),
+    });
+    let d = f.service.execute(b, request.clone(), 100);
+    let e = social_message(&d);
+    assert_eq!(e.sender_id, credentials.member_id);
+    assert_eq!(e.display_name, "Participant");
+    assert_ne!(e.message_id, request.event_id);
+    assert_eq!(e.text, "Hola 😂\nsegunda línea");
+    assert_eq!(e.sent_at_ms, 100);
+    let seq = e.social_sequence;
+    assert_eq!(f.state(), &before);
+    let duplicate = f.service.execute(b, request.clone(), 101);
+    assert!(!duplicate.iter().any(|d| matches!(
+        d.effect,
+        Effect::Social {
+            payload: cine_rooms::social::SocialPayload::Message(_),
+            ..
+        }
+    )));
+    let mut different = request;
+    different.command = Command::Chat {
+        text: "changed".into(),
+    };
+    assert_eq!(
+        error(&f.service.execute(b, different, 102)),
+        Some(ErrorCode::InvalidEvent)
+    );
+    let request = f.req(Command::Chat {
+        text: "host".into(),
+    });
+    let d = f.service.execute(f.host, request, 103);
+    assert_eq!(social_message(&d).social_sequence, seq + 1);
+    assert_eq!(f.state(), &before);
+}
+#[test]
+fn social_validation_scope_and_independent_member_quotas() {
+    let mut f = Fixture::new();
+    let (b, _) = f.join();
+    for (text, code) in [
+        (" \n\t".into(), ErrorCode::InvalidEvent),
+        ("😂".repeat(513), ErrorCode::PayloadTooLarge),
+        ("a\n".repeat(10), ErrorCode::InvalidEvent),
+        ("\0".into(), ErrorCode::InvalidEvent),
+    ] {
+        let r = f.req(Command::Chat { text });
+        assert_eq!(error(&f.service.execute(b, r, 100)), Some(code));
+    }
+    for i in 0..20 {
+        let r = f.req(Command::Chat {
+            text: format!("{i}"),
+        });
+        assert_eq!(
+            error(&f.service.execute(b, r, 100)),
+            if i < 5 {
+                None
+            } else {
+                Some(ErrorCode::RateLimited)
+            }
+        );
+    }
+    let r = f.req(Command::Chat {
+        text: "other quota".into(),
+    });
+    assert_eq!(error(&f.service.execute(f.host, r, 100)), None);
+    let r = f.req(Command::Chat {
+        text: "refilled".into(),
+    });
+    assert_eq!(error(&f.service.execute(b, r, 2100)), None);
+    for wrong_epoch in [true, false] {
+        let mut r = f.req(Command::Chat {
+            text: "bad scope".into(),
+        });
+        if wrong_epoch {
+            r.room_epoch = Some(Uuid::new_v4());
+        } else {
+            r.room_id = Some(Uuid::new_v4());
+        }
+        assert!(error(&f.service.execute(b, r, 2200)).is_some());
+    }
+}
+#[test]
+fn social_resume_replays_chat_once_retains_names_and_quota_but_not_reactions() {
+    use cine_rooms::social::SocialPayload;
+    let mut f = Fixture::new();
+    let (b, c) = f.join();
+    for i in 0..5 {
+        let r = f.req(Command::Chat {
+            text: format!("{i}"),
+        });
+        f.service.execute(b, r, 10);
+    }
+    let r = f.req(Command::React {
+        emoji: "😂".into()
+    });
+    assert!(f.service.execute(b, r, 10).iter().any(|d| matches!(
+        d.effect,
+        Effect::Social {
+            payload: SocialPayload::Reaction { .. },
+            ..
+        }
+    )));
+    let d = f.service.disconnect(b, 20);
+    assert!(!d.iter().any(|d| matches!(d.effect, Effect::Social { .. })));
+    let new = Uuid::new_v4();
+    let r = f.req(Command::Resume {
+        resume_token: c.resume_token,
+        last_sequence: 0,
+    });
+    let d = f.service.execute(new, r, 30);
+    let entries = d
+        .iter()
+        .find_map(|d| match &d.effect {
+            Effect::Social {
+                payload: SocialPayload::Snapshot { entries, .. },
+                ..
+            } => Some(entries),
+            _ => None,
+        })
+        .unwrap();
+    assert_eq!(entries.iter().filter(|e| e.kind == "chat").count(), 5);
+    assert_eq!(entries.iter().filter(|e| e.kind == "joined").count(), 1);
+    assert_eq!(entries.iter().filter(|e| e.kind == "resumed").count(), 1);
+    assert!(!d.iter().any(|d| matches!(
+        d.effect,
+        Effect::Social {
+            payload: SocialPayload::Reaction { .. },
+            ..
+        }
+    )));
+    let r = f.req(Command::Chat {
+        text: "still limited".into(),
+    });
+    assert_eq!(
+        error(&f.service.execute(new, r, 31)),
+        Some(ErrorCode::RateLimited)
+    );
+    let r = f.req(Command::Leave);
+    f.service.execute(new, r, 40);
+    let r = f.req(Command::Sync);
+    let d = f.service.execute(f.host, r, 41);
+    let entries = d
+        .iter()
+        .find_map(|d| match &d.effect {
+            Effect::Social {
+                payload: SocialPayload::Snapshot { entries, .. },
+                ..
+            } => Some(entries),
+            _ => None,
+        })
+        .unwrap();
+    assert_eq!(
+        entries
+            .iter()
+            .filter(|e| e.kind == "chat" && e.display_name == "Participant")
+            .count(),
+        5
+    );
+    assert!(entries.iter().any(|e| e.kind == "left"));
+}
+#[test]
+fn social_reaction_allowlist_burst_and_no_room_mutation() {
+    let mut f = Fixture::new();
+    let before = f.state().clone();
+    let r = f.req(Command::React {
+        emoji: "🚫".into()
+    });
+    assert_eq!(
+        error(&f.service.execute(f.host, r, 100)),
+        Some(ErrorCode::InvalidEvent)
+    );
+    for i in 0..50 {
+        let r = f.req(Command::React {
+            emoji: "❤️".into()
+        });
+        assert_eq!(
+            error(&f.service.execute(f.host, r, 100)),
+            if i < 8 {
+                None
+            } else {
+                Some(ErrorCode::RateLimited)
+            }
+        );
+    }
+    let r = f.req(Command::React {
+        emoji: "👏".into()
+    });
+    assert_eq!(error(&f.service.execute(f.host, r, 600)), None);
+    assert_eq!(f.state(), &before);
+}
+#[test]
+fn social_history_is_bounded_by_count_and_escaped_wire_budget() {
+    use cine_rooms::social::*;
+    for text in ["small".into(), "\"".repeat(CHAT_MAX_BYTES)] {
+        let mut f = Fixture::new();
+        for i in 0..400 {
+            let r = f.req(Command::Chat { text: text.clone() });
+            assert_eq!(error(&f.service.execute(f.host, r, i * 2000)), None);
+        }
+        let r = f.req(Command::Sync);
+        let d = f.service.execute(f.host, r, 800_001);
+        let entries = d
+            .iter()
+            .find_map(|d| match &d.effect {
+                Effect::Social {
+                    payload: SocialPayload::Snapshot { entries, .. },
+                    ..
+                } => Some(entries),
+                _ => None,
+            })
+            .unwrap();
+        assert!(entries.len() <= HISTORY_MAX_COUNT);
+        assert!(entries.iter().map(|e| e.budget()).sum::<usize>() <= HISTORY_MAX_BYTES);
+        assert_eq!(entries.last().unwrap().social_sequence, 400);
+    }
+}
+
+#[test]
+fn social_ids_cannot_collide_across_members_and_resume_presence_is_coalesced() {
+    let mut f = Fixture::new();
+    let (b, c) = f.join();
+    let r = f.req(Command::Chat {
+        text: "same client event ID".into(),
+    });
+    let first = f.service.execute(b, r.clone(), 10);
+    let second = f.service.execute(f.host, r, 10);
+    assert_ne!(
+        social_message(&first).message_id,
+        social_message(&second).message_id
+    );
+    f.service.disconnect(b, 20);
+    let connection = Uuid::new_v4();
+    let r = f.req(Command::Resume {
+        resume_token: c.resume_token,
+        last_sequence: 0,
+    });
+    let d = f.service.execute(connection, r, 30);
+    let rotated = credentials(&d);
+    assert_eq!(social_message(&d).kind, "resumed");
+    f.service.disconnect(connection, 40);
+    let connection = Uuid::new_v4();
+    let r = f.req(Command::Resume {
+        resume_token: rotated.resume_token,
+        last_sequence: 0,
+    });
+    let d = f.service.execute(connection, r, 50);
+    assert!(!d.iter().any(|d| matches!(
+        d.effect,
+        Effect::Social {
+            payload: cine_rooms::social::SocialPayload::Message(_),
+            ..
+        }
+    )));
+    assert!(d.iter().any(|d| matches!(
+        d.effect,
+        Effect::Social {
+            payload: cine_rooms::social::SocialPayload::Snapshot { .. },
+            ..
+        }
+    )));
+}

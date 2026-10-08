@@ -1,4 +1,5 @@
 use crate::model::*;
+use crate::social::{REACTIONS, SocialPayload, SocialState, validate_text};
 use base64::{Engine, engine::general_purpose::URL_SAFE_NO_PAD};
 use cine_core::playback::{PlaybackStatus, Timeline};
 use sha2::{Digest, Sha256};
@@ -21,6 +22,7 @@ impl Default for ServiceConfig {
     }
 }
 struct Room {
+    social: SocialState,
     state: RoomState,
     invite: [u8; 32],
     connections: HashMap<Uuid, Uuid>,
@@ -101,6 +103,16 @@ impl Room {
             }),
         }
     }
+    fn social_delivery(&self, recipients: Vec<Uuid>, payload: SocialPayload) -> Delivery {
+        Delivery {
+            recipients,
+            effect: Effect::Social {
+                room_id: self.state.room_id,
+                room_epoch: self.state.room_epoch,
+                payload,
+            },
+        }
+    }
     fn changed(&mut self, now: u64) {
         self.state.sequence += 1;
         self.state.updated_at_ms = now;
@@ -169,6 +181,7 @@ impl RoomService {
                 }
                 deliveries.push(private(connection, Effect::Snapshot(room.state.clone())));
             }
+            self.decorate_social(&mut deliveries, None, now);
             return deliveries;
         }
         if self.cache.len() >= 65_536
@@ -182,6 +195,14 @@ impl RoomService {
                 },
             )];
         }
+        let previous = self.binding(connection).and_then(|(id, mid)| {
+            self.store.rooms[&id]
+                .state
+                .members
+                .iter()
+                .find(|m| m.member_id == mid)
+                .cloned()
+        });
         let result = self.apply(connection, &request, now);
         let mut deliveries = match result {
             Ok(d) => d,
@@ -209,6 +230,7 @@ impl RoomService {
                 },
             );
         }
+        self.decorate_social(&mut deliveries, previous.as_ref(), now);
         // Requests consume no transport resources; only returned effects leave the service.
         deliveries.shrink_to_fit();
         deliveries
@@ -246,6 +268,7 @@ impl RoomService {
             self.store.rooms.insert(
                 id,
                 Room {
+                    social: SocialState::default(),
                     state: state.clone(),
                     invite,
                     connections: HashMap::from([(host, connection)]),
@@ -431,6 +454,57 @@ impl RoomService {
         let mut reason = None;
         let mut old_host = None;
         match &req.command {
+            Command::Chat { text } => {
+                let text = validate_text(text)?;
+                if !room.social.allow(mid, false, now) {
+                    return Err(RateLimited);
+                }
+                let member = room
+                    .state
+                    .members
+                    .iter()
+                    .find(|m| m.member_id == mid)
+                    .unwrap();
+                let entry = room.social.entry(Uuid::new_v4(), member, "chat", text, now);
+                return Ok(vec![
+                    private(
+                        connection,
+                        Effect::Ack {
+                            request_event_id: req.event_id,
+                            sequence: None,
+                            result: AckResult::Empty,
+                        },
+                    ),
+                    room.social_delivery(room.recipients(), SocialPayload::Message(entry)),
+                ]);
+            }
+            Command::React { emoji } => {
+                if !REACTIONS.contains(&emoji.as_str()) {
+                    return Err(InvalidEvent);
+                }
+                if !room.social.allow(mid, true, now) {
+                    return Err(RateLimited);
+                }
+                return Ok(vec![
+                    private(
+                        connection,
+                        Effect::Ack {
+                            request_event_id: req.event_id,
+                            sequence: None,
+                            result: AckResult::Empty,
+                        },
+                    ),
+                    room.social_delivery(
+                        room.recipients(),
+                        SocialPayload::Reaction {
+                            reaction_id: Uuid::new_v4(),
+                            sender_id: mid,
+                            emoji: emoji.clone(),
+                            sent_at_ms: now,
+                        },
+                    ),
+                ]);
+            }
             Command::Sync => {
                 return Ok(vec![private(
                     connection,
@@ -758,6 +832,65 @@ impl RoomService {
             None,
         )]
     }
+    fn decorate_social(
+        &mut self,
+        deliveries: &mut Vec<Delivery>,
+        previous: Option<&Member>,
+        now: u64,
+    ) {
+        let mut extra = vec![];
+        for d in deliveries.iter() {
+            if let Effect::Event(e) = &d.effect {
+                let kind = match e.kind {
+                    EventKind::MemberJoined => Some("joined"),
+                    EventKind::MemberLeft => Some("left"),
+                    EventKind::MemberStatus if e.reason == Some("resumed") => Some("resumed"),
+                    _ => None,
+                };
+                if let (Some(kind), Some(mid), Some(room)) = (
+                    kind,
+                    e.member_id,
+                    self.store.rooms.get_mut(&e.state.room_id),
+                ) {
+                    if let Some(member) = e
+                        .state
+                        .members
+                        .iter()
+                        .find(|m| m.member_id == mid)
+                        .or(previous.filter(|m| m.member_id == mid))
+                        && let Some(entry) = room.social.presence(member, kind, now)
+                    {
+                        extra.push(
+                            room.social_delivery(
+                                d.recipients.clone(),
+                                SocialPayload::Message(entry),
+                            ),
+                        );
+                    }
+                    if kind == "left" {
+                        room.social.forget(mid);
+                    }
+                }
+            }
+        }
+        for d in deliveries.iter() {
+            if let Effect::Snapshot(st) = &d.effect
+                && let Some(room) = self.store.rooms.get(&st.room_id)
+            {
+                extra.insert(
+                    0,
+                    room.social_delivery(
+                        d.recipients.clone(),
+                        SocialPayload::Snapshot {
+                            sequence: room.social.sequence,
+                            entries: room.social.history.iter().cloned().collect(),
+                        },
+                    ),
+                );
+            }
+        }
+        deliveries.extend(extra);
+    }
     pub fn tick(&mut self, now: u64) -> Vec<Delivery> {
         self.cache.retain(|_, v| now < v.expires);
         let mut deliveries = vec![];
@@ -793,6 +926,13 @@ impl RoomService {
                 continue;
             }
             for mid in expired {
+                if let Some(member) = room.state.members.iter().find(|m| m.member_id == mid) {
+                    let entry = room.social.entry(Uuid::new_v4(), member, "left", "", now);
+                    deliveries.push(
+                        room.social_delivery(room.recipients(), SocialPayload::Message(entry)),
+                    );
+                }
+                room.social.forget(mid);
                 room.state.members.retain(|m| m.member_id != mid);
                 room.resume.remove(&mid);
                 room.changed(now);

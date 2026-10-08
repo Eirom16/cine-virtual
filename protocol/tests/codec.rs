@@ -128,3 +128,84 @@ fn canonical_payload_fingerprint_is_stable_and_detects_extensions() {
     };
     assert_ne!(first.payload_fingerprint, changed.payload_fingerprint);
 }
+
+#[test]
+fn social_intents_are_plain_bounded_and_server_events_are_not_client_intents() {
+    let mut v = hello();
+    v["type"] = json!("CHAT_SEND");
+    v["room_id"] = json!(Uuid::new_v4());
+    v["room_epoch"] = json!(Uuid::new_v4());
+    v["sender_id"] = json!(Uuid::new_v4());
+    v["payload"] = json!({"text":"Hola 😂\n世界"});
+    assert!(matches!(
+        incoming(&decode(&v.to_string()).unwrap()),
+        Ok(Incoming::Room(_))
+    ));
+    for payload in [
+        json!({"text":""}),
+        json!({"text":" \n\t"}),
+        json!({"text":"a","sender_id":Uuid::new_v4()}),
+        json!({"text":"a","display_name":"Host"}),
+        json!({"text":"x".repeat(2049)}),
+    ] {
+        v["payload"] = payload;
+        assert!(matches!(
+            rejected(v.clone()),
+            ErrorCode::InvalidEvent | ErrorCode::PayloadTooLarge
+        ));
+    }
+    v["type"] = json!("REACTION_SEND");
+    v["payload"] = json!({"emoji":"😂"});
+    assert!(incoming(&decode(&v.to_string()).unwrap()).is_ok());
+    v["payload"] = json!({"emoji":"a".repeat(4096)});
+    assert_eq!(rejected(v.clone()), ErrorCode::InvalidEvent);
+    for kind in ["CHAT_MESSAGE", "SOCIAL_STATE", "REACTION"] {
+        v["type"] = json!(kind);
+        assert_eq!(rejected(v.clone()), ErrorCode::NotAuthorized);
+    }
+    let bad = hello().to_string().replace("Test", r"\ud800");
+    assert!(decode(&bad).is_err());
+}
+#[test]
+fn social_snapshot_encoding_stays_below_transport_limit_with_escaped_unicode() {
+    use cine_rooms::{
+        model::Member,
+        model::{MemberStatus, Role},
+        social::{SocialPayload, SocialState},
+    };
+    let member = Member {
+        member_id: Uuid::new_v4(),
+        display_name: "\"".repeat(64),
+        role: Role::Host,
+        connected: true,
+        ready: false,
+        verified_media_revision: None,
+        status: MemberStatus::Idle,
+        joined_at_ms: 0,
+        lease_expires_at_ms: None,
+    };
+    let mut social = SocialState::default();
+    for i in 0..300 {
+        social.entry(
+            Uuid::new_v4(),
+            &member,
+            "chat",
+            &format!("a{}z", "\t".repeat(2046)),
+            i,
+        );
+    }
+    let m = social_message(
+        Uuid::new_v4(),
+        Uuid::new_v4(),
+        &SocialPayload::Snapshot {
+            sequence: social.sequence,
+            entries: social.history.into(),
+        },
+        999,
+    );
+    let text = encode(&m).unwrap();
+    assert!(text.len() < MAX_MESSAGE_BYTES);
+    let snapshot: SocialSnapshotDto =
+        serde_json::from_value(decode(&text).unwrap().payload).unwrap();
+    snapshot.validate().unwrap();
+}
