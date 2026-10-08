@@ -286,10 +286,15 @@ void main() {
         Column(
           children: [
             Expanded(child: SocialPanel(controller: c)),
+            ValueListenableBuilder(
+              valueListenable: c.playback,
+              builder: (_, value, _) => Text('${value.position}'),
+            ),
             LayoutBuilder(
               builder: (_, _) {
                 if (!sent) {
                   sent = true;
+                  (c.gateway as SocialGateway).sync['position_ms'] = 6000;
                   unawaited(c.sendReaction('😂'));
                 }
                 return const SizedBox();
@@ -300,6 +305,7 @@ void main() {
       );
       await t.pumpAndSettle();
       expect(t.takeException(), isNull);
+      expect(find.text('6000'), findsOneWidget);
       expect((c.gateway as SocialGateway).payloads.last['emoji'], '😂');
       await t.pumpWidget(const SizedBox());
     },

@@ -198,6 +198,7 @@ class ApplicationController extends ChangeNotifier with WidgetsBindingObserver {
   bool socialPending = false;
   int _socialVisible = 0, _lastSocialSequence = 0, _unread = 0;
   bool _socialPublishScheduled = false;
+  bool _publishScheduled = false;
   final playback = ValueNotifier(const PlaybackView());
   final hashProgress = ValueNotifier<double?>(null);
   final diagnostics = ValueNotifier<Map<String, dynamic>>({});
@@ -256,6 +257,17 @@ class ApplicationController extends ChangeNotifier with WidgetsBindingObserver {
 
   void _publish() {
     if (!active) return;
+    if (SchedulerBinding.instance.schedulerPhase ==
+        SchedulerPhase.persistentCallbacks) {
+      if (!_publishScheduled) {
+        _publishScheduled = true;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _publishScheduled = false;
+          if (active) _publish();
+        });
+      }
+      return;
+    }
     final next = RoomView(
       raw: _raw,
       session: session,
@@ -371,6 +383,7 @@ class ApplicationController extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   void _publishSocial() {
+    if (!active) return;
     // Coalesce notifications if an intent arrives while Flutter builds/layouts.
     if (SchedulerBinding.instance.schedulerPhase ==
         SchedulerPhase.persistentCallbacks) {
