@@ -39,6 +39,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
           !participants &&
           !sheet &&
           widget.controller.view.error.isEmpty &&
+          (widget.controller.gateway.videoDiagnostics['error'] ?? 0) == 0 &&
           (ModalRoute.of(context)?.isCurrent ?? true)) {
         setState(() => visible = false);
       }
@@ -171,7 +172,10 @@ class _PlayerScreenState extends State<PlayerScreen> {
               viewType: 'cine.mobile/surface',
             )
           else if (controller.gateway.videoTexture != null)
-            DesktopVideo(texture: controller.gateway.videoTexture!)
+            DesktopVideo(
+              texture: controller.gateway.videoTexture!,
+              onFailure: showControls,
+            )
           else
             const Center(child: Text('Reproductor no disponible')),
           ValueListenableBuilder<PlaybackView>(

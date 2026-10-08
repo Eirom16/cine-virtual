@@ -6,7 +6,8 @@ import 'package:flutter/services.dart';
 /// Presentation only: the texture and mpv owner survive this widget's lifetime.
 class DesktopVideo extends StatefulWidget {
   final int texture;
-  const DesktopVideo({required this.texture, super.key});
+  final VoidCallback? onFailure;
+  const DesktopVideo({required this.texture, this.onFailure, super.key});
   @override
   State<DesktopVideo> createState() => _DesktopVideoState();
 }
@@ -26,9 +27,15 @@ class _DesktopVideoState extends State<DesktopVideo> {
     try {
       final state = await channel.invokeMapMethod<String, dynamic>('status');
       final error = state?['error'] != 0;
-      if (mounted && failed != error) setState(() => failed = error);
+      if (mounted && failed != error) {
+        setState(() => failed = error);
+        if (error) widget.onFailure?.call();
+      }
     } on PlatformException {
-      if (mounted && !failed) setState(() => failed = true);
+      if (mounted && !failed) {
+        setState(() => failed = true);
+        widget.onFailure?.call();
+      }
     }
   }
 
