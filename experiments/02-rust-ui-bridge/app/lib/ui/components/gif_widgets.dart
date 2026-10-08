@@ -139,8 +139,8 @@ class _GifPickerState extends State<GifPicker> {
                 },
                 child: GridView.builder(
                   padding: const EdgeInsets.all(12),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
+                  gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                    maxCrossAxisExtent: 180,
                     crossAxisSpacing: 8,
                     mainAxisSpacing: 8,
                     childAspectRatio: 1.4,
@@ -301,6 +301,7 @@ class _GifImageState extends State<GifImage> {
   void scheduleVisibility() {
     if (visibilityScheduled) return;
     visibilityScheduled = true;
+    WidgetsBinding.instance.ensureVisualUpdate();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       visibilityScheduled = false;
       if (!mounted) return;
@@ -328,39 +329,45 @@ class _GifImageState extends State<GifImage> {
   }
 
   @override
-  Widget build(BuildContext context) => Semantics(
-    label: widget.label,
-    excludeSemantics: true,
-    child: ClipRRect(
-      borderRadius: BorderRadius.circular(CineTokens.radius),
-      child: ColoredBox(
-        color: CineTokens.surface,
-        child: SizedBox.expand(
-          child: failed
-              ? const Center(
-                  child: Text('GIF no disponible', textAlign: TextAlign.center),
-                )
-              : bytes == null
-              ? const Center(
-                  child: SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
+  Widget build(BuildContext context) {
+    scheduleVisibility();
+    return Semantics(
+      label: widget.label,
+      excludeSemantics: true,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(CineTokens.radius),
+        child: ColoredBox(
+          color: CineTokens.surface,
+          child: SizedBox.expand(
+            child: failed
+                ? const Center(
+                    child: Text(
+                      'GIF no disponible',
+                      textAlign: TextAlign.center,
+                    ),
+                  )
+                : bytes == null
+                ? const Center(
+                    child: SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                  )
+                : !visible
+                ? const Center(child: Icon(Icons.gif_box_outlined))
+                : reduce
+                ? RawImage(image: still, fit: BoxFit.contain)
+                : Image.memory(
+                    bytes!,
+                    fit: BoxFit.contain,
+                    cacheWidth: widget.gif.width.clamp(1, 320),
+                    errorBuilder: (_, _, _) =>
+                        const Center(child: Text('GIF no disponible')),
                   ),
-                )
-              : !visible
-              ? const Center(child: Icon(Icons.gif_box_outlined))
-              : reduce
-              ? RawImage(image: still, fit: BoxFit.contain)
-              : Image.memory(
-                  bytes!,
-                  fit: BoxFit.contain,
-                  cacheWidth: widget.gif.width.clamp(1, 320),
-                  errorBuilder: (_, _, _) =>
-                      const Center(child: Text('GIF no disponible')),
-                ),
+          ),
         ),
       ),
-    ),
-  );
+    );
+  }
 }

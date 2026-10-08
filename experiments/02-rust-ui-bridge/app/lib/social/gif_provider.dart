@@ -264,8 +264,9 @@ class GiphyGifProvider implements GifProvider {
 
   Future<GifPage> _page(String path, String query, String? cursor) async {
     if (query.runes.length > 50) throw const GifFailure('query');
+    final maxOffset = path == 'trending' ? 499 : 4999;
     final offset = cursor == null ? 0 : int.tryParse(cursor);
-    if (offset == null || offset < 0 || offset > 4999) {
+    if (offset == null || offset < 0 || offset > maxOffset) {
       throw const GifFailure('malformed');
     }
     final result = await _get(path, {
@@ -288,7 +289,7 @@ class GiphyGifProvider implements GifProvider {
         next:
             data.isNotEmpty &&
                 next < (pagination['total_count'] as int) &&
-                next <= 4999
+                next <= maxOffset
             ? '$next'
             : null,
       );

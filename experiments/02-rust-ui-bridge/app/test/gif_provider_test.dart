@@ -81,6 +81,7 @@ void main() {
     final second = await p.search('cat', cursor: first.next);
     expect(second.items.single.id, 'def');
     expect(second.next, isNull);
+    await expectLater(p.trending(cursor: '500'), throwsA(isA<GifFailure>()));
     await p.trending();
     expect(calls.last.path, '/v1/gifs/trending');
     expect((await p.resolve('abc')).id, 'abc');

@@ -80,15 +80,10 @@ Future<ApplicationController> setup(WidgetTester t) async {
 Future<void> socialScreen(WidgetTester tester, Widget child) async {
   var theme = productTheme();
   if (Platform.environment['CINE_SOCIAL_CAPTURE'] != null) {
-    final text = theme.textTheme.apply(fontFamily: 'Roboto');
     theme = theme.copyWith(
-      textTheme: text.copyWith(
-        bodyMedium: text.bodyMedium!.copyWith(
-          fontFamilyFallback: ['Noto Color Emoji'],
-        ),
-        bodyLarge: text.bodyLarge!.copyWith(
-          fontFamilyFallback: ['Noto Color Emoji'],
-        ),
+      textTheme: theme.textTheme.apply(
+        fontFamily: 'Roboto',
+        fontFamilyFallback: ['Noto Color Emoji'],
       ),
     );
   }

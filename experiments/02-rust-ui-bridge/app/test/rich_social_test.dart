@@ -147,6 +147,47 @@ void main() {
       expect(c.social.value.unread, 1);
     },
   );
+  testWidgets('new GIF autoscroll resumes image stream inside viewport', (
+    t,
+  ) async {
+    t.view.physicalSize = const Size(1366, 768);
+    t.view.devicePixelRatio = 1;
+    addTearDown(t.view.resetPhysicalSize);
+    addTearDown(t.view.resetDevicePixelRatio);
+    final c = await setup(t);
+    final g = c.gateway as RichGateway;
+    await socialScreen(
+      t,
+      reduced(
+        SizedBox(width: 300, height: 600, child: SocialPanel(controller: c)),
+      ),
+    );
+    for (int i = 1; i <= 8; i++) {
+      g.append(gifEntry(i));
+      c.poll();
+      await settle(t);
+    }
+    final last = find.byKey(const ValueKey<dynamic>('message-8'));
+    final image = find.descendant(of: last, matching: find.byType(RawImage));
+    expect(image, findsOneWidget);
+    final position = t
+        .state<ScrollableState>(
+          find.descendant(
+            of: find.byKey(const Key('chat-messages')),
+            matching: find.byType(Scrollable),
+          ),
+        )
+        .position;
+    expect(position.extentAfter, lessThan(1));
+    await t.drag(find.byKey(const Key('chat-messages')), const Offset(0, 500));
+    await settle(t);
+    final offset = position.pixels;
+    g.append(gifEntry(9));
+    c.poll();
+    await settle(t);
+    expect(position.pixels, closeTo(offset, 1));
+    await t.pumpWidget(const SizedBox());
+  });
   testWidgets('blocked provider retains text chat and offers retry', (t) async {
     final c = await setup(t);
     c.gifProvider = const UnavailableGifProvider();
