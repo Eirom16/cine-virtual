@@ -1,0 +1,335 @@
+{
+  "date": "2026-10-08",
+  "environment": {
+    "linux": "KDE Wayland / 1366x768 / libmpv embedded",
+    "android": "Samsung SM-J701M / API28 / armeabi-v7a / Media3",
+    "media": "synthetic 620-second fixture",
+    "room_transport": "LAN WebSocket; USB only QA/debug"
+  },
+  "two_clients": {
+    "status": "TESTED",
+    "identical_history": true,
+    "unicode_text_received": true,
+    "android_reply_received": true,
+    "linux": {
+      "generation": 1,
+      "sequence": 10,
+      "ready": true,
+      "room_ready": true,
+      "playing": true,
+      "identity_match": true,
+      "chat_ids": [
+        "5dcbd4ae-fa50-451e-96a5-01950efcd617",
+        "8aef53f4-8d50-4139-bf8a-2e2a3883656b",
+        "c067dcbf-4aa7-4d1e-83ad-d4c3e2e8afa9"
+      ],
+      "chat_authors": [
+        "Alex",
+        "Sam",
+        "Alex"
+      ],
+      "social": {
+        "social_sequence": 4,
+        "buffer_count": 4,
+        "buffer_bytes": 1600,
+        "dropped_reactions": 0,
+        "supported": true
+      }
+    },
+    "android": {
+      "generation": 3,
+      "sequence": 10,
+      "ready": true,
+      "room_ready": true,
+      "playing": true,
+      "identity_match": true,
+      "chat_ids": [
+        "5dcbd4ae-fa50-451e-96a5-01950efcd617",
+        "8aef53f4-8d50-4139-bf8a-2e2a3883656b",
+        "c067dcbf-4aa7-4d1e-83ad-d4c3e2e8afa9"
+      ],
+      "chat_authors": [
+        "Alex",
+        "Sam",
+        "Alex"
+      ],
+      "social": {
+        "social_sequence": 4,
+        "buffer_count": 4,
+        "buffer_bytes": 1600,
+        "dropped_reactions": 0,
+        "supported": true
+      }
+    }
+  },
+  "focused_editor": {
+    "status": "TESTED",
+    "space_f_arrows_no_room_timeline_mutation": true,
+    "paste_unicode": "TESTED",
+    "regression": "widget test additionally checks caret movement and paste"
+  },
+  "media_controls": {
+    "status": "TESTED",
+    "ready_play_pause_seek": "PASS",
+    "chat_ids_unchanged": true,
+    "linux": {
+      "generation": 1,
+      "sequence": 15,
+      "ready": true,
+      "room_ready": true,
+      "playing": true,
+      "identity_match": true,
+      "chat_ids": [
+        "5dcbd4ae-fa50-451e-96a5-01950efcd617",
+        "8aef53f4-8d50-4139-bf8a-2e2a3883656b",
+        "c067dcbf-4aa7-4d1e-83ad-d4c3e2e8afa9"
+      ],
+      "chat_authors": [
+        "Alex",
+        "Sam",
+        "Alex"
+      ],
+      "social": {
+        "social_sequence": 4,
+        "buffer_count": 4,
+        "buffer_bytes": 1600,
+        "dropped_reactions": 0,
+        "supported": true
+      }
+    },
+    "android": {
+      "generation": 3,
+      "sequence": 15,
+      "ready": true,
+      "room_ready": true,
+      "playing": true,
+      "identity_match": true,
+      "chat_ids": [
+        "5dcbd4ae-fa50-451e-96a5-01950efcd617",
+        "8aef53f4-8d50-4139-bf8a-2e2a3883656b",
+        "c067dcbf-4aa7-4d1e-83ad-d4c3e2e8afa9"
+      ],
+      "chat_authors": [
+        "Alex",
+        "Sam",
+        "Alex"
+      ],
+      "social": {
+        "social_sequence": 4,
+        "buffer_count": 4,
+        "buffer_bytes": 1600,
+        "dropped_reactions": 0,
+        "supported": true
+      }
+    }
+  },
+  "reconnect": {
+    "status": "TESTED",
+    "elapsed_seconds": 16.69,
+    "same_member": true,
+    "history_prefix_retained": true,
+    "no_duplicates": true,
+    "missed_message_recovered": true,
+    "no_reaction_replay": true,
+    "linux": {
+      "generation": 1,
+      "sequence": 18,
+      "ready": true,
+      "room_ready": true,
+      "playing": true,
+      "identity_match": true,
+      "chat_ids": [
+        "5dcbd4ae-fa50-451e-96a5-01950efcd617",
+        "8aef53f4-8d50-4139-bf8a-2e2a3883656b",
+        "c067dcbf-4aa7-4d1e-83ad-d4c3e2e8afa9",
+        "cbbd828d-1d2c-44a5-a43f-cf27e2a7ee05"
+      ],
+      "chat_authors": [
+        "Alex",
+        "Sam",
+        "Alex",
+        "Alex"
+      ],
+      "social": {
+        "social_sequence": 6,
+        "buffer_count": 6,
+        "buffer_bytes": 2408,
+        "dropped_reactions": 0,
+        "supported": true
+      }
+    },
+    "android": {
+      "generation": 3,
+      "sequence": 18,
+      "ready": true,
+      "room_ready": true,
+      "playing": true,
+      "identity_match": true,
+      "chat_ids": [
+        "5dcbd4ae-fa50-451e-96a5-01950efcd617",
+        "8aef53f4-8d50-4139-bf8a-2e2a3883656b",
+        "c067dcbf-4aa7-4d1e-83ad-d4c3e2e8afa9",
+        "cbbd828d-1d2c-44a5-a43f-cf27e2a7ee05"
+      ],
+      "chat_authors": [
+        "Alex",
+        "Sam",
+        "Alex",
+        "Alex"
+      ],
+      "social": {
+        "social_sequence": 6,
+        "buffer_count": 6,
+        "buffer_bytes": 2408,
+        "dropped_reactions": 0,
+        "supported": true
+      }
+    }
+  },
+  "android_background": {
+    "status": "TESTED",
+    "elapsed_seconds": 21.85,
+    "same_member": true,
+    "history_recovered": true,
+    "no_duplicates": true,
+    "lost_reaction_not_replayed": true,
+    "player_recovered": true,
+    "linux": {
+      "generation": 1,
+      "sequence": 20,
+      "ready": true,
+      "room_ready": true,
+      "playing": true,
+      "identity_match": true,
+      "chat_ids": [
+        "5dcbd4ae-fa50-451e-96a5-01950efcd617",
+        "8aef53f4-8d50-4139-bf8a-2e2a3883656b",
+        "c067dcbf-4aa7-4d1e-83ad-d4c3e2e8afa9",
+        "cbbd828d-1d2c-44a5-a43f-cf27e2a7ee05",
+        "bf9c0875-ea52-4f5c-bcd5-7ef9b549f883"
+      ],
+      "chat_authors": [
+        "Alex",
+        "Sam",
+        "Alex",
+        "Alex",
+        "Alex"
+      ],
+      "social": {
+        "social_sequence": 7,
+        "buffer_count": 7,
+        "buffer_bytes": 2844,
+        "dropped_reactions": 0,
+        "supported": true
+      }
+    },
+    "android": {
+      "generation": 5,
+      "sequence": 20,
+      "ready": true,
+      "room_ready": true,
+      "playing": true,
+      "identity_match": true,
+      "chat_ids": [
+        "5dcbd4ae-fa50-451e-96a5-01950efcd617",
+        "8aef53f4-8d50-4139-bf8a-2e2a3883656b",
+        "c067dcbf-4aa7-4d1e-83ad-d4c3e2e8afa9",
+        "cbbd828d-1d2c-44a5-a43f-cf27e2a7ee05",
+        "bf9c0875-ea52-4f5c-bcd5-7ef9b549f883"
+      ],
+      "chat_authors": [
+        "Alex",
+        "Sam",
+        "Alex",
+        "Alex",
+        "Alex"
+      ],
+      "social": {
+        "social_sequence": 7,
+        "buffer_count": 7,
+        "buffer_bytes": 2844,
+        "dropped_reactions": 0,
+        "supported": true
+      }
+    }
+  },
+  "fullscreen": {
+    "status": "VISUALLY VERIFIED",
+    "linux": "native fullscreen entered; chat overlay available",
+    "android": "landscape and immersive fullscreen entered"
+  },
+  "reaction_visuals": {
+    "status": "VISUALLY VERIFIED",
+    "linux_to_android_heart": "PASS",
+    "android_to_linux_laughter": "PASS",
+    "disappears_after_animation": "PASS",
+    "room_timeline_not_changed": "TESTED",
+    "screenshots": [
+      "android-reaction-portrait.png",
+      "linux-reaction-overlay.png"
+    ]
+  },
+  "physical_burst": {
+    "status": "PROVISIONAL",
+    "method": "50 sequential production ApplicationController sends each, invoked through local debug VM; no parallel sends, no external spam tool",
+    "chat": {
+      "requests": 50,
+      "accepted": 5,
+      "rate_limited": 45,
+      "other_errors": 0,
+      "seconds": 1.931
+    },
+    "reactions": {
+      "requests": 50,
+      "accepted": 12,
+      "rate_limited": 38,
+      "other_errors": 0,
+      "seconds": 2.567
+    },
+    "same_player_generation": true,
+    "room_sequence_unchanged": true,
+    "identical_deduplicated_history": true,
+    "client_queue_after_expiry": 0,
+    "social": {
+      "social_sequence": 12,
+      "buffer_count": 12,
+      "buffer_bytes": 4894,
+      "dropped_reactions": 0,
+      "supported": true
+    },
+    "limitation": "VM debug invocation interfered with Flutter timers; transport counters only, excluded from UI performance assessment; replaced by real picker input run."
+  },
+  "final_clean_build": {
+    "status": "TESTED",
+    "fresh_installed_apk": true,
+    "hot_reload": false,
+    "both_ready_playing": true,
+    "unicode_chat_and_reply": true,
+    "identical_history": true,
+    "scope": "Fresh APK prior to final frame-publication guards; guards subsequently loaded via controlled hot reload. Final clean Linux process includes all guards."
+  },
+  "gui_reaction_burst": {
+    "status": "TESTED",
+    "method": "50 controlled picker attempts via Linux virtual touchscreen, normal production UI; debug VM used only to read state",
+    "ui_attempts": 50,
+    "seconds": 19.7,
+    "server_rate_limited_errors": 5,
+    "accepted_count": "NOT MEASURED: UI pending/animation can suppress attempts",
+    "same_player_generation": true,
+    "room_sequence_unchanged": true,
+    "playback_advanced": true,
+    "both_playing": true,
+    "identical_history": true,
+    "no_duplicates": true,
+    "client_queue_after_expiry": 0,
+    "visual_multiple_reactions": "VISUALLY VERIFIED on Android"
+  },
+  "clean_ui_background_repeat": {
+    "status": "TESTED",
+    "method": "Android Home, Linux UI sends chat and reaction, Android foreground",
+    "history_identical": true,
+    "player_recovered": true,
+    "linux_fresh_process": true,
+    "no_vm_invocations": true
+  }
+}

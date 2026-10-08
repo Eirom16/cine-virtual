@@ -241,3 +241,11 @@ foco que bloquea playback, ausencia de rebuild de estructura y redacción.
 Viewports: 1366×768, 1920×1080, 390×844, 844×390, 568×320, incluyendo teclado.
 Los widget tests no prueban frames ni dispositivos físicos. Evidencia física,
 limitaciones y comandos en [experimento 11](../experiments/11-social-chat-reactions/README.md).
+
+La regresión de teclado comprueba también cursor y Ctrl+A/Ctrl+V: proteger Player
+no debe deshabilitar los atajos de edición. `DefaultTextEditingShortcuts` local
+resuelve edición antes de los shortcuts del Player; Enter confirma, F sin
+modificadores se entrega al editor y Esc puede cerrar el panel.
+
+Opt-in adicional: `cargo test -p cine-server --test social_real_player --locked -- --ignored`
+usa dos libmpv reales con el corpus sintético. No sustituye la QA visual física.

@@ -33,3 +33,25 @@ No usar datos personales ni incluir invitación, URI, path, SHA o debug VM URL e
 Las pruebas de UI y bindings no equivalen a frames reales. Capturas deben proceder
 de ventanas/dispositivo y revisarse visualmente; identificar bloqueos de dispositivo
 sin inventar PASS. No se recalibra p95 multimedia ni se añaden GIF/voz/vídeo.
+
+## Validaciones opt-in y capturas de widgets
+
+```sh
+cargo test -p cine-server --test social_real_player --locked -- --ignored
+```
+
+Este test necesita libmpv y el corpus generado; valida dos decoders reales por
+WebSocket y recuperación social, sin afirmar frames ni Android.
+
+La ráfaga física usa pulsaciones reales del picker/input, como máximo 50 intentos
+controlados, sin retries. Las cuotas exactas se comprueban en los tests Rust;
+el número de pulsaciones no equivale a intents aceptados por la UI. No invocar
+métodos mediante el VM de debug para medir fluidez: puede interferir con los
+timers de Flutter. La observación de estado usa lecturas, sin ejecutar métodos.
+
+Para renderizar los cinco viewports con fuentes reales, ejecutar desde `app`
+`flutter test test/social_test.dart --plain-name 'social responsive fullscreen'`
+con `CINE_SOCIAL_CAPTURE` apuntando a una carpeta local, `CINE_SOCIAL_FONT_DIR`
+a los `material_fonts` del SDK fijado y `CINE_SOCIAL_EMOJI_FONT` a NotoColorEmoji.ttf.
+Sin esas variables los tests no escriben capturas ni dependen de fuentes locales.
+Esos PNG se etiquetan **widget** y no sustituyen las capturas físicas.

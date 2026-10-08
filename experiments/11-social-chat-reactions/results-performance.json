@@ -1,0 +1,39 @@
+{
+  "status": "MEASURED",
+  "scope": "Fresh Linux debug Flutter process + real embedded libmpv, 1366x768 native fullscreen, synthetic clip; /proc CPU percent of one core. UI input only; no VM method invocation. Short samples, not profiler or p95.",
+  "player_normal": {
+    "seconds": 8.04,
+    "cpu_percent_one_core": 26.98,
+    "rss_kib_start": 555916,
+    "rss_kib_end": 556956,
+    "rss_kib_max": 556956,
+    "threads": 49,
+    "fds_start": 61,
+    "fds_end": 61
+  },
+  "player_chat_open": {
+    "seconds": 8.04,
+    "cpu_percent_one_core": 28.22,
+    "rss_kib_start": 578052,
+    "rss_kib_end": 579668,
+    "rss_kib_max": 582560,
+    "threads": 49,
+    "fds_start": 61,
+    "fds_end": 61
+  },
+  "player_reaction_burst": {
+    "seconds": 19.7,
+    "cpu_percent_one_core": 125.16,
+    "rss_kib_start": 542940,
+    "rss_kib_end": 576272,
+    "rss_kib_max": 580932,
+    "threads": 51,
+    "fds_start": 61,
+    "fds_end": 61,
+    "ui_picker_attempts": 50
+  },
+  "server_rate_limited_errors_during_burst": 5,
+  "client_reactions_after_expiry": 0,
+  "memory_conclusion": "PROVISIONAL: short debug observation; RSS increased during burst, FD count stable. No long-duration heap/leak proof. Synthetic replica tests bound 500 chat and 1000 reactions.",
+  "discarded_measurements": "Earlier VM-invoked runs interfered with Flutter timers and are excluded. Android PSS from that run is also excluded."
+}
