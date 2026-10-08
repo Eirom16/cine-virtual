@@ -29,6 +29,8 @@ class SocialView {
       (data['entries'] as List? ?? []).map(object).toList();
   List<Map<String, dynamic>> get reactions =>
       (data['reactions'] as List? ?? []).map(object).toList();
+  bool get richSupported => data['rich_supported'] == true;
+  bool get canSendRich => canSend && richSupported;
   bool get supported => data['supported'] == true;
   bool get canSend => connected && supported && !pending && !blocked;
   String get errorText => switch (error) {

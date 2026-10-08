@@ -10,6 +10,8 @@ import 'package:flutter/services.dart';
 import '../bridge.dart';
 import 'view_state.dart';
 import 'social_view.dart';
+import '../social/gif_provider.dart';
+import '../social/gif_cache.dart';
 
 /// Replaceable only at the presentation boundary for widget tests.
 abstract class SessionGateway {
@@ -193,6 +195,28 @@ class Invitation {
 /// Intents and observation only. Rust remains the only room/network state machine.
 class ApplicationController extends ChangeNotifier with WidgetsBindingObserver {
   final SessionGateway gateway;
+  GifProvider gifProvider = const bool.fromEnvironment('CINE_GIF_FIXTURES')
+      ? const FixtureGifProvider()
+      : const UnavailableGifProvider();
+  final gifCache = GifMediaCache();
+  String gifLastError = '';
+  int? gifSearchLatencyMs;
+  String? replyToMessageId;
+  void replyTo(String? id) {
+    replyToMessageId = id;
+  }
+
+  Future<bool> sendGif(GifDescriptor gif) async {
+    final sent = await _sendSocial('message', {
+      'content': {'type': 'gif', 'gif': gif.toJson()},
+      'reply_to_message_id': replyToMessageId,
+    });
+    if (sent) replyToMessageId = null;
+    return sent;
+  }
+
+  Future<bool> reactMessage(String id, String emoji) =>
+      _sendSocial('message_reaction', {'message_id': id, 'emoji': emoji});
   final social = ValueNotifier(const SocialView());
   String chatDraft = '', socialError = '', _socialKey = '', _socialEpoch = '';
   bool socialPending = false;
@@ -309,7 +333,32 @@ class ApplicationController extends ChangeNotifier with WidgetsBindingObserver {
         ])
           key: next.hash[key],
       },
+      'gif': {
+        'provider_status': gifProvider.status,
+        'cache_entries': gifCache.entries,
+        'cache_bytes': gifCache.byteCount,
+        'decoded_cache_bytes':
+            PaintingBinding.instance.imageCache.currentSizeBytes,
+        'decoded_cache_entries':
+            PaintingBinding.instance.imageCache.currentSize,
+        'last_error': gifLastError,
+        'search_latency_ms': gifSearchLatencyMs,
+      },
       'social': {
+        'rich_social_capability': social.value.richSupported,
+        'gif_message_count': social.value.entries
+            .where((e) => object(e['content'])['type'] == 'gif')
+            .length,
+        'reply_count': social.value.entries
+            .where((e) => e['reply_to_message_id'] != null)
+            .length,
+        'message_reaction_count': social.value.entries.fold<int>(
+          0,
+          (n, e) =>
+              n +
+              object(e['message_reactions']).values
+                  .fold<int>(0, (m, ids) => m + (ids as List).length),
+        ),
         'buffer_count': social.value.data['buffer_count'],
         'buffer_bytes': social.value.data['buffer_bytes'],
         'last_social_sequence': social.value.data['social_sequence'],
@@ -403,6 +452,7 @@ class ApplicationController extends ChangeNotifier with WidgetsBindingObserver {
       _lastSocialSequence = 0;
       _unread = 0;
       chatDraft = '';
+      replyToMessageId = null;
       socialError = '';
     }
     final member = '${view.presentation['member_id'] ?? ''}';
@@ -449,7 +499,20 @@ class ApplicationController extends ChangeNotifier with WidgetsBindingObserver {
     if (_socialVisible > 0) _socialVisible--;
   }
 
-  Future<bool> sendChat(String text) => _sendSocial('chat', {'text': text});
+  Future<bool> sendChat(String text) async {
+    final sent = await _sendSocial(
+      replyToMessageId == null ? 'chat' : 'message',
+      replyToMessageId == null
+          ? {'text': text}
+          : {
+              'content': {'type': 'text', 'text': text},
+              'reply_to_message_id': replyToMessageId,
+            },
+    );
+    if (sent) replyToMessageId = null;
+    return sent;
+  }
+
   Future<bool> sendReaction(String emoji) =>
       _sendSocial('reaction', {'emoji': emoji});
   Future<bool> _sendSocial(String action, Map<String, dynamic> fields) async {
@@ -460,8 +523,13 @@ class ApplicationController extends ChangeNotifier with WidgetsBindingObserver {
       _publishSocial();
       return false;
     }
-    if (action == 'chat') {
-      final text = fields['text'] as String;
+    if (action == 'chat' ||
+        (action == 'message' && object(fields['content'])['type'] == 'text')) {
+      final text =
+          (action == 'chat'
+                  ? fields['text']
+                  : object(fields['content'])['text'])
+              as String;
       if (utf8.encode(text).length > 2048) {
         socialError = 'PAYLOAD_TOO_LARGE';
         _publishSocial();
@@ -689,6 +757,7 @@ class ApplicationController extends ChangeNotifier with WidgetsBindingObserver {
     _timer?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     unawaited(gateway.dispose());
+    gifCache.dispose();
     social.dispose();
     playback.dispose();
     hashProgress.dispose();

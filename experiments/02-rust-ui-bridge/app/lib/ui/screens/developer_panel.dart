@@ -56,6 +56,13 @@ class DeveloperPanel extends StatelessWidget {
                 spacing: CineTokens.sm,
                 children: [
                   TextButton(
+                    onPressed: () {
+                      controller.gifCache.clear();
+                      controller.poll();
+                    },
+                    child: const Text('Limpiar cache GIF'),
+                  ),
+                  TextButton(
                     onPressed: controller.busy
                         ? null
                         : controller.disconnectForDiagnostics,

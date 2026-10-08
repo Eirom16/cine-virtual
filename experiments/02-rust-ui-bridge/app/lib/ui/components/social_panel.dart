@@ -9,6 +9,8 @@ import '../../presentation/social_view.dart';
 import '../../presentation/view_state.dart';
 import '../theme/product_theme.dart';
 import 'product_components.dart';
+import 'gif_widgets.dart';
+import '../../social/gif_provider.dart';
 
 Future<void> showSocialSheet(
   BuildContext context,
@@ -257,6 +259,72 @@ class _ChatConversationState extends State<ChatConversation> {
     if (mounted && !Platform.isAndroid && !Platform.isIOS) focus.requestFocus();
   }
 
+  Future<void> actions(Map<String, dynamic> entry, [Offset? point]) async {
+    final social = controller.social.value;
+    final value = await showMenu<String>(
+      context: context,
+      position: point == null
+          ? const RelativeRect.fromLTRB(80, 120, 16, 16)
+          : RelativeRect.fromLTRB(point.dx, point.dy, 0, 0),
+      items: [
+        if (social.richSupported)
+          const PopupMenuItem(value: 'reply', child: Text('Responder')),
+        if (social.richSupported)
+          const PopupMenuItem(
+            value: 'react',
+            child: Text('Reaccionar al mensaje'),
+          ),
+        const PopupMenuItem(value: 'copy', child: Text('Copiar')),
+      ],
+    );
+    if (!mounted) return;
+    if (value == 'copy') {
+      final content = object(entry['content']);
+      final text = content['type'] == 'gif'
+          ? object(content['gif'])['alt_text'] as String? ?? 'GIF'
+          : '${entry['text']}';
+      await Clipboard.setData(ClipboardData(text: text));
+    } else if (value == 'reply') {
+      setState(() => controller.replyTo('${entry['message_id']}'));
+      focus.requestFocus();
+    } else if (value == 'react') {
+      final emoji = await showMenu<String>(
+        context: context,
+        position: const RelativeRect.fromLTRB(80, 120, 16, 16),
+        items: [
+          for (int i = 0; i < socialEmojis.length; i++)
+            PopupMenuItem(
+              value: socialEmojis[i],
+              child: Text('${socialEmojis[i]}  ${socialLabels[i]}'),
+            ),
+        ],
+      );
+      if (emoji != null) {
+        await controller.reactMessage('${entry['message_id']}', emoji);
+      }
+    }
+  }
+
+  String preview(Map<String, dynamic>? entry) {
+    if (entry == null) return 'Mensaje anterior no disponible';
+    return object(entry['content'])['type'] == 'gif'
+        ? '${entry['display_name']} · GIF'
+        : '${entry['display_name']} · ${entry['text']}';
+  }
+
+  String timestamp(BuildContext context, Map<String, dynamic> entry) {
+    final utc = entry['sent_at_utc_ms'];
+    if (utc is! int) return '';
+    final time = DateTime.fromMillisecondsSinceEpoch(
+      utc,
+      isUtc: true,
+    ).toLocal();
+    return MaterialLocalizations.of(context).formatTimeOfDay(
+      TimeOfDay.fromDateTime(time),
+      alwaysUse24HourFormat: MediaQuery.alwaysUse24HourFormatOf(context),
+    );
+  }
+
   @override
   void dispose() {
     controller.social.removeListener(changed);
@@ -311,6 +379,13 @@ class _ChatConversationState extends State<ChatConversation> {
                     );
                   }
                   final mine = entry['sender_id'] == social.memberId;
+                  final content = object(entry['content']);
+                  final reply = entry['reply_to_message_id'];
+                  final original = social.entries
+                      .where((e) => e['message_id'] == reply)
+                      .firstOrNull;
+                  final reactions = object(entry['message_reactions']);
+                  final time = timestamp(context, entry);
                   return Padding(
                     key: ValueKey(entry['message_id']),
                     padding: const EdgeInsets.only(bottom: CineTokens.md),
@@ -319,18 +394,138 @@ class _ChatConversationState extends State<ChatConversation> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            mine ? '$name · tú' : name,
-                            style: TextStyle(
-                              color: mine
-                                  ? CineTokens.accent
-                                  : CineTokens.muted,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 12,
-                            ),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  mine ? '$name · tú' : name,
+                                  style: TextStyle(
+                                    color: mine
+                                        ? CineTokens.accent
+                                        : CineTokens.muted,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ),
+                              if (time.isNotEmpty)
+                                Text(
+                                  time,
+                                  style: const TextStyle(
+                                    color: CineTokens.muted,
+                                    fontSize: 10,
+                                  ),
+                                ),
+                              SizedBox(
+                                width: 44,
+                                height: 44,
+                                child: IconButton(
+                                  padding: EdgeInsets.zero,
+                                  tooltip: 'Acciones del mensaje',
+                                  onPressed: () => actions(entry),
+                                  icon: const Icon(Icons.more_horiz, size: 18),
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(height: 3),
-                          SelectableText('${entry['text']}'),
+                          if (reply != null)
+                            Container(
+                              padding: const EdgeInsets.all(6),
+                              margin: const EdgeInsets.only(bottom: 4),
+                              decoration: const BoxDecoration(
+                                border: Border(
+                                  left: BorderSide(
+                                    color: CineTokens.accent,
+                                    width: 2,
+                                  ),
+                                ),
+                              ),
+                              child: Text(
+                                preview(original),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: CineTokens.muted,
+                                ),
+                              ),
+                            ),
+                          GestureDetector(
+                            onLongPress: () => actions(entry),
+                            onSecondaryTapDown: (d) =>
+                                actions(entry, d.globalPosition),
+                            child: content['type'] == 'gif'
+                                ? LayoutBuilder(
+                                    builder: (context, bounds) {
+                                      try {
+                                        final gif = GifDescriptor.fromJson(
+                                          object(content['gif']),
+                                        );
+                                        final width = bounds.maxWidth.clamp(
+                                          0.0,
+                                          240.0,
+                                        );
+                                        final height =
+                                            (width * gif.height / gif.width)
+                                                .clamp(64.0, 180.0);
+                                        return SizedBox(
+                                          width: width,
+                                          height: height,
+                                          child: GifImage(
+                                            gif: gif,
+                                            controller: controller,
+                                            label:
+                                                'GIF enviado por $name. ${gif.alt}',
+                                          ),
+                                        );
+                                      } catch (_) {
+                                        return const SizedBox(
+                                          height: 100,
+                                          child: Center(
+                                            child: Text('GIF no disponible'),
+                                          ),
+                                        );
+                                      }
+                                    },
+                                  )
+                                : SelectableText('${entry['text']}'),
+                          ),
+                          if (reactions.isNotEmpty)
+                            Wrap(
+                              spacing: 4,
+                              children: [
+                                for (final reaction in reactions.entries)
+                                  TextButton(
+                                    style: TextButton.styleFrom(
+                                      minimumSize: const Size(44, 44),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                      ),
+                                    ),
+                                    onPressed: social.canSendRich
+                                        ? () => controller.reactMessage(
+                                            '${entry['message_id']}',
+                                            reaction.key,
+                                          )
+                                        : null,
+                                    child: Semantics(
+                                      label:
+                                          '${reaction.key}: ${(reaction.value as List).length} reacciones${(reaction.value as List).contains(social.memberId) ? ", tu reacción" : ""}',
+                                      child: Text(
+                                        '${reaction.key} ${(reaction.value as List).length}',
+                                        style: TextStyle(
+                                          color:
+                                              (reaction.value as List).contains(
+                                                social.memberId,
+                                              )
+                                              ? CineTokens.accent
+                                              : null,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
                         ],
                       ),
                     ),
@@ -369,11 +564,41 @@ class _ChatConversationState extends State<ChatConversation> {
           ),
         if (social.connected && !social.supported)
           const Text('Chat no disponible en este servidor.'),
+        if (controller.replyToMessageId != null)
+          Row(
+            children: [
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Respondiendo a ${preview(social.entries.where((e) => e['message_id'] == controller.replyToMessageId).firstOrNull)}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              IconButton(
+                tooltip: 'Cancelar respuesta',
+                onPressed: () => setState(() => controller.replyTo(null)),
+                icon: const Icon(Icons.close),
+              ),
+            ],
+          ),
         Padding(
           padding: const EdgeInsets.all(CineTokens.sm),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
+              IconButton(
+                key: const Key('gif-picker'),
+                tooltip: 'Enviar GIF',
+                onPressed: social.canSendRich
+                    ? () async {
+                        focus.unfocus();
+                        await showGifPicker(context, controller);
+                        if (mounted) setState(() {});
+                      }
+                    : null,
+                icon: const Icon(Icons.gif_box_outlined),
+              ),
               Expanded(
                 child: DefaultTextEditingShortcuts(
                   child: Focus(
