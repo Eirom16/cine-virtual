@@ -352,8 +352,11 @@ no se declararon inmutables. iOS background no probado.
 
 MEASURED: CPU Linux intervalos3s: un GIF39.7%, varios26%, picker40%, scroll54.6%,
 cierre31% de un core. No comparación controlada: intervalos debug, GC/hot reload y
-un asset. VISUALLY VERIFIED reproducción/scroll en QA; jank cuantitativo/frame timing,
-profile/release Android y percentiles de sync NOT MEASURED / NOT TESTED.
+un asset. MEASURED adicional: scroll Android9.52s, 116 scopes Frame y116 raster;
+Frame p95 26.28ms/max71.17, 14 sobre16.67ms; raster p95 7.05ms/max51.15, 3 sobre
+16.67ms. Son scopes del timeline debug, no dropped frames presentados ni contadores
+sumables. Muestra tomada tras EOF, Player parado; frame timing durante playback y
+profile/release siguen NOT TESTED. No percentiles nuevos de sync.
 
 ## 54. Memory/resources
 
@@ -401,7 +404,9 @@ Sin modificar Player, SyncEngine ni Kotlin para resolver estas correcciones.
 BLOCKED: activación GIPHY/credencial/branding/cache y render remoto de producción.
 NOT IMPLEMENTED: disk cache, descarga remota aprobada, refresh de URL expirada,
 reaction notifications secundarias, threads, edit/delete/uploads/DB/accounts.
-NOT TESTED: proveedor físico, WebP físico, profile/release/jank y lector real.
+NOT TESTED: proveedor físico, WebP físico, profile/release, jank durante playback
+y lector real. El trace debug detectó scopes por encima del presupuesto orientativo;
+requiere repetir con varios assets y build profile antes de afirmar fluidez.
 
 ## 61. Windows/macOS/iOS
 
@@ -438,7 +443,7 @@ resultados/JSON/capturas; no sobrescribe experimento11.
 
 `18524ce` protocolo/rich state/bridge/tests; `44ad08d` provider/cache/picker/rich UI;
 `42452fd` visibilidad/autoscroll, grid landscape y cursor. Documentación y evidencia
-en commit posterior. Historial pequeño, sin force push/rebase destructivo.
+en `16c1673`; muestra de frames en commit posterior. Historial pequeño, sin force push/rebase destructivo.
 
 ## 66. Estado Git final
 

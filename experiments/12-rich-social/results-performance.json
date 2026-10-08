@@ -59,5 +59,30 @@
       "android_total_pss_kib": 237551
     }
   ],
-  "limitations": "Sequential short snapshots, not a benchmark or proof of a total RSS cap; same GIF may share decoder/cache; no release/profile or frame timing percentiles. CPU samples overlap physical UI and debug tooling; RSS/PSS methods differ. Final samples show GC reduction; no monotonic leak was demonstrated, but long physical soak was not run."
+  "limitations": "Sequential short snapshots, not a benchmark or proof of a total RSS cap; same GIF may share decoder/cache; no release/profile or frame timing percentiles. CPU samples overlap physical UI and debug tooling; RSS/PSS methods differ. Final samples show GC reduction; no monotonic leak was demonstrated, but long physical soak was not run.",
+  "frame_trace_diagnostic": {
+    "method": "Existing debug Dart VM ring timeline, cleared before each physical scroll, read after. Matched Frame b/e and GPURasterizer::Draw B/E by thread/id; no VM calls inside scroll. 16.67ms is an approximate 60Hz budget, counts are separate trace scopes and cannot be added or interpreted as presented dropped frames. Unpaired scopes excluded. Includes small setup/read tail, one shared synthetic GIF, not profile/release or synchronization measurement.",
+    "samples": {
+      "android": {
+        "physical_scroll_seconds": 9.52,
+        "trace_extent_seconds": 9.35,
+        "framework_Frame": {
+          "samples": 116,
+          "over_16_67ms": 14,
+          "p95_ms": 26.28,
+          "max_ms": 71.17
+        },
+        "raster_GPURasterizer_Draw": {
+          "samples": 116,
+          "over_16_67ms": 3,
+          "p95_ms": 7.05,
+          "max_ms": 51.15
+        }
+      },
+      "context": {
+        "player_playing": false,
+        "linux_not_sampled": "Desktop foreground changed after functional QA; no further desktop inputs sent."
+      }
+    }
+  }
 }

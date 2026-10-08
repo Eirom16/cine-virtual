@@ -83,8 +83,12 @@ fallback de fuente de las capturas, sin añadir fuentes/dependencias al producto
 MEASURED: [muestras debug](results-performance.json), RSS Linux y PSS Android,
 CPU Linux en intervalos de 3 s; baseline texto, un GIF, varios, picker, scroll,
 tras cerrar. Son muestras secuenciales con un solo asset compartido, hot reload y
-GC; no benchmark controlado, causalidad ni cap del RSS completo. Profile/release,
-frame timing/jank cuantitativo y soak físico de semanas: NOT TESTED / NOT MEASURED.
+GC; no benchmark controlado, causalidad ni cap del RSS completo. MEASURED adicional:
+trace VM debug durante scroll Android9.52s, 116 scopes Frame/116 raster. Frame
+p95 26.28ms/max71.17, 14 sobre16.67ms; raster p95 7.05ms/max51.15, 3 sobre16.67ms.
+No son dropped frames presentados ni scopes sumables. El vídeo ya alcanzó EOF en
+esta muestra: no demuestra jank durante playback. Frame timing Linux, profile/release
+y soak físico de semanas: NOT TESTED / NOT MEASURED.
 
 Cache IMPLEMENTED: bytes LRU 8 MiB/32 entradas, asset ≤2 MiB; Flutter ImageCache
 24 MiB/64 entradas, decode width ≤320. No disco. Imágenes vivas, codecs, Player,
