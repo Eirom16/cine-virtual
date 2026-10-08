@@ -468,3 +468,47 @@ hasta 120 s dentro de sus límites; no equivale a historial durable.
 Solo joined/left/expired/resumed producen entradas de presencia. Disconnect
 transitorio no crea entrada; resumed se coalesce a una por miembro cada 30 s.
 Play/Pause/Seek/Ready no llenan chat. No texto social en logs por defecto.
+
+## Extensión opt-in rich_social_v1 (protocol_version 1)
+
+HELLO debe ofrecer social_v1 y rich_social_v1; ACCEPT devuelve ambas. Sin rich,
+MESSAGE_SEND/MESSAGE_REACTION_SEND → FEATURE_NOT_SUPPORTED. Clientes social_v1
+reciben CHAT_MESSAGE con texto fallback `[GIF]` y SOCIAL_STATE sin contenido rico,
+reply, UTC ni reacciones a mensajes. Sin social_v1 no reciben nada social.
+
+MESSAGE_SEND payload contiene content discriminado `{type:"text",text}` o
+`{type:"gif",gif:descriptor}` y reply_to_message_id opcional/null. No permite
+sender/nombre/ID/secuencia del mensaje: los deriva RoomService. CHAT_MESSAGE
+conserva kind chat/text fallback y añade content, reply_to_message_id,
+sent_at_utc_ms opcionales. Históricos sin UTC muestran autor sin hora inventada.
+
+Descriptor: provider, provider_content_id (ASCII alfanumérico/guion/underscore
+1–64 bytes), media_url (≤1024 bytes), preview_url opcional (mismo límite),
+width/height enteros 1–640 y alt_text ≤256 bytes sin controles. Objetos estrictos,
+sin claves adicionales; esquema HTTPS, sin usuario/puerto/fragmento. Fixture solo
+`celebrate` y URL exacta `https://fixtures.cine.invalid/celebrate.gif`: identificador
+sintético que Flutter resuelve al asset incluido, nunca HTTP hacia .invalid.
+
+Validación GIPHY sintáctica restringida a media.giphy.com/media0..4.giphy.com,
+path /media/{content_id}/ con extensión GIF/WebP y queries cid/ep/rid/ct acotadas.
+RoomService devuelve FEATURE_NOT_SUPPORTED para GIPHY incluso con descriptor
+sintácticamente válido mientras no exista aprobación de integración. No arbitrary
+remote renderer, redirects, server fetch ni proxy multimedia.
+
+Reply solo referencia UUID de Text/GIF retenido en la misma sala. ID desconocido,
+erróneo, de otra sala o ya evicted al enviar → INVALID_EVENT. Una referencia ya
+aceptada sigue válida al evictar original; UI muestra mensaje no disponible.
+
+MESSAGE_REACTION_SEND payload `{message_id,emoji}` hace toggle por miembro/emoji;
+allowlist ❤️ 😂 😮 😢 🔥 👏. Máximo 16 identidades/emoji, 6 emojis/entry; cuota
+independiente burst 6 y refill 1/s por membership, conservada durante resume.
+ID desconocido/sistema → INVALID_EVENT. UUID del actor viene del binding, no payload.
+
+Toggle aceptado aumenta social_sequence y entrega SOCIAL_STATE completo con
+live_update:true. Entries conservan su secuencia original; watermark puede ser
+mayor que la última entry. message_reactions es mapa emoji → lista de member UUIDs,
+sin nombres ni contenido duplicado. Cliente conserva floating queue en live_update;
+snapshot de reconnect la vacía. Resume recupera replies/reacciones con el mismo
+historial 100/48 KiB de presupuesto conservador JSON; metadata/reacciones también
+consumen presupuesto. Dedup existente evita segundo toggle/rebroadcast al retry.
+UTC es epoch ms del servidor capturado al crear mensaje, solo presentación.

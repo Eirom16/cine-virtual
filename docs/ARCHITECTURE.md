@@ -280,3 +280,18 @@ conservados; no polling 20 ms ni WebSocket Dart. ReactionOverlay/message list/
 unread observan un ValueNotifier independiente; escribir es estado local del
 editor. Retención/quotas en [PROTOCOL](PROTOCOL.md). Rust es fuente de verdad;
 Flutter solo draft, visibilidad, unread, scroll y animación. Chat no es durable.
+
+## Rich Social Phase 2
+
+[ADR-013](DECISIONS.md) extiende SocialState existente con MessageContent
+Text/Gif/System, reply por UUID y reacciones acotadas dentro de cada entry.
+No otro historial ni socket. RoomService valida/broadcast; no consulta proveedores.
+GIPHY permanece bloqueado por política y por falta de configuración legítima.
+Flutter GifProvider y GifSearch aíslan HTTP/debounce/paginación de WebSocket.
+Hoy solo FixtureGifProvider explícito produce assets sintéticos locales; default
+UnavailableGifProvider informa bloqueo sin afectar texto o Player.
+
+Bridge añade intents message y message_reaction en ambos owners; sin lógica social
+Kotlin. Proyección rich_supported, content, reply y reactions llega por el mismo
+SocialView/notifier aislado. UTC vive en la entry, nunca en la timeline de control.
+Privacidad y recursos se delimitan en ADR y [resultados](../experiments/12-rich-social/RESULTS.md).

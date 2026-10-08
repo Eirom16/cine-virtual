@@ -1,0 +1,428 @@
+{
+  "initial_rich_flow": {
+    "linux": {
+      "generation": 1,
+      "connected": true,
+      "member_id": "20981642-ad8a-4eac-b032-67673353e1cb",
+      "room_id": "e2481204-c06b-4847-9f9d-28d7dee21dfa",
+      "sequence": 13,
+      "media_revision": 1,
+      "timeline": {
+        "position_ms": 123933,
+        "status": "playing",
+        "anchor_time_ms": 534478,
+        "duration_ms": 620000
+      },
+      "position_ms": 200333,
+      "target_ms": 200374,
+      "playing": true,
+      "ready": true,
+      "room_ready": true,
+      "snapshot_required": false,
+      "trusted": true,
+      "seeking": false,
+      "corrections": {
+        "rate": 1,
+        "restore": 1,
+        "seek": 0
+      },
+      "identity_match": true,
+      "hash_state": "complete",
+      "last_action": "message",
+      "error": null,
+      "ui_error": "",
+      "recovering": false,
+      "sample": {
+        "position_ms": 0,
+        "playing": false,
+        "loaded": false,
+        "seeking": false,
+        "buffering": false
+      },
+      "chat_ids": [
+        "84aa1ed2-0707-4da1-9b7f-4dac4dfaff4a",
+        "a314b244-fcba-40d3-b3c0-189950a8671d",
+        "3c8b87ff-e5d2-4510-b517-4e06878cb141",
+        "a56719ec-e935-438b-b7d8-4b3d8d89988e"
+      ],
+      "social": {
+        "supported": true,
+        "rich_supported": true,
+        "social_sequence": 5,
+        "buffer_count": 4,
+        "buffer_bytes": 4189
+      },
+      "video": {
+        "_source": {
+          "context": true,
+          "ready": true,
+          "error": 0,
+          "frames": 3031,
+          "width": 1066,
+          "height": 680,
+          "backend": "GdkWaylandDisplay",
+          "generation": 5,
+          "completed_generation": 5
+        }
+      },
+      "rich_counts": {
+        "gif": 1,
+        "reply": 1,
+        "reactions": 1
+      }
+    },
+    "android": {
+      "generation": 3,
+      "connected": true,
+      "member_id": "4dec6c57-6d23-443a-ad11-a6bb06ad4c66",
+      "room_id": "e2481204-c06b-4847-9f9d-28d7dee21dfa",
+      "sequence": 13,
+      "media_revision": 1,
+      "timeline": {
+        "position_ms": 123933,
+        "status": "playing",
+        "anchor_time_ms": 534478,
+        "duration_ms": 620000
+      },
+      "position_ms": 202767,
+      "target_ms": 202730,
+      "playing": true,
+      "ready": true,
+      "room_ready": true,
+      "snapshot_required": false,
+      "trusted": true,
+      "seeking": false,
+      "corrections": {
+        "rate": 3,
+        "restore": 2,
+        "seek": 4
+      },
+      "identity_match": true,
+      "hash_state": "complete",
+      "last_action": "message_reaction",
+      "error": null,
+      "ui_error": "",
+      "recovering": false,
+      "sample": {
+        "position_ms": 202767,
+        "playing": true,
+        "loaded": true,
+        "seeking": false,
+        "buffering": false
+      },
+      "chat_ids": [
+        "84aa1ed2-0707-4da1-9b7f-4dac4dfaff4a",
+        "a314b244-fcba-40d3-b3c0-189950a8671d",
+        "3c8b87ff-e5d2-4510-b517-4e06878cb141",
+        "a56719ec-e935-438b-b7d8-4b3d8d89988e"
+      ],
+      "social": {
+        "supported": true,
+        "rich_supported": true,
+        "social_sequence": 5,
+        "buffer_count": 4,
+        "buffer_bytes": 4189
+      },
+      "video": {},
+      "rich_counts": {
+        "gif": 1,
+        "reply": 1,
+        "reactions": 1
+      }
+    }
+  },
+  "background_foreground_playing": {
+    "before": {
+      "generation": 7,
+      "connected": true,
+      "member_id": "4dec6c57-6d23-443a-ad11-a6bb06ad4c66",
+      "room_id": "e2481204-c06b-4847-9f9d-28d7dee21dfa",
+      "sequence": 24,
+      "media_revision": 1,
+      "timeline": {
+        "position_ms": 441174,
+        "status": "playing",
+        "anchor_time_ms": 958775,
+        "duration_ms": 620000
+      },
+      "position_ms": 502302,
+      "target_ms": 502329,
+      "playing": true,
+      "ready": true,
+      "room_ready": true,
+      "snapshot_required": false,
+      "trusted": true,
+      "seeking": false,
+      "corrections": {
+        "rate": 6,
+        "restore": 4,
+        "seek": 7
+      },
+      "identity_match": true,
+      "hash_state": "complete",
+      "last_action": "ready",
+      "error": null,
+      "ui_error": "",
+      "recovering": false,
+      "sample": {
+        "position_ms": 502302,
+        "playing": true,
+        "loaded": true,
+        "seeking": false,
+        "buffering": false
+      },
+      "chat_ids": [
+        "84aa1ed2-0707-4da1-9b7f-4dac4dfaff4a",
+        "a314b244-fcba-40d3-b3c0-189950a8671d",
+        "3c8b87ff-e5d2-4510-b517-4e06878cb141",
+        "a56719ec-e935-438b-b7d8-4b3d8d89988e",
+        "772de3ad-32db-416e-9ab3-c9a83c2fd705",
+        "f8ddd2fb-8478-4f06-8db7-7be6ecd86294",
+        "389d100c-4789-4c1f-b503-4f40ac81b53e",
+        "98c48776-a673-49de-a089-ce140bdcb8c1",
+        "764794c1-15a6-48e3-90d7-6b1c6a459359"
+      ],
+      "social": {
+        "supported": true,
+        "rich_supported": true,
+        "social_sequence": 10,
+        "buffer_count": 9,
+        "buffer_bytes": 12513
+      },
+      "video": {},
+      "rich_counts": {
+        "gif": 5,
+        "reply": 1,
+        "reactions": 1
+      }
+    },
+    "after": {
+      "generation": 9,
+      "connected": true,
+      "member_id": "4dec6c57-6d23-443a-ad11-a6bb06ad4c66",
+      "room_id": "e2481204-c06b-4847-9f9d-28d7dee21dfa",
+      "sequence": 27,
+      "media_revision": 1,
+      "timeline": {
+        "position_ms": 441174,
+        "status": "playing",
+        "anchor_time_ms": 958775,
+        "duration_ms": 620000
+      },
+      "position_ms": 525991,
+      "target_ms": 525831,
+      "playing": true,
+      "ready": true,
+      "room_ready": true,
+      "snapshot_required": false,
+      "trusted": true,
+      "seeking": false,
+      "corrections": {
+        "rate": 7,
+        "restore": 4,
+        "seek": 8
+      },
+      "identity_match": true,
+      "hash_state": "complete",
+      "last_action": "ready",
+      "error": null,
+      "ui_error": "",
+      "recovering": false,
+      "sample": {
+        "position_ms": 525991,
+        "playing": true,
+        "loaded": true,
+        "seeking": false,
+        "buffering": false
+      },
+      "chat_ids": [
+        "84aa1ed2-0707-4da1-9b7f-4dac4dfaff4a",
+        "a314b244-fcba-40d3-b3c0-189950a8671d",
+        "3c8b87ff-e5d2-4510-b517-4e06878cb141",
+        "a56719ec-e935-438b-b7d8-4b3d8d89988e",
+        "772de3ad-32db-416e-9ab3-c9a83c2fd705",
+        "f8ddd2fb-8478-4f06-8db7-7be6ecd86294",
+        "389d100c-4789-4c1f-b503-4f40ac81b53e",
+        "98c48776-a673-49de-a089-ce140bdcb8c1",
+        "764794c1-15a6-48e3-90d7-6b1c6a459359",
+        "14418b44-a8f7-47a4-b2ce-9b36a1bb50b2",
+        "d66fc9d7-7535-4c4f-9a0a-3722ce91fd95"
+      ],
+      "social": {
+        "supported": true,
+        "rich_supported": true,
+        "social_sequence": 12,
+        "buffer_count": 11,
+        "buffer_bytes": 15323
+      },
+      "video": {},
+      "rich_counts": {
+        "gif": 6,
+        "reply": 1,
+        "reactions": 1
+      }
+    },
+    "same_member": true,
+    "added_entries": 2,
+    "unique_ids": true
+  },
+  "explicit_disconnect_resume": {
+    "before": {
+      "generation": 9,
+      "connected": true,
+      "member_id": "4dec6c57-6d23-443a-ad11-a6bb06ad4c66",
+      "room_id": "e2481204-c06b-4847-9f9d-28d7dee21dfa",
+      "sequence": 28,
+      "media_revision": 1,
+      "timeline": {
+        "position_ms": 58531,
+        "status": "playing",
+        "anchor_time_ms": 1071759,
+        "duration_ms": 620000
+      },
+      "position_ms": 138594,
+      "target_ms": 138558,
+      "playing": true,
+      "ready": true,
+      "room_ready": true,
+      "snapshot_required": false,
+      "trusted": true,
+      "seeking": false,
+      "corrections": {
+        "rate": 8,
+        "restore": 5,
+        "seek": 8
+      },
+      "identity_match": true,
+      "hash_state": "complete",
+      "last_action": "ready",
+      "error": null,
+      "ui_error": "",
+      "recovering": false,
+      "sample": {
+        "position_ms": 138594,
+        "playing": true,
+        "loaded": true,
+        "seeking": false,
+        "buffering": false
+      },
+      "chat_ids": [
+        "84aa1ed2-0707-4da1-9b7f-4dac4dfaff4a",
+        "a314b244-fcba-40d3-b3c0-189950a8671d",
+        "3c8b87ff-e5d2-4510-b517-4e06878cb141",
+        "a56719ec-e935-438b-b7d8-4b3d8d89988e",
+        "772de3ad-32db-416e-9ab3-c9a83c2fd705",
+        "f8ddd2fb-8478-4f06-8db7-7be6ecd86294",
+        "389d100c-4789-4c1f-b503-4f40ac81b53e",
+        "98c48776-a673-49de-a089-ce140bdcb8c1",
+        "764794c1-15a6-48e3-90d7-6b1c6a459359",
+        "14418b44-a8f7-47a4-b2ce-9b36a1bb50b2",
+        "d66fc9d7-7535-4c4f-9a0a-3722ce91fd95"
+      ],
+      "social": {
+        "supported": true,
+        "rich_supported": true,
+        "social_sequence": 12,
+        "buffer_count": 11,
+        "buffer_bytes": 15323
+      },
+      "video": {},
+      "rich_counts": {
+        "gif": 6,
+        "reply": 1,
+        "reactions": 1
+      }
+    },
+    "after": {
+      "generation": 9,
+      "connected": true,
+      "member_id": "4dec6c57-6d23-443a-ad11-a6bb06ad4c66",
+      "room_id": "e2481204-c06b-4847-9f9d-28d7dee21dfa",
+      "sequence": 31,
+      "media_revision": 1,
+      "timeline": {
+        "position_ms": 58531,
+        "status": "playing",
+        "anchor_time_ms": 1071759,
+        "duration_ms": 620000
+      },
+      "position_ms": 168336,
+      "target_ms": 168390,
+      "playing": true,
+      "ready": true,
+      "room_ready": true,
+      "snapshot_required": false,
+      "trusted": true,
+      "seeking": false,
+      "corrections": {
+        "rate": 10,
+        "restore": 5,
+        "seek": 9
+      },
+      "identity_match": true,
+      "hash_state": "complete",
+      "last_action": "reconnect",
+      "error": null,
+      "ui_error": "",
+      "recovering": false,
+      "sample": {
+        "position_ms": 168376,
+        "playing": true,
+        "loaded": true,
+        "seeking": false,
+        "buffering": false
+      },
+      "chat_ids": [
+        "84aa1ed2-0707-4da1-9b7f-4dac4dfaff4a",
+        "a314b244-fcba-40d3-b3c0-189950a8671d",
+        "3c8b87ff-e5d2-4510-b517-4e06878cb141",
+        "a56719ec-e935-438b-b7d8-4b3d8d89988e",
+        "772de3ad-32db-416e-9ab3-c9a83c2fd705",
+        "f8ddd2fb-8478-4f06-8db7-7be6ecd86294",
+        "389d100c-4789-4c1f-b503-4f40ac81b53e",
+        "98c48776-a673-49de-a089-ce140bdcb8c1",
+        "764794c1-15a6-48e3-90d7-6b1c6a459359",
+        "14418b44-a8f7-47a4-b2ce-9b36a1bb50b2",
+        "d66fc9d7-7535-4c4f-9a0a-3722ce91fd95",
+        "72bb13e8-4691-48f1-b37b-5b0b503b6065",
+        "6317797f-294b-417b-87b2-5e54215e8b7a",
+        "5c9b2a06-9b0d-4dab-9ad9-f05b16a6bedb"
+      ],
+      "social": {
+        "supported": true,
+        "rich_supported": true,
+        "social_sequence": 15,
+        "buffer_count": 14,
+        "buffer_bytes": 18508
+      },
+      "video": {},
+      "rich_counts": {
+        "gif": 7,
+        "reply": 1,
+        "reactions": 1
+      }
+    },
+    "same_member": true,
+    "added_entries": 3,
+    "same_ids": true,
+    "unique_ids": true
+  },
+  "native_social_identity": {
+    "android_surface_before": [
+      "@923e1fd",
+      "@923e1fd",
+      "@379515f",
+      "@379515f"
+    ],
+    "android_surface_after": [
+      "@923e1fd",
+      "@923e1fd",
+      "@379515f",
+      "@379515f"
+    ],
+    "same_surface_view": true,
+    "linux_texture_id_before": 94574173318192,
+    "linux_texture_id_after": 94574173318192,
+    "same_linux_texture": true
+  }
+}

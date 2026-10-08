@@ -249,3 +249,21 @@ modificadores se entrega al editor y Esc puede cerrar el panel.
 
 Opt-in adicional: `cargo test -p cine-server --test social_real_player --locked -- --ignored`
 usa dos libmpv reales con el corpus sintético. No sustituye la QA visual física.
+
+## Rich Social Phase 2
+
+[Experimento 12](../experiments/12-rich-social/README.md) distingue transporte/render
+fixture de búsqueda real (REAL PROVIDER SEARCH NOT TESTED). Tests CI no usan APIs
+externas ni credenciales. Rust cubre descriptor/URL/metadata, scope/identidad, reply,
+toggle/aggregation/cuotas/dedup, snapshots y budget mixto con reacción máxima.
+WebSocket real dos Client/FakePlayer cubre GIF → reply → reacción → replay sin
+duplicados ni cambios a playback; legacy social_v1 recibe fallback compatible.
+Opt-in social_real_player ahora repite Rich Chat con dos decoders libmpv reales.
+
+Flutter gif_provider_test cubre mapping search/trending/ID/pagination, empty,
+missing asset/malformed JSON, HTTP fixture 429/offline/oversize, timeout, debounce,
+stale/dispose y cache LRU/clear. rich_social_test cubre picker/selección explícita,
+blocked/text fallback, reply/cancel/eviction, copy, reacción/toggle, hora/GIF,
+fallo/layout fijo, reduced motion, cinco viewports/teclado y SurfaceView estable.
+Capturas widget se pueden generar con CINE_SOCIAL_CAPTURE y CINE_SOCIAL_FONT_DIR;
+no representan runtime multimedia. Pruebas físicas y medidas están separadas.

@@ -188,3 +188,30 @@ usan connected/Ready/Host existentes; no away/busy/online inventados.
 Developer muestra count/budget/sequence/dropped reactions/pending/rate limit/error,
 sin conversación, tokens, paths, URI o hashes. Cadencia UI sigue 2 Hz; latencia
 visual puede incluir hasta 500 ms de polling. No se declara entrega instantánea.
+
+## Rich Chat Phase 2
+
+GIF junto al composer abre diálogo desktop compacto o bottom sheet móvil con
+safe area/teclado. Search usa debounce 350 ms, generaciones descartan respuestas
+viejas incluso durante debounce; paginación 20/resultados y retención UI ≤100.
+Loading/empty/retry/unavailable/offline/timeout/429 son estados de presentación.
+Seleccionar explícitamente envía intent; la burbuja llega con eco autoritativo.
+
+Default remoto bloqueado; `--dart-define=CINE_GIF_FIXTURES=true` habilita el picker
+sintético para QA, sin credencial. El descriptor fixture siempre se renderiza desde
+asset propio cuando llega de otro cliente. GIF reserva dimensiones antes de load,
+contain/radio coherente, máximo 240×180 px, placeholder estable en error.
+Reduced motion/accessibility usa primer frame sin codec animado activo.
+Offscreen retira Image stream; listas son perezosas. Cache solo temporal, sin disco:
+8 MiB/32 entradas de bytes, 24 MiB/64 ImageCache; imágenes vivas añaden memoria.
+
+Menú visible, right click y long press ofrecen Responder/Reaccionar/Copiar.
+Composer conserva reply cancelable; quote compacto resuelve ID local, sin threads.
+Copy texto plano; GIF copia alt/descripción, nunca metadata o URLs privadas.
+Reacciones muestran emoji/count y estado propio, toggle por miembro/emoji.
+Hora usa UTC opcional autoritativo convertido a timezone/locale del cliente;
+monotonic ms nunca se muestran. GIF cuenta en unread igual que texto.
+
+Diagnósticos agregan estado proveedor, error seguro/latencia, bytes/entradas de
+cache, rich capability y conteos GIF/reply/reacciones, sin query/key/URL/contenido.
+El Player mantiene la misma plataforma/textura al abrir picker/menú/reply.

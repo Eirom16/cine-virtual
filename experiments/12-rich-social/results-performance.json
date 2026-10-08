@@ -1,0 +1,63 @@
+{
+  "mode": "debug; Linux Wayland libmpv / Samsung SM-J701M API28 Media3; synthetic video+one unique 160x100 GIF; no VM queries during samples",
+  "samples": [
+    {
+      "stage": "text_chat_before_first_gif",
+      "linux_rss_kib": 435036,
+      "android_total_pss_kib": 226191,
+      "linux_cpu_percent_one_core": null,
+      "sample_seconds": null,
+      "note": "Single process snapshot taken before GIF selection; CPU lifetime percentage omitted."
+    },
+    {
+      "stage": "one_gif_visible",
+      "linux_rss_kib": 448340,
+      "linux_cpu_percent_one_core": 39.7,
+      "sample_seconds": 3.0,
+      "android_total_pss_kib": 224651
+    },
+    {
+      "stage": "linux_picker_open",
+      "linux_rss_kib": 476340,
+      "linux_cpu_percent_one_core": 40.0,
+      "sample_seconds": 3.0,
+      "android_total_pss_kib": 224649
+    },
+    {
+      "stage": "several_gifs_visible",
+      "linux_rss_kib": 480592,
+      "linux_cpu_percent_one_core": 26.0,
+      "sample_seconds": 3.0,
+      "android_total_pss_kib": 225500
+    },
+    {
+      "stage": "several_visible_after_background",
+      "linux_rss_kib": 317040,
+      "linux_cpu_percent_one_core": 37.7,
+      "sample_seconds": 3.0,
+      "android_total_pss_kib": 222227
+    },
+    {
+      "stage": "android_picker_open",
+      "linux_rss_kib": 309248,
+      "linux_cpu_percent_one_core": 42.7,
+      "sample_seconds": 3.0,
+      "android_total_pss_kib": 270221
+    },
+    {
+      "stage": "scroll_gif_history",
+      "linux_rss_kib": 310692,
+      "linux_cpu_percent_one_core": 54.6,
+      "sample_seconds": 3.0,
+      "android_total_pss_kib": 229083
+    },
+    {
+      "stage": "after_closing_chat_picker",
+      "linux_rss_kib": 255476,
+      "linux_cpu_percent_one_core": 31.0,
+      "sample_seconds": 3.0,
+      "android_total_pss_kib": 237551
+    }
+  ],
+  "limitations": "Sequential short snapshots, not a benchmark or proof of a total RSS cap; same GIF may share decoder/cache; no release/profile or frame timing percentiles. CPU samples overlap physical UI and debug tooling; RSS/PSS methods differ. Final samples show GC reduction; no monotonic leak was demonstrated, but long physical soak was not run."
+}

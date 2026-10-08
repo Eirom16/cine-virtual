@@ -383,3 +383,58 @@ de presupuesto conservador de JSON escapado. No persistencia ni envío optimista
 Resume recupera historial disponible, no conversación ilimitada. Pérdida breve
 solo cambia participants; resumed visible como máximo una vez por miembro/30 s.
 Reinicio pierde todo. GIF/voz/vídeo/cuentas siguen NOT IMPLEMENTED.
+
+## ADR-013 — Rich social y proveedores GIF bloqueados por política (Provisional)
+
+**Context:** GIF añade red, privacidad y cache; no es una reacción efímera.
+La investigación oficial actual descubre Tenor retirado y restricciones de cache
+GIPHY/KLIPY. social_v1 anterior solo interpreta texto/presencia. El usuario
+autorizó continuar con fixtures y mantener GIPHY bloqueado por defecto.
+
+**Alternatives:** acceso directo por cliente, solo buscador consultando API y todos
+cargando media, proxy servidor, cache persistente, catálogo propio, posponer toda
+la fase. Proxy no elimina límites contractuales y añade SSRF/tráfico; se descarta.
+No se crea un catálogo de contenido ajeno ni se introduce storage/DB.
+
+**Decision:** GifProvider pequeño en Flutter (search/trending/resolve). Adapter
+GIPHY real con transporte inyectable, desactivado en producto. Provider fixture
+sintético explícito para QA. MESSAGE_SEND usa contenido discriminado text/gif,
+reply ID opcional; CHAT_MESSAGE mantiene fallback. rich_social_v1 adicional a
+social_v1 habilita metadata rica. v1 antiguo recibe texto y snapshots compatibles.
+Message reaction toggle devuelve SOCIAL_STATE con live_update y watermark nuevo;
+entry mantiene secuencia original. Seis emojis, una reacción por miembro/emoji,
+16 identidades por emoji y cuota independiente 6 + 1/s. Eviction elimina reacciones.
+
+**Credential handling:** sin claves en código, Dart defines, APK, servidor o logs.
+Adapter recibe una key runtime en memoria solo si una integración fue aprobada;
+ese camino no está expuesto por la UI. Una clave secreta no puede distribuirse
+como configuración pública. No se asume que una key GIPHY sea pública. Resolver
+ese contrato es gate de activación, no motivo para crear cuentas o un proxy.
+
+**Privacy:** hoy fixtures no contactan servicios externos. En un provider futuro
+aprobado, quien busca contactaría API; receptores cargarían media directamente.
+Eso revela IP/media al proveedor; API queries solo desde buscador. RoomService
+recibe descriptor acotado, nunca query/key/blob y nunca hace HTTP. No SSRF server
+porque no existe fetch/proxy. Self-hosting de salas no oculta IP al CDN remoto.
+
+**Caching:** LRU temporal 8 MiB/32 entradas de bytes aprobados, asset ≤2 MiB;
+ImageCache Flutter 24 MiB/64 entradas. Sin disco, tokens o queries. Solo fixture
+se carga hoy; GIPHY recibido se rechaza/no descarga. Clear disponible; dispose
+limpia bytes y cache decodificada. Imágenes vivas/codec/frame buffers añaden
+memoria fuera de currentSizeBytes: no se afirma un límite global de RSS de 32 MiB.
+Listas perezosas y retirada del stream fuera del viewport reducen trabajo.
+Reduced motion decodifica primer frame y destruye codec, no simula pausa.
+
+**Protocol neutrality:** provider+content_id identifica GIF; URL HTTPS es hint
+validado contra allowlist/ID. No eventos de marca. Dominio MessageContent enum,
+DTO opcional content conserva compatibilidad wire con texto fallback. No metadata
+completa de proveedor. Reply nuevo solo a mensaje retenido de esa sala; referencias
+aceptadas sobreviven eviction con placeholder. UTC opcional solo presentación;
+ordering usa social_sequence y playback sigue con reloj monotónico.
+
+**Consequences:** Rich Chat se valida con corpus controlado sin incumplir términos.
+Provider real/search/render externo continúan BLOCKED/NOT TESTED. Cache de disco
+NOT IMPLEMENTED deliberadamente. Antes de activar proveedor revisar contrato,
+marcas/attribution y expiración/revalidación. Sin cambios a Player/SyncEngine,
+Kotlin, membership, historial durable o protocolo breaking. Auditoría, fuentes y
+pruebas en [experimento 12](../experiments/12-rich-social/README.md).
