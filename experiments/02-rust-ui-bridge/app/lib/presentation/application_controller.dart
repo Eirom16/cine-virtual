@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:flutter/scheduler.dart';
 
 import 'dart:async';
 import 'dart:convert';
@@ -196,6 +197,7 @@ class ApplicationController extends ChangeNotifier with WidgetsBindingObserver {
   String chatDraft = '', socialError = '', _socialKey = '', _socialEpoch = '';
   bool socialPending = false;
   int _socialVisible = 0, _lastSocialSequence = 0, _unread = 0;
+  bool _socialPublishScheduled = false;
   final playback = ValueNotifier(const PlaybackView());
   final hashProgress = ValueNotifier<double?>(null);
   final diagnostics = ValueNotifier<Map<String, dynamic>>({});
@@ -369,6 +371,18 @@ class ApplicationController extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   void _publishSocial() {
+    // Coalesce notifications if an intent arrives while Flutter builds/layouts.
+    if (SchedulerBinding.instance.schedulerPhase ==
+        SchedulerPhase.persistentCallbacks) {
+      if (!_socialPublishScheduled) {
+        _socialPublishScheduled = true;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _socialPublishScheduled = false;
+          if (active) _publishSocial();
+        });
+      }
+      return;
+    }
     final data = session ? object(view.network['social']) : <String, dynamic>{};
     final epoch = '${view.room['room_epoch'] ?? ''}';
     if (epoch != _socialEpoch) {

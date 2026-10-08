@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:ui' as ui;
@@ -272,6 +273,34 @@ void main() {
       await t.sendKeyEvent(LogicalKeyboardKey.escape);
       await t.pumpAndSettle();
       expect(find.byKey(const Key('chat-input')), findsNothing);
+      await t.pumpWidget(const SizedBox());
+    },
+  );
+  testWidgets(
+    'social notifications arriving during layout wait for the frame',
+    (t) async {
+      final c = await setup(t);
+      var sent = false;
+      await socialScreen(
+        t,
+        Column(
+          children: [
+            Expanded(child: SocialPanel(controller: c)),
+            LayoutBuilder(
+              builder: (_, _) {
+                if (!sent) {
+                  sent = true;
+                  unawaited(c.sendReaction('😂'));
+                }
+                return const SizedBox();
+              },
+            ),
+          ],
+        ),
+      );
+      await t.pumpAndSettle();
+      expect(t.takeException(), isNull);
+      expect((c.gateway as SocialGateway).payloads.last['emoji'], '😂');
       await t.pumpWidget(const SizedBox());
     },
   );

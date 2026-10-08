@@ -423,7 +423,7 @@ class _ChatConversationState extends State<ChatConversation> {
               ),
               IconButton(
                 key: const Key('chat-send'),
-                tooltip: 'Enviar mensaje',
+                tooltip: 'Enviar mensaje a la sala',
                 onPressed: social.canSend && input.text.trim().isNotEmpty
                     ? send
                     : null,
