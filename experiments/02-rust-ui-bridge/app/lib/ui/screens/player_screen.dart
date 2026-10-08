@@ -159,6 +159,17 @@ class _PlayerScreenState extends State<PlayerScreen> {
       },
     ),
   );
+  // Fade presentation only; hidden controls stop receiving input immediately.
+  Widget overlay(Widget child) => IgnorePointer(
+    ignoring: !visible,
+    child: ExcludeSemantics(
+      excluding: !visible,
+      child: AnimatedSwitcher(
+        duration: CineTokens.motion,
+        child: visible ? child : const SizedBox.shrink(),
+      ),
+    ),
+  );
   Widget video() {
     final controller = widget.controller;
     return ColoredBox(
@@ -264,20 +275,18 @@ class _PlayerScreenState extends State<PlayerScreen> {
                         fit: StackFit.expand,
                         children: [
                           surface,
-                          if (visible)
-                            Positioned(
-                              top: 0,
-                              left: 0,
-                              right: 0,
-                              child: header(desktop),
-                            ),
-                          if (visible)
-                            Positioned(
-                              bottom: 0,
-                              left: 0,
-                              right: 0,
-                              child: controls(),
-                            ),
+                          Positioned(
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            child: overlay(header(desktop)),
+                          ),
+                          Positioned(
+                            bottom: 0,
+                            left: 0,
+                            right: 0,
+                            child: overlay(controls()),
+                          ),
                         ],
                       )
                     : Column(

@@ -181,6 +181,9 @@ Scrub mantiene preview local y solo envía un seek al commit. Mouse/tap restaura
 controles; no se ocultan durante scrub, modal, panel o error. Desktop tiene
 participantes lateral, mobile bottom sheet. Sync usa texto semántico sin drift
 permanente. Shortcuts Host Space/Left/Right y F/Esc; Participant sin autoridad.
+Linux usa fade de 180 ms con input/semántica deshabilitados inmediatamente al
+ocultar. Último smoke físico con biblioteca PlayerScreen final hot reloaded:
+mouse show/tap hide, F/Esc, vídeo y posición 286533 ms conservados, render error 0.
 Text scaling/regresiones responsive **TESTED**; auditoría WCAG completa **NOT TESTED**.
 No capturas de buffering sostenido: **NOT VISUALLY VERIFIED** en esta sesión.
 

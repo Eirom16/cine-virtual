@@ -10,7 +10,8 @@ en modo ventana. Wayland probado en KWin 6.7.5; un monitor físico 1366×768.
 | [Linux Host fullscreen](linux-host-fullscreen.png) | 1366×768 | Sin decoración, controles/timeline Flutter sobre vídeo; misma timeline. |
 | [Linux normal 1920](linux-normal-1920.png) | 1920×1080 | Participant y controles visibles. Ventana Wayland sobredimensionada real, monitor físico 1366×768; no imagen escalada ni segundo monitor. |
 | [Linux fullscreen](linux-fullscreen-1366.png) | 1366×768 | Participant, controles visibles, sin chrome nativo. |
-| [Linux normal 1366](linux-normal-1366.png) | 1366×768 | Player con controles ocultos; el nombre indica tamaño, no visibilidad de controles. |
+| [Linux normal 1366](linux-normal-1366.png) | 1366×768 | Player Participant final con controles visibles tras integración de fade; posición 4:46. |
+| [Linux final controles ocultos](linux-final-controls-hidden.png) | 1366×768 | Mismo frame y proporción, controles ocultos tras tap; biblioteca Dart final. |
 | [Linux controles ocultos](linux-controls-hidden.png) | 1366×700 | Vídeo integrado en modo ventana, sin controles encima. |
 | [Linux participantes](linux-participants.png) | 1366×700 | Panel lateral Flutter y vídeo real; puede reducir región de vídeo. |
 | [Linux primer embedding](linux-first-embedded.png) | 1366×700 | Primer frame integrado durante la implementación; evidencia intermedia. |

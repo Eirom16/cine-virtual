@@ -816,5 +816,64 @@
     "exit_code": 0,
     "method": "GTK titlebar close while mpv render context attached",
     "note": "One optional libcuda loader diagnostic; hwdec remains no. No crash or hang observed."
+  },
+  "final_controls_fade_smoke": {
+    "result": "PASS",
+    "method": "Final PlayerScreen Dart library hot reloaded (1 library); real mouse show/tap hide, F fullscreen/Esc exit, same paused 286533ms SDK frame. Linux debug build/analyze/30 tests pass.",
+    "duration_ms": 180,
+    "hidden_input": "IgnorePointer and ExcludeSemantics; no hidden authority shortcuts added",
+    "after": {
+      "generation": 1,
+      "connected": true,
+      "member_id": "8afee8a2-bdd2-4edf-9ba7-aa9b641988c0",
+      "room_id": "dc1691bd-51de-4156-a764-1d5176289d0e",
+      "sequence": 28,
+      "media_revision": 1,
+      "timeline": {
+        "position_ms": 286519,
+        "status": "paused",
+        "anchor_time_ms": 2898713,
+        "duration_ms": 620000
+      },
+      "position_ms": 286533,
+      "target_ms": 286519,
+      "playing": false,
+      "ready": true,
+      "room_ready": true,
+      "snapshot_required": false,
+      "trusted": true,
+      "seeking": false,
+      "corrections": {
+        "rate": 0,
+        "restore": 0,
+        "seek": 1
+      },
+      "identity_match": true,
+      "hash_state": "complete",
+      "last_action": "ready",
+      "error": null,
+      "ui_error": "",
+      "recovering": false,
+      "sample": {
+        "position_ms": 0,
+        "playing": false,
+        "loaded": false,
+        "seeking": false,
+        "buffering": false
+      }
+    },
+    "video": {
+      "_source": {
+        "context": true,
+        "ready": true,
+        "error": 0,
+        "frames": 3238,
+        "width": 1366,
+        "height": 720,
+        "backend": "GdkWaylandDisplay",
+        "generation": 5,
+        "completed_generation": 5
+      }
+    }
   }
 }
