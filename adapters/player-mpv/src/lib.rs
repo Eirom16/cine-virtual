@@ -71,6 +71,8 @@ impl From<AdapterError> for PlayerError {
 #[derive(Debug, Clone, Default)]
 pub struct Config {
     pub visible: bool,
+    /// External Render API; never creates a native video window.
+    pub embedded: bool,
     pub audio: bool,
     pub hardware_decode: bool,
     /// SDK device name, e.g. pulse/cine_spike_b. Never persisted in results.
@@ -153,7 +155,16 @@ impl MpvPlayer {
             ("hwdec", if config.hardware_decode { "auto" } else { "no" }),
             ("vd-lavc-threads", "2"),
             ("ad-lavc-threads", "1"),
-            ("vo", if config.visible { "gpu" } else { "null" }),
+            (
+                "vo",
+                if config.embedded {
+                    "libmpv"
+                } else if config.visible {
+                    "gpu"
+                } else {
+                    "null"
+                },
+            ),
             ("title", "Cine Virtual - Spike B"),
         ];
         for (name, value) in options {
@@ -179,6 +190,11 @@ impl MpvPlayer {
             player.check(rc, ErrorCode::BackendFailure)?;
         }
         Ok(player)
+    }
+    /// Borrowed only by a native presenter holding a RealPlayer lifetime lease.
+    /// It may call mpv_render_* on a separate context, never playback APIs.
+    pub fn presentation_handle(&self) -> usize {
+        self.handle.map_or(0, |h| h.as_ptr() as usize)
     }
     fn handle(&self) -> Result<*mut c_void, AdapterError> {
         self.handle

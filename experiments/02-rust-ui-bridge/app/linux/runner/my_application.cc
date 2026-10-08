@@ -1,4 +1,5 @@
 #include "my_application.h"
+#include "video_presenter.h"
 
 #include <flutter_linux/flutter_linux.h>
 #ifdef GDK_WINDOWING_X11
@@ -104,6 +105,7 @@ static void my_application_activate(GApplication* application) {
   gtk_widget_realize(GTK_WIDGET(view));
 
   fl_register_plugins(FL_PLUGIN_REGISTRY(view));
+  cine_video_register(view, window);
   g_autoptr(FlStandardMethodCodec) codec = fl_standard_method_codec_new();
   g_autoptr(FlMethodChannel) files = fl_method_channel_new(
       fl_engine_get_binary_messenger(fl_view_get_engine(view)),

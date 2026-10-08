@@ -286,7 +286,10 @@ impl Application {
                 {
                     return self.reply(now, vec![], Some("MEDIA_NOT_READY"));
                 }
-                let descriptor = if matches!(intent, network::Intent::Attach) {
+                let descriptor = if matches!(
+                    intent,
+                    network::Intent::Attach | network::Intent::Revalidate
+                ) {
                     if self.suspended || !self.sample.loaded || self.sample.duration_ms == 0 {
                         return self.reply(now, vec![], Some("MEDIA_NOT_READY"));
                     }
@@ -770,5 +773,100 @@ mod fd_tests {
             Err("UNSUPPORTED_SOURCE")
         );
         std::fs::remove_file(path).unwrap();
+    }
+}
+
+// Native Linux presentation leases keep the playback owner alive independently
+// of bridge/session disposal. No SDK address is included in JSON or sent to Dart.
+#[cfg(target_os = "linux")]
+static VIDEO_LEASES: OnceLock<Mutex<HashMap<u64, cine_client::player_backend::RealPlayer>>> =
+    OnceLock::new();
+#[cfg(target_os = "linux")]
+fn video_leases() -> &'static Mutex<HashMap<u64, cine_client::player_backend::RealPlayer>> {
+    VIDEO_LEASES.get_or_init(Mutex::default)
+}
+/// Acquire a presentation-only native lease. Free the render context before release.
+/// # Safety
+/// `output` must point to writable storage for one native pointer. The native
+/// consumer must not use the borrowed pointer after releasing the returned lease.
+#[cfg(target_os = "linux")]
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn cine_bridge_video_acquire(
+    handle: u64,
+    output: *mut *mut std::ffi::c_void,
+) -> u64 {
+    if output.is_null() {
+        return 0;
+    }
+    unsafe {
+        *output = std::ptr::null_mut();
+    }
+    let player = registry()
+        .lock()
+        .unwrap()
+        .get(&handle)
+        .and_then(|i| i.app.desktop.as_ref())
+        .and_then(|d| d.video_lease());
+    let Some(player) = player else {
+        return 0;
+    };
+    let mut leases = video_leases().lock().unwrap();
+    if leases.len() >= 16 {
+        return 0;
+    }
+    let id = NEXT.fetch_add(1, Ordering::Relaxed);
+    unsafe {
+        *output = player.presentation_handle() as *mut std::ffi::c_void;
+    }
+    leases.insert(id, player);
+    id
+}
+#[cfg(target_os = "linux")]
+#[unsafe(no_mangle)]
+pub extern "C" fn cine_bridge_video_release(lease: u64) -> i32 {
+    let player = video_leases().lock().unwrap().remove(&lease);
+    if player.is_some() {
+        drop(player);
+        0
+    } else {
+        -1
+    }
+}
+
+#[cfg(all(test, target_os = "linux"))]
+mod video_tests {
+    use super::*;
+    #[test]
+    fn native_video_boundary_rejects_stale_handles_and_null_outputs() {
+        let mut output = std::ptr::dangling_mut::<std::ffi::c_void>();
+        assert_eq!(
+            unsafe { cine_bridge_video_acquire(u64::MAX, &mut output) },
+            0
+        );
+        assert!(output.is_null());
+        let handle = cine_bridge_create();
+        assert_eq!(
+            unsafe { cine_bridge_video_acquire(handle, std::ptr::null_mut()) },
+            0
+        );
+        assert_eq!(cine_bridge_destroy(handle), 0);
+        assert_eq!(unsafe { cine_bridge_video_acquire(handle, &mut output) }, 0);
+        assert_eq!(cine_bridge_video_release(u64::MAX), -1);
+    }
+    #[test]
+    #[ignore = "requires libmpv; native ownership only, no frame assertion"]
+    fn video_lease_retains_owner_until_render_detach() {
+        let player = cine_client::player_backend::RealPlayer::embedded(Instant::now()).unwrap();
+        let address = player.presentation_handle();
+        assert_ne!(address, 0);
+        let id = NEXT.fetch_add(1, Ordering::Relaxed);
+        video_leases().lock().unwrap().insert(id, player.clone());
+        drop(player);
+        assert_eq!(
+            video_leases().lock().unwrap()[&id].presentation_handle(),
+            address
+        );
+        assert_eq!(cine_bridge_video_release(id), 0);
+        assert_eq!(cine_bridge_video_release(id), -1);
     }
 }

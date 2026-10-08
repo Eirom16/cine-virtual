@@ -34,6 +34,7 @@ pub enum Intent {
         invite_token: String,
     },
     Attach,
+    Revalidate,
     Ready,
     Play,
     Pause,
@@ -306,7 +307,7 @@ impl Network {
                         let Some(cmd)=cmd else{break};
                         if cmd.generation!=*current.lock().unwrap() && !matches!(cmd.intent,Intent::Suspend){continue;}
                         published.lock().unwrap()["busy"]=json!(true);
-                        let intent_name=String::from(match &cmd.intent {Intent::Connect{..}=>"connect",Intent::Create=>"create",Intent::Join{..}=>"join",Intent::Attach=>"attach",Intent::Ready=>"ready",Intent::Play=>"play",Intent::Pause=>"pause",Intent::Seek{..}=>"seek",Intent::Disconnect=>"disconnect",Intent::Reconnect=>"reconnect",Intent::Leave=>"leave",Intent::Suspend=>"suspend",Intent::Foreground=>"foreground"});
+                        let intent_name=String::from(match &cmd.intent {Intent::Connect{..}=>"connect",Intent::Create=>"create",Intent::Join{..}=>"join",Intent::Attach=>"attach",Intent::Revalidate=>"revalidate",Intent::Ready=>"ready",Intent::Play=>"play",Intent::Pause=>"pause",Intent::Seek{..}=>"seek",Intent::Disconnect=>"disconnect",Intent::Reconnect=>"reconnect",Intent::Leave=>"leave",Intent::Suspend=>"suspend",Intent::Foreground=>"foreground"});
                         let operation=async {
                             if let Intent::Connect{url,name,allow_lan}=&cmd.intent {
                                 if let Some(mut old)=client.take(){old.disconnect().await;}
@@ -319,6 +320,7 @@ impl Network {
                                 Intent::Create=>{let v=c.create().await?;Ok(json!({"room_id":v["room_id"],"room_epoch":v["room_epoch"],"invite_token":v["invite_token"]}))},
                                 Intent::Join{room_id,room_epoch,invite_token}=>{verified_generation=None;c.join(room_id,room_epoch,&invite_token).await?;Ok(json!({}))},
                                 Intent::Attach=>{c.attach_media(cmd.descriptor.ok_or("MEDIA_NOT_READY")?).await?;verified_generation=Some(cmd.generation);Ok(json!({}))},
+                                Intent::Revalidate=>{verified_generation=None;c.revalidate_media(cmd.descriptor.ok_or("MEDIA_NOT_READY")?).await?;verified_generation=Some(cmd.generation);Ok(json!({}))},
                                 Intent::Ready=>{if verified_generation!=Some(cmd.generation){return Err("MEDIA_NOT_READY".into());}ready_when_usable(c,cmd.generation,&current).await?;Ok(json!({}))},
                                 Intent::Play|Intent::Pause|Intent::Seek{..}=>{let(kind,p)=match cmd.intent{Intent::Play=>("PLAY_REQUEST",Some(c.player().position_ms)),Intent::Pause=>("PAUSE_REQUEST",None),Intent::Seek{position_ms}=>("SEEK_REQUEST",Some(position_ms)),_=>unreachable!()};let r=c.control(kind,p).await?;require_ack(&r)?;Ok(json!({"sequence":r.payload["room_sequence"]}))},
                                 Intent::Disconnect=>{c.disconnect().await;Ok(json!({}))},
@@ -727,6 +729,111 @@ mod tests {
         drop(n);
         sdk_samples.await.unwrap();
         host.disconnect().await;
+        let _ = stop.send(());
+        server.await.unwrap().unwrap();
+    }
+    #[tokio::test]
+    async fn host_revalidation_preserves_selection_and_nonzero_timeline() {
+        let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let url = format!("ws://{}", listener.local_addr().unwrap());
+        let (stop, stopped) = tokio::sync::oneshot::channel();
+        let server = tokio::spawn(cine_server::Server::default().serve(listener, async {
+            let _ = stopped.await;
+        }));
+        let n = Network::new(Instant::now(), 1, true).unwrap();
+        n.enqueue(
+            Intent::Connect {
+                url,
+                name: "mobile-host".into(),
+                allow_lan: false,
+            },
+            1,
+            None,
+        )
+        .unwrap();
+        assert!(done(&n, "connect").await["error"].is_null());
+        n.enqueue(Intent::Create, 1, None).unwrap();
+        assert!(done(&n, "create").await["error"].is_null());
+        let descriptor = MediaDescriptor {
+            media_id: Uuid::new_v4().to_string(),
+            source_type: cine_core::media::SourceType::LocalFile,
+            title: None,
+            duration_ms: 300000,
+            identity: cine_core::media::ContentIdentity {
+                size_bytes: 1024,
+                sha256: [0xaa; 32],
+            },
+            mime: Some("video/mp4".into()),
+            codecs: vec![],
+        };
+        n.enqueue(Intent::Attach, 1, Some(descriptor.clone()))
+            .unwrap();
+        assert!(done(&n, "attach").await["error"].is_null());
+        let sdk_proxy = n.player.clone();
+        let sdk_samples = tokio::spawn(async move {
+            loop {
+                if !sdk_proxy.shared.lock().unwrap().active {
+                    break;
+                }
+                sdk_proxy.sample(
+                    PlayerView {
+                        ready: true,
+                        duration_ms: 300000,
+                        sampled_at_ms: sdk_proxy.boot.elapsed().as_millis() as u64,
+                        rate: 1.0,
+                        ..Default::default()
+                    },
+                    true,
+                );
+                tokio::time::sleep(Duration::from_millis(20)).await;
+            }
+        });
+        n.enqueue(Intent::Ready, 1, None).unwrap();
+        assert!(done(&n, "ready").await["error"].is_null());
+        n.enqueue(Intent::Seek { position_ms: 45000 }, 1, None)
+            .unwrap();
+        assert!(done(&n, "seek").await["error"].is_null());
+        tokio::time::sleep(Duration::from_millis(1400)).await;
+        let before = n.status()["presentation"]["room"].clone();
+        assert_eq!(
+            before["playback"]["pending"]["timeline_after"]["position_ms"],
+            45000
+        );
+        // The SDK deliberately keeps reporting the temporary reload position 0.
+        // Revalidation must not turn that observation into Host room authority.
+        n.reset(2);
+        n.enqueue(Intent::Suspend, 2, None).unwrap();
+        assert!(done(&n, "suspend").await["error"].is_null());
+        n.enqueue(Intent::Foreground, 2, None).unwrap();
+        assert!(done(&n, "foreground").await["error"].is_null());
+        n.enqueue(Intent::Revalidate, 2, Some(descriptor.clone()))
+            .unwrap();
+        assert!(done(&n, "revalidate").await["error"].is_null());
+        n.enqueue(Intent::Ready, 2, None).unwrap();
+        assert!(done(&n, "ready").await["error"].is_null());
+        tokio::time::sleep(Duration::from_millis(150)).await;
+        let after = n.status()["presentation"]["room"].clone();
+        assert_eq!(after["media"], before["media"]);
+        assert_eq!(
+            after["playback"]["current"],
+            before["playback"]["pending"]["timeline_after"]
+        );
+        // Wrong content is still rejected before Ready; no identity shortcut.
+        let mut wrong = descriptor.clone();
+        wrong.identity.sha256[0] ^= 1;
+        n.enqueue(Intent::Revalidate, 2, Some(wrong)).unwrap();
+        assert_eq!(done(&n, "revalidate").await["error"], "MEDIA_MISMATCH");
+        n.enqueue(Intent::Ready, 2, None).unwrap();
+        assert_eq!(done(&n, "ready").await["error"], "MEDIA_NOT_READY");
+        // An explicit user selection retains its original reset semantics.
+        n.enqueue(Intent::Attach, 2, Some(descriptor)).unwrap();
+        assert!(done(&n, "attach").await["error"].is_null());
+        tokio::time::sleep(Duration::from_millis(150)).await;
+        let selected = n.status()["presentation"]["room"].clone();
+        assert_ne!(selected["media"], before["media"]);
+        assert_eq!(selected["playback"]["current"]["position_ms"], 0);
+        drop(n);
+        sdk_samples.await.unwrap();
         let _ = stop.send(());
         server.await.unwrap().unwrap();
     }

@@ -471,6 +471,21 @@ impl<P: ApplicationPlayer + Send + 'static> Client<P> {
         }
         Ok(())
     }
+    /// Rebind a freshly validated local file to the current room selection.
+    /// Foreground recovery must not publish a new Host selection or timeline.
+    pub async fn revalidate_media(&self, descriptor: MediaDescriptor) -> Result<(), ClientError> {
+        self.session.lock().unwrap().local_descriptor = None;
+        if !descriptor.valid_local() {
+            return Err("INVALID_METADATA".into());
+        }
+        let state = self.state().ok_or("No room")?;
+        let selected = state.media.ok_or("No media")?;
+        if !descriptor.identity.matches(&selected.descriptor.identity) {
+            return Err("MEDIA_MISMATCH".into());
+        }
+        self.session.lock().unwrap().local_descriptor = Some(descriptor);
+        Ok(())
+    }
     pub async fn suspend(&self) -> Result<(), ClientError> {
         {
             let mut s = self.session.lock().unwrap();

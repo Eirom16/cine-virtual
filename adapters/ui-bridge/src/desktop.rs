@@ -1,6 +1,8 @@
 //! Presentation bridge to the existing desktop Client/LocalMedia/libmpv owner.
-//! Video uses the existing native window; no new surface or sync implementation.
+//! Video presentation has a separate native lease; control stays in Client.
 use crate::network::{Intent, safe_error};
+#[cfg(target_os = "linux")]
+use cine_client::player_backend::RealPlayer;
 use cine_client::{Client, player_backend::BackendPlayer, require_ack};
 use serde::Deserialize;
 use serde_json::{Value, json};
@@ -35,6 +37,8 @@ pub struct Desktop {
     stop: watch::Sender<bool>,
     join: Option<thread::JoinHandle<()>>,
     status: Arc<Mutex<Value>>,
+    #[cfg(target_os = "linux")]
+    player: Arc<Mutex<Option<RealPlayer>>>,
 }
 fn publish(c: &Client<BackendPlayer>, status: &Mutex<Value>) {
     let mut v = status.lock().unwrap();
@@ -51,6 +55,8 @@ impl Desktop {
         let (stop, mut stopped) = watch::channel(false);
         let status = Arc::new(Mutex::new(json!({"connected":false,"busy":false})));
         let published = status.clone();
+        let player = Arc::new(Mutex::new(None));
+        let native_player = player.clone();
         let join = thread::Builder::new().name("cine-desktop-ui".into()).spawn(move || {
             let runtime = tokio::runtime::Builder::new_current_thread().enable_all().build().unwrap();
             runtime.block_on(async move {
@@ -68,13 +74,14 @@ impl Desktop {
                                     Intent::Connect{..}=>"connect",Intent::Create=>"create",Intent::Join{..}=>"join",
                                     Intent::Ready=>"ready",Intent::Play=>"play",Intent::Pause=>"pause",Intent::Seek{..}=>"seek",
                                     Intent::Disconnect=>"disconnect",Intent::Reconnect=>"reconnect",Intent::Leave=>"leave",
-                                    Intent::Suspend=>"suspend",Intent::Foreground=>"foreground",Intent::Attach=>"attach",
+                                    Intent::Suspend=>"suspend",Intent::Foreground=>"foreground",Intent::Attach=>"attach",Intent::Revalidate=>"revalidate",
                                 },
                             };
                             let operation = async {
                                 if let DesktopIntent::Room(Intent::Connect{url,name,allow_lan}) = &cmd {
                                     if let Some(mut old) = client.take() { old.disconnect().await; }
-                                    let player = tokio::task::spawn_blocking(move || BackendPlayer::new("mpv",boot,true)).await??;
+                                    let player = tokio::task::spawn_blocking(move || cine_client::player_backend::RealPlayer::embedded(boot).map(BackendPlayer::Mpv)).await??;
+                                    *native_player.lock().unwrap() = player.real();
                                     client = Some(Client::connect_injected(url,name,player,boot,*allow_lan).await?);
                                     return Ok(json!({}));
                                 }
@@ -126,7 +133,13 @@ impl Desktop {
             stop,
             join: Some(join),
             status,
+            #[cfg(target_os = "linux")]
+            player,
         })
+    }
+    #[cfg(target_os = "linux")]
+    pub fn video_lease(&self) -> Option<RealPlayer> {
+        self.player.lock().unwrap().clone()
     }
     pub fn enqueue(&self, intent: DesktopIntent) -> Result<(), &'static str> {
         let mut s = self.status.lock().unwrap();

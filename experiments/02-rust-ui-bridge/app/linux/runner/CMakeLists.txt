@@ -9,6 +9,7 @@ project(runner LANGUAGES CXX)
 add_executable(${BINARY_NAME}
   "main.cc"
   "my_application.cc"
+  "video_presenter.cc"
   "${FLUTTER_MANAGED_DIR}/generated_plugin_registrant.cc"
 )
 
@@ -20,6 +21,10 @@ apply_standard_settings(${BINARY_NAME})
 add_definitions(-DAPPLICATION_ID="${APPLICATION_ID}")
 
 # Add dependency libraries. Add any application-specific dependencies here.
+pkg_check_modules(MPV REQUIRED IMPORTED_TARGET mpv)
+pkg_check_modules(EPOXY REQUIRED IMPORTED_TARGET epoxy)
+pkg_check_modules(GMODULE REQUIRED IMPORTED_TARGET gmodule-2.0)
+target_link_libraries(${BINARY_NAME} PRIVATE PkgConfig::MPV PkgConfig::EPOXY PkgConfig::GMODULE)
 target_link_libraries(${BINARY_NAME} PRIVATE flutter)
 target_link_libraries(${BINARY_NAME} PRIVATE PkgConfig::GTK)
 

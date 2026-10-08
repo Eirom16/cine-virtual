@@ -110,6 +110,7 @@ struct Owner {
     sender: mpsc::SyncSender<Command>,
     view: Arc<Mutex<PlayerView>>,
     join: Mutex<Option<thread::JoinHandle<()>>>,
+    presentation_handle: usize,
 }
 impl Drop for Owner {
     fn drop(&mut self) {
@@ -131,6 +132,16 @@ pub struct RealPlayer {
 }
 impl RealPlayer {
     pub fn new(boot: Instant, visible: bool) -> Result<Self, PlayerError> {
+        Self::with_output(boot, visible, false)
+    }
+    pub fn embedded(boot: Instant) -> Result<Self, PlayerError> {
+        Self::with_output(boot, true, true)
+    }
+    /// This address is meaningful only while a clone of this lease remains alive.
+    pub fn presentation_handle(&self) -> usize {
+        self.owner.presentation_handle
+    }
+    fn with_output(boot: Instant, visible: bool, embedded: bool) -> Result<Self, PlayerError> {
         let (tx, rx) = mpsc::sync_channel::<Command>(32);
         let (startup, start) = mpsc::sync_channel(1);
         let view = Arc::new(Mutex::new(PlayerView {
@@ -140,11 +151,12 @@ impl RealPlayer {
         let published = view.clone();
         let join = thread::Builder::new()
             .name("cine-mpv-owner".into())
-            .spawn(move || run_owner(boot, visible, rx, published, startup))
+            .spawn(move || run_owner(boot, visible, embedded, rx, published, startup))
             .map_err(|_| failure("PLAYER_THREAD_FAILED"))?;
         match start.recv_timeout(Duration::from_secs(10)) {
-            Ok(Ok(())) => Ok(Self {
+            Ok(Ok(presentation_handle)) => Ok(Self {
                 owner: Arc::new(Owner {
+                    presentation_handle,
                     sender: tx,
                     view,
                     join: Mutex::new(Some(join)),
@@ -286,18 +298,20 @@ impl ApplicationPlayer for BackendPlayer {
 fn run_owner(
     boot: Instant,
     visible: bool,
+    embedded: bool,
     rx: mpsc::Receiver<Command>,
     published: Arc<Mutex<PlayerView>>,
-    startup: mpsc::SyncSender<Result<(), PlayerError>>,
+    startup: mpsc::SyncSender<Result<usize, PlayerError>>,
 ) {
     tracing::info!(event="player_resources",stage="before_create",resources=%measurements::resources());
     let mut player = match MpvPlayer::new(Config {
         visible,
+        embedded,
         audio: visible,
         ..Default::default()
     }) {
         Ok(p) => {
-            let _ = startup.send(Ok(()));
+            let _ = startup.send(Ok(p.presentation_handle()));
             p
         }
         Err(e) => {

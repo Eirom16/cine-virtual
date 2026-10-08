@@ -26,6 +26,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let visible = args.iter().any(|a| a == "--visible");
     let config = Config {
         visible,
+        embedded: false,
         audio: visible || args.iter().any(|a| a == "--audio"),
         hardware_decode: args.iter().any(|a| a == "--hwdec"),
         audio_device: option("--audio-device").cloned(),
