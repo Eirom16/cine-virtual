@@ -177,7 +177,8 @@ async fn connection(mut socket: WebSocket, server: Server) {
         tokio::select! {
             item=rx.recv()=>{
                 let Some(effect)=item else {let _=socket.send(Message::Close(None)).await;break;};
-                let message={let h=server.hub.lock().unwrap();effect_message(&effect,h.clock_epoch,h.now())};
+                let (clock_epoch,at)={let h=server.hub.lock().unwrap();(h.clock_epoch,h.now())};
+                let message=effect_message(&effect,clock_epoch,at);
                 if let Some(message)=message && !send(&mut socket,&message).await {break;}
             },
             _=heartbeat.tick()=>{
