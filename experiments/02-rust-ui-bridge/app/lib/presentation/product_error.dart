@@ -76,6 +76,15 @@ class ProductError {
           'El anfitrión controla esta acción.',
           'Espera a que el anfitrión continúe.',
         );
+      case 'VIDEO_RENDER_FAILED':
+      case 'VIDEO_CONTEXT_PENDING':
+      case 'VIDEO_BRIDGE_FAILED':
+      case 'VIDEO_LEASE_FAILED':
+        return const ProductError(
+          ErrorCategory.player,
+          'No se pudo mostrar el vídeo.',
+          'Vuelve a entrar a la sala. Si continúa, reinicia la aplicación.',
+        );
       case 'PLAYER_UNSUPPORTED':
         return const ProductError(
           ErrorCategory.player,

@@ -8,6 +8,7 @@ import 'package:cine_mobile_spike/product_app.dart';
 import 'package:cine_mobile_spike/presentation/application_controller.dart';
 import 'package:cine_mobile_spike/presentation/view_state.dart';
 import 'package:cine_mobile_spike/ui/components/product_components.dart';
+import 'package:cine_mobile_spike/ui/components/desktop_video.dart';
 import 'package:cine_mobile_spike/ui/screens/lobby_screen.dart';
 import 'package:cine_mobile_spike/ui/screens/player_screen.dart';
 import 'package:cine_mobile_spike/ui/theme/product_theme.dart';
@@ -19,7 +20,7 @@ const credentials = {
   'invite_token': 'test-only-token',
 };
 
-class TestGateway implements SessionGateway {
+class TestGateway extends SessionGateway {
   @override
   bool get android => false;
   @override
@@ -529,4 +530,97 @@ void main() {
     expect(returned, true);
     expect(tester.takeException(), isNull);
   });
+  testWidgets('Participant fullscreen and Escape preserve authority', (
+    tester,
+  ) async {
+    final c = await fixture(tester);
+    final g = c.gateway as TestGateway;
+    g.network['presentation']['member_id'] = 'friend';
+    c.poll();
+    var fullscreen = false;
+    await screen(
+      tester,
+      StatefulBuilder(
+        builder: (context, update) => PlayerScreen(
+          controller: c,
+          onLobby: () {},
+          fullscreen: fullscreen,
+          onFullscreen: () => update(() => fullscreen = !fullscreen),
+        ),
+      ),
+    );
+    await tester.sendKeyEvent(LogicalKeyboardKey.keyF);
+    await tester.pump();
+    expect(fullscreen, true);
+    expect(find.byTooltip('Salir de pantalla completa'), findsOneWidget);
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await tester.pump();
+    expect(fullscreen, false);
+    await tester.sendKeyEvent(LogicalKeyboardKey.space);
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+    expect(g.intents, isEmpty);
+    await tester.pumpWidget(const SizedBox());
+  });
+  testWidgets('Scrubbing previews locally and commits one authoritative seek', (
+    tester,
+  ) async {
+    final c = await fixture(tester);
+    final g = c.gateway as TestGateway;
+    await screen(tester, PlayerControls(controller: c, onInteraction: () {}));
+    final slider = tester.widget<Slider>(find.byKey(const Key('player-seek')));
+    slider.onChangeStart!(5000);
+    slider.onChanged!(10000);
+    slider.onChanged!(15000);
+    slider.onChanged!(20000);
+    await tester.pump();
+    expect(g.intents, isEmpty);
+    expect(c.playback.value.position, 5000);
+    slider.onChangeEnd!(20000);
+    await tester.pump();
+    expect(g.intents, ['seek']);
+    expect(c.playback.value.position, 20000);
+  });
+  testWidgets(
+    'Native video errors are visible and observation stops on detach',
+    (tester) async {
+      const channel = MethodChannel('cine.desktop/video');
+      var observations = 0;
+      final sizes = <Map<dynamic, dynamic>>[];
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(channel, (
+        call,
+      ) async {
+        if (call.method == 'status') {
+          observations++;
+          return {'error': -1005};
+        }
+        if (call.method == 'resize') sizes.add(call.arguments as Map);
+        return null;
+      });
+      addTearDown(
+        () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+          channel,
+          null,
+        ),
+      );
+      await screen(
+        tester,
+        const SizedBox(
+          width: 320,
+          height: 180,
+          child: DesktopVideo(texture: 1),
+        ),
+      );
+      await tester.pump(const Duration(seconds: 1));
+      await tester.pump();
+      expect(
+        find.textContaining('No se pudo mostrar el vídeo.'),
+        findsOneWidget,
+      );
+      expect(sizes.length, 1);
+      await tester.pumpWidget(const SizedBox());
+      final before = observations;
+      await tester.pump(const Duration(seconds: 2));
+      expect(observations, before);
+    },
+  );
 }

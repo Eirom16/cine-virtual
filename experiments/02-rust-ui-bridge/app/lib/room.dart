@@ -136,7 +136,7 @@ class _RoomScreenState extends State<RoomScreen> with WidgetsBindingObserver {
     invite.text = jsonEncode(await intent('create'));
   }
 
-  Future<void> hashAndAttach() async {
+  Future<void> hashAndAttach({bool revalidate = false}) async {
     final fd = await native.invokeMethod<int>('openHashFd');
     try {
       bridge.hashFd(fd!);
@@ -155,7 +155,7 @@ class _RoomScreenState extends State<RoomScreen> with WidgetsBindingObserver {
       if (hash['state'] == 'complete' &&
           sample['loaded'] == true &&
           sample['seeking'] == false) {
-        await intent('attach');
+        await intent(revalidate ? 'revalidate' : 'attach');
         return;
       }
       if (['modified', 'read_failed', 'cancelled'].contains(hash['state'])) {
@@ -223,7 +223,7 @@ class _RoomScreenState extends State<RoomScreen> with WidgetsBindingObserver {
       }
       if (!recovered) throw BridgeFailure('FOREGROUND_TIMEOUT');
       if (!picking && title != 'None') {
-        await hashAndAttach();
+        await hashAndAttach(revalidate: true);
         await intent('ready');
       }
       debugPrint(

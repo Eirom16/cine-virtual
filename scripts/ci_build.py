@@ -208,6 +208,7 @@ def package(args):
         'runtime_validation': 'NOT TESTED by build job',
         'player': 'IOS PLAYER RUNTIME NOT IMPLEMENTED' if args.platform == 'ios' else
                   'Media3 Android provisional' if args.platform == 'android' else
+                  'libmpv Render API / Flutter texture; Linux provisional' if args.platform == 'linux' else
                   'libmpv adapter compiled; desktop Flutter surface not integrated',
         'multimedia_sdk_bundled': args.platform == 'android',
         'experimental': True, 'project_license': 'PENDING; not a distribution approval',

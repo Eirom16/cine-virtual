@@ -37,7 +37,7 @@ class ProductShell extends StatefulWidget {
 class _ProductShellState extends State<ProductShell> {
   late final ApplicationController controller;
   ProductPage page = ProductPage.home;
-  bool routedPlayback = false;
+  bool routedPlayback = false, fullscreen = false, changingFullscreen = false;
   @override
   void initState() {
     super.initState();
@@ -70,7 +70,31 @@ class _ProductShellState extends State<ProductShell> {
     setState(() => page = next);
   }
 
+  Future<void> toggleFullscreen() async {
+    if (changingFullscreen) return;
+    changingFullscreen = true;
+    final enabled = !fullscreen;
+    try {
+      await controller.gateway.fullscreen(enabled);
+      if (mounted) setState(() => fullscreen = enabled);
+    } on PlatformException {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No se pudo cambiar la pantalla completa.'),
+          ),
+        );
+      }
+    } finally {
+      changingFullscreen = false;
+    }
+  }
+
   void showLobby() {
+    if (fullscreen) {
+      unawaited(controller.gateway.fullscreen(false));
+      fullscreen = false;
+    }
     routedPlayback = true;
     navigate(ProductPage.lobby);
   }
@@ -121,6 +145,7 @@ class _ProductShellState extends State<ProductShell> {
   @override
   void dispose() {
     controller.removeListener(observe);
+    if (fullscreen) unawaited(controller.gateway.fullscreen(false));
     if (widget.controller == null) controller.dispose();
     super.dispose();
   }
@@ -147,13 +172,17 @@ class _ProductShellState extends State<ProductShell> {
       ProductPage.player => PlayerScreen(
         controller: controller,
         onLobby: showLobby,
+        fullscreen: fullscreen,
+        onFullscreen: toggleFullscreen,
       ),
     };
     return PopScope(
       canPop: page == ProductPage.home,
       onPopInvokedWithResult: (didPop, _) {
         if (!didPop) {
-          if (page == ProductPage.player) {
+          if (page == ProductPage.player && fullscreen) {
+            toggleFullscreen();
+          } else if (page == ProductPage.player) {
             showLobby();
           } else if (controller.session) {
             exitRoom();
@@ -165,8 +194,9 @@ class _ProductShellState extends State<ProductShell> {
       child: Scaffold(
         appBar:
             page == ProductPage.player &&
-                MediaQuery.sizeOf(context).width >
-                    MediaQuery.sizeOf(context).height
+                (fullscreen ||
+                    MediaQuery.sizeOf(context).width >
+                        MediaQuery.sizeOf(context).height)
             ? null
             : AppBar(
                 leading: page == ProductPage.home
@@ -231,49 +261,65 @@ class _ProductShellState extends State<ProductShell> {
                   ),
                 ],
               ),
-        body: SafeArea(
-          child: Column(
-            children: [
-              if (view.error.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: CineTokens.md,
-                  ),
-                  child: ProductErrorBanner(
-                    code: view.error,
-                    onDismiss: controller.dismissError,
-                  ),
-                ),
-              if (controller.session &&
-                  view.connection != ConnectionStatus.connected)
-                Container(
-                  width: double.infinity,
-                  color: CineTokens.warning.withValues(alpha: .08),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: CineTokens.md,
-                    vertical: CineTokens.xs,
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          view.connection == ConnectionStatus.disconnected
-                              ? 'Se perdió la conexión. Tu sala permanece aquí.'
-                              : connectionLabel(view.connection),
-                          style: const TextStyle(color: CineTokens.warning),
-                        ),
+        body: Stack(
+          children: [
+            SafeArea(
+              child: Column(
+                children: [
+                  if (view.error.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: CineTokens.md,
                       ),
-                      if (!controller.busy && !controller.recovering)
-                        TextButton(
-                          onPressed: controller.reconnect,
-                          child: const Text('Reintentar'),
-                        ),
-                    ],
-                  ),
+                      child: ProductErrorBanner(
+                        code: view.error,
+                        onDismiss: controller.dismissError,
+                      ),
+                    ),
+                  if (controller.session &&
+                      view.connection != ConnectionStatus.connected)
+                    Container(
+                      width: double.infinity,
+                      color: CineTokens.warning.withValues(alpha: .08),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: CineTokens.md,
+                        vertical: CineTokens.xs,
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              view.connection == ConnectionStatus.disconnected
+                                  ? 'Se perdió la conexión. Tu sala permanece aquí.'
+                                  : connectionLabel(view.connection),
+                              style: const TextStyle(color: CineTokens.warning),
+                            ),
+                          ),
+                          if (!controller.busy && !controller.recovering)
+                            TextButton(
+                              onPressed: controller.reconnect,
+                              child: const Text('Reintentar'),
+                            ),
+                        ],
+                      ),
+                    ),
+                  Expanded(child: body),
+                ],
+              ),
+            ),
+            // Bootstrap EGL before load; Player then uses the persistent texture.
+            if (page != ProductPage.player &&
+                controller.gateway.videoTexture != null)
+              Positioned(
+                left: 0,
+                top: 0,
+                width: 1,
+                height: 1,
+                child: IgnorePointer(
+                  child: Texture(textureId: controller.gateway.videoTexture!),
                 ),
-              Expanded(child: body),
-            ],
-          ),
+              ),
+          ],
         ),
       ),
     );

@@ -13,6 +13,13 @@ import 'view_state.dart';
 abstract class SessionGateway {
   bool get android;
   bool get supportsPlayer;
+  int? get videoTexture => null;
+  Map<String, dynamic> get videoDiagnostics => const {};
+  Future<void> prepareDesktop() async {}
+  Future<void> detachVideo() async {}
+  Future<void> beginVideoChange() async {}
+  Future<void> finishVideoChange() async {}
+  Future<void> fullscreen(bool enabled) async {}
   Future<void> initialize();
   Map<String, dynamic> call(String type, [Map<String, dynamic>? fields]);
   Future<Map<String, dynamic>?> pick();
@@ -23,6 +30,28 @@ abstract class SessionGateway {
 class NativeSessionGateway implements SessionGateway {
   static const native = MethodChannel('cine.mobile/player');
   static const desktop = MethodChannel('cine.desktop/files');
+  static const video = MethodChannel('cine.desktop/video');
+  int? _texture;
+  Map<String, dynamic> _videoDiagnostics = {};
+  Timer? videoObservation;
+  bool observingVideo = false;
+  @override
+  Map<String, dynamic> get videoDiagnostics => _videoDiagnostics;
+  Future<void> observeVideo() async {
+    if (observingVideo) return;
+    observingVideo = true;
+    try {
+      _videoDiagnostics =
+          await video.invokeMapMethod<String, dynamic>('status') ?? {};
+    } on PlatformException {
+      _videoDiagnostics = {'error': 'VIDEO_STATUS_FAILED'};
+    } finally {
+      observingVideo = false;
+    }
+  }
+
+  @override
+  int? get videoTexture => _texture;
   CineBridge? bridge;
   @override
   bool get android => Platform.isAndroid;
@@ -38,6 +67,12 @@ class NativeSessionGateway implements SessionGateway {
     if (android) {
       await native.invokeMethod('bindOwner', bridge!.handle);
       await native.invokeMethod('startNetworkDriver');
+    } else if (Platform.isLinux) {
+      _texture = await video.invokeMethod<int>('initialize');
+      videoObservation = Timer.periodic(
+        const Duration(seconds: 1),
+        (_) => observeVideo(),
+      );
     }
   }
 
@@ -59,7 +94,65 @@ class NativeSessionGateway implements SessionGateway {
   }
 
   @override
+  Future<void> prepareDesktop() async {
+    if (!Platform.isLinux) return;
+    for (int i = 0; i < 200; i++) {
+      final state = await video.invokeMapMethod<String, dynamic>('status');
+      if (state?['context'] == true) break;
+      await Future<void>.delayed(const Duration(milliseconds: 25));
+    }
+    await video.invokeMethod('bind', {
+      'handle': bridge!.handle,
+      'library': bridge!.openedPath,
+    });
+    for (int i = 0; i < 200; i++) {
+      final state = await video.invokeMapMethod<String, dynamic>('status');
+      if (state?['error'] != 0) throw BridgeFailure('VIDEO_RENDER_FAILED');
+      if (state?['ready'] == true) return;
+      await Future<void>.delayed(const Duration(milliseconds: 25));
+    }
+    throw BridgeFailure('VIDEO_RENDER_FAILED');
+  }
+
+  @override
+  Future<void> beginVideoChange() async {
+    if (Platform.isLinux) await video.invokeMethod('clear');
+  }
+
+  @override
+  Future<void> finishVideoChange() async {
+    if (!Platform.isLinux) return;
+    await video.invokeMethod('reveal');
+    for (int i = 0; i < 200; i++) {
+      final state = await video.invokeMapMethod<String, dynamic>('status');
+      if (state?['error'] != 0) throw BridgeFailure('VIDEO_RENDER_FAILED');
+      if (state?['completed_generation'] == state?['generation']) return;
+      await Future<void>.delayed(const Duration(milliseconds: 25));
+    }
+    throw BridgeFailure('VIDEO_RENDER_FAILED');
+  }
+
+  @override
+  Future<void> detachVideo() async {
+    if (Platform.isLinux) await video.invokeMethod('dispose');
+  }
+
+  @override
+  Future<void> fullscreen(bool enabled) async {
+    if (Platform.isLinux) {
+      await video.invokeMethod('fullscreen', enabled);
+    } else if (Platform.isAndroid) {
+      await SystemChrome.setEnabledSystemUIMode(
+        enabled ? SystemUiMode.immersiveSticky : SystemUiMode.edgeToEdge,
+      );
+    }
+  }
+
+  @override
   Future<void> dispose() async {
+    videoObservation?.cancel();
+    if (android) await fullscreen(false);
+    await detachVideo();
     await bridge?.disposeAsync();
   }
 }
@@ -195,9 +288,10 @@ class ApplicationController extends ChangeNotifier with WidgetsBindingObserver {
           key: next.hash[key],
       },
       'raw_error': error,
+      'video': gateway.videoDiagnostics,
       'platform_player': gateway.android
           ? 'Media3 provisional'
-          : 'libmpv native window / unsupported platform',
+          : 'libmpv Render API / unsupported platform',
     };
     if (changed) notifyListeners();
   }
@@ -274,11 +368,13 @@ class ApplicationController extends ChangeNotifier with WidgetsBindingObserver {
         uri.host.isEmpty) {
       throw BridgeFailure('INVALID_ENDPOINT');
     }
+    await gateway.detachVideo();
     await _intent('connect', {
       'url': endpoint,
       'name': displayName,
       'allow_lan': true,
     });
+    await gateway.prepareDesktop();
     if (create) {
       final data = await _intent('create');
       invitation = jsonEncode({'server': endpoint, 'invitation': data});
@@ -290,7 +386,7 @@ class ApplicationController extends ChangeNotifier with WidgetsBindingObserver {
     filename = '';
     poll();
   });
-  Future<void> _hashAndAttach(int operation) async {
+  Future<void> _hashAndAttach(int operation, {bool revalidate = false}) async {
     await gateway.prepareAndroid();
     final generation = _raw['generation'];
     Stopwatch? loadWait;
@@ -304,7 +400,7 @@ class ApplicationController extends ChangeNotifier with WidgetsBindingObserver {
       if (hash == 'complete' &&
           sample['loaded'] == true &&
           sample['seeking'] == false) {
-        await _intent('attach');
+        await _intent(revalidate ? 'revalidate' : 'attach');
         return;
       }
       if (['modified', 'read_failed', 'cancelled'].contains(hash)) {
@@ -337,7 +433,9 @@ class ApplicationController extends ChangeNotifier with WidgetsBindingObserver {
       if (gateway.android) {
         await _hashAndAttach(operation);
       } else {
+        await gateway.beginVideoChange();
         await _intent('select', {'path': chosen['path']});
+        await gateway.finishVideoChange();
       }
     } finally {
       picking = false;
@@ -369,6 +467,7 @@ class ApplicationController extends ChangeNotifier with WidgetsBindingObserver {
   Future<bool> leave() => _run('leave', () async {
     // Leave only resets navigation after the backend acknowledges the operation.
     await _intent(view.connected ? 'leave' : 'disconnect');
+    await gateway.detachVideo();
     session = false;
     filename = '';
     invitation = null;
@@ -411,7 +510,7 @@ class ApplicationController extends ChangeNotifier with WidgetsBindingObserver {
         await Future<void>.delayed(const Duration(milliseconds: 50));
       }
       if (!picking && filename.isNotEmpty && gateway.android) {
-        await _hashAndAttach(++_mediaOperation);
+        await _hashAndAttach(++_mediaOperation, revalidate: true);
         await _intent('ready');
       }
     } on BridgeFailure catch (e) {

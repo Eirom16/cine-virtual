@@ -6,14 +6,19 @@ import 'package:flutter/services.dart';
 import '../../presentation/application_controller.dart';
 import '../../presentation/view_state.dart';
 import '../components/product_components.dart';
+import '../components/desktop_video.dart';
 import '../theme/product_theme.dart';
 
 class PlayerScreen extends StatefulWidget {
   final ApplicationController controller;
   final VoidCallback onLobby;
+  final VoidCallback? onFullscreen;
+  final bool fullscreen;
   const PlayerScreen({
     required this.controller,
     required this.onLobby,
+    this.onFullscreen,
+    this.fullscreen = false,
     super.key,
   });
   @override
@@ -21,7 +26,7 @@ class PlayerScreen extends StatefulWidget {
 }
 
 class _PlayerScreenState extends State<PlayerScreen> {
-  bool visible = true, participants = false;
+  bool visible = true, participants = false, scrubbing = false, sheet = false;
   Timer? idle;
   void showControls() {
     idle?.cancel();
@@ -29,7 +34,12 @@ class _PlayerScreenState extends State<PlayerScreen> {
     idle = Timer(CineTokens.overlayIdle, () {
       if (mounted &&
           widget.controller.playback.value.playing &&
-          !widget.controller.busy) {
+          !widget.controller.busy &&
+          !scrubbing &&
+          !participants &&
+          !sheet &&
+          widget.controller.view.error.isEmpty &&
+          (ModalRoute.of(context)?.isCurrent ?? true)) {
         setState(() => visible = false);
       }
     });
@@ -65,32 +75,167 @@ class _PlayerScreenState extends State<PlayerScreen> {
     showControls();
   }
 
-  void showParticipants(bool desktop) {
+  Future<void> showParticipants(bool desktop) async {
     showControls();
     if (desktop) {
       setState(() => participants = !participants);
+      return;
+    }
+    sheet = true;
+    await showModalBottomSheet<void>(
+      context: context,
+      useSafeArea: true,
+      isScrollControlled: true,
+      builder: (context) => AnimatedBuilder(
+        animation: widget.controller,
+        builder: (context, _) => SingleChildScrollView(
+          padding: CineTokens.pageInsets,
+          child: Participants(widget.controller.view.members),
+        ),
+      ),
+    );
+    sheet = false;
+    if (mounted) showControls();
+  }
+
+  void escape() {
+    if (widget.fullscreen) {
+      widget.onFullscreen?.call();
     } else {
-      showModalBottomSheet<void>(
-        context: context,
-        useSafeArea: true,
-        isScrollControlled: true,
-        builder: (context) => AnimatedBuilder(
-          animation: widget.controller,
-          builder: (context, _) => SingleChildScrollView(
-            padding: CineTokens.pageInsets,
-            child: Participants(widget.controller.view.members),
+      setState(() {
+        visible = true;
+        participants = false;
+      });
+    }
+  }
+
+  Widget header(bool desktop) => Container(
+    color: CineTokens.background.withValues(alpha: .92),
+    padding: const EdgeInsets.symmetric(horizontal: CineTokens.sm),
+    child: Row(
+      children: [
+        IconButton(
+          onPressed: widget.onLobby,
+          tooltip: 'Volver a la sala',
+          icon: const Icon(Icons.arrow_back),
+        ),
+        Expanded(
+          child: Text(
+            widget.controller.view.filename.isEmpty
+                ? 'Cine Virtual'
+                : widget.controller.view.filename,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
-      );
-    }
+        IconButton(
+          onPressed: () => showParticipants(desktop),
+          tooltip: 'Participantes',
+          icon: const Icon(Icons.people_outline),
+        ),
+      ],
+    ),
+  );
+  Widget controls() => Focus(
+    onFocusChange: (focused) {
+      if (focused) {
+        idle?.cancel();
+        if (!visible) setState(() => visible = true);
+      }
+    },
+    child: PlayerControls(
+      controller: widget.controller,
+      onInteraction: showControls,
+      fullscreen: widget.fullscreen,
+      onFullscreen: widget.onFullscreen,
+      onScrubbing: (active) {
+        scrubbing = active;
+        if (active) {
+          idle?.cancel();
+        } else {
+          showControls();
+        }
+      },
+    ),
+  );
+  Widget video() {
+    final controller = widget.controller;
+    return ColoredBox(
+      color: Colors.black,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          if (controller.gateway.android && controller.gateway.supportsPlayer)
+            const AndroidView(
+              key: ValueKey('media-surface'),
+              viewType: 'cine.mobile/surface',
+            )
+          else if (controller.gateway.videoTexture != null)
+            DesktopVideo(texture: controller.gateway.videoTexture!)
+          else
+            const Center(child: Text('Reproductor no disponible')),
+          ValueListenableBuilder<PlaybackView>(
+            valueListenable: controller.playback,
+            builder: (context, p, _) {
+              if (controller.view.sync['failed'] == true) {
+                return const ColoredBox(
+                  color: Colors.black,
+                  child: Center(child: Text('No se pudo mostrar el vídeo.')),
+                );
+              }
+              if (controller.view.picking ||
+                  controller.view.media['local_loaded'] == false) {
+                return const ColoredBox(
+                  color: Colors.black,
+                  child: Center(
+                    child: StatusPill(
+                      'Preparando vídeo…',
+                      color: CineTokens.warning,
+                      icon: Icons.hourglass_top,
+                    ),
+                  ),
+                );
+              }
+              return p.buffering
+                  ? const Center(
+                      child: StatusPill(
+                        'Cargando…',
+                        color: CineTokens.warning,
+                        icon: Icons.hourglass_top,
+                      ),
+                    )
+                  : const SizedBox.shrink();
+            },
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) => LayoutBuilder(
-    builder: (context, constraints) {
-      final desktop = constraints.maxWidth >= CineTokens.desktop;
-      final controller = widget.controller;
-      final view = controller.view;
+    builder: (context, bounds) {
+      final desktop = bounds.maxWidth >= CineTokens.desktop;
+      // Android keeps reliable touch regions outside its Media3 SurfaceView.
+      final composite =
+          !widget.controller.gateway.android &&
+          widget.controller.gateway.videoTexture != null;
+      final surface = MouseRegion(
+        onHover: (_) => showControls(),
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onDoubleTap: composite ? widget.onFullscreen : null,
+          onTap: () {
+            if (visible && !scrubbing) {
+              idle?.cancel();
+              setState(() => visible = false);
+            } else {
+              showControls();
+            }
+          },
+          child: video(),
+        ),
+      );
       return CallbackShortcuts(
         bindings: {
           const SingleActivator(LogicalKeyboardKey.space): toggle,
@@ -98,12 +243,11 @@ class _PlayerScreenState extends State<PlayerScreen> {
               seekBy(-10000),
           const SingleActivator(LogicalKeyboardKey.arrowRight): () =>
               seekBy(10000),
-          const SingleActivator(LogicalKeyboardKey.escape): () {
-            setState(() {
-              visible = true;
-              participants = false;
-            });
+          const SingleActivator(LogicalKeyboardKey.keyF): () {
+            widget.onFullscreen?.call();
+            showControls();
           },
+          const SingleActivator(LogicalKeyboardKey.escape): escape,
         },
         child: Focus(
           autofocus: true,
@@ -111,176 +255,44 @@ class _PlayerScreenState extends State<PlayerScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Expanded(
-                child: Column(
-                  children: [
-                    AnimatedSize(
-                      duration: CineTokens.motion,
-                      child: visible
-                          ? IgnorePointer(
-                              ignoring: !visible,
-                              child: AnimatedOpacity(
-                                opacity: visible ? 1 : 0,
-                                duration: CineTokens.motion,
-                                child: Container(
-                                  color: CineTokens.background.withValues(
-                                    alpha: .92,
-                                  ),
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: CineTokens.sm,
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      IconButton(
-                                        onPressed: widget.onLobby,
-                                        tooltip: 'Volver a la sala',
-                                        icon: const Icon(Icons.arrow_back),
-                                      ),
-                                      Expanded(
-                                        child: Text(
-                                          view.filename.isEmpty
-                                              ? 'Cine Virtual'
-                                              : view.filename,
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                      IconButton(
-                                        onPressed: () =>
-                                            showParticipants(desktop),
-                                        tooltip: 'Participantes',
-                                        icon: const Icon(Icons.people_outline),
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                child: composite
+                    ? Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          surface,
+                          if (visible)
+                            Positioned(
+                              top: 0,
+                              left: 0,
+                              right: 0,
+                              child: header(desktop),
+                            ),
+                          if (visible)
+                            Positioned(
+                              bottom: 0,
+                              left: 0,
+                              right: 0,
+                              child: controls(),
+                            ),
+                        ],
+                      )
+                    : Column(
+                        children: [
+                          if (visible) header(desktop),
+                          Expanded(child: surface),
+                          if (visible)
+                            controls()
+                          else
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: IconButton(
+                                onPressed: showControls,
+                                tooltip: 'Mostrar controles',
+                                icon: const Icon(Icons.tune),
                               ),
-                            )
-                          : const SizedBox.shrink(),
-                    ),
-                    Expanded(
-                      child: MouseRegion(
-                        onHover: (_) => showControls(),
-                        child: GestureDetector(
-                          onTap: () {
-                            if (visible) {
-                              idle?.cancel();
-                              setState(() => visible = false);
-                            } else {
-                              showControls();
-                            }
-                          },
-                          child: Stack(
-                            fit: StackFit.expand,
-                            children: [
-                              ColoredBox(
-                                color: Colors.black,
-                                child:
-                                    controller.gateway.android &&
-                                        controller.gateway.supportsPlayer
-                                    ? const AndroidView(
-                                        key: ValueKey('media-surface'),
-                                        viewType: 'cine.mobile/surface',
-                                      )
-                                    : Center(
-                                        child: SingleChildScrollView(
-                                          padding: CineTokens.pageInsets,
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Icon(
-                                                controller
-                                                        .gateway
-                                                        .supportsPlayer
-                                                    ? Icons.open_in_new
-                                                    : Icons
-                                                          .videocam_off_outlined,
-                                                size: 44,
-                                                color: CineTokens.muted,
-                                              ),
-                                              const SizedBox(
-                                                height: CineTokens.md,
-                                              ),
-                                              Text(
-                                                controller
-                                                        .gateway
-                                                        .supportsPlayer
-                                                    ? 'Vídeo en la ventana del reproductor'
-                                                    : 'Reproductor no disponible',
-                                                textAlign: TextAlign.center,
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .titleLarge,
-                                              ),
-                                              const SizedBox(
-                                                height: CineTokens.xs,
-                                              ),
-                                              Text(
-                                                controller
-                                                        .gateway
-                                                        .supportsPlayer
-                                                    ? 'El vídeo se abre en una ventana aparte.\nLa reproducción sigue coordinada con la sala.'
-                                                    : 'iOS: runtime NOT IMPLEMENTED.\nWindows/macOS: reproducción NOT TESTED.',
-                                                textAlign: TextAlign.center,
-                                                style: const TextStyle(
-                                                  color: CineTokens.muted,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                              ),
-                              if (controller.playback.value.buffering)
-                                const Center(
-                                  child: StatusPill(
-                                    'Preparando vídeo…',
-                                    color: CineTokens.warning,
-                                    icon: Icons.hourglass_top,
-                                  ),
-                                ),
-                            ],
-                          ),
-                        ),
+                            ),
+                        ],
                       ),
-                    ),
-                    // Controls occupy their own region so Android SurfaceView cannot obscure them.
-                    // Keyboard focus keeps controls visible for accessible navigation.
-                    Focus(
-                      onFocusChange: (focused) {
-                        if (focused) {
-                          idle?.cancel();
-                          if (!visible) setState(() => visible = true);
-                        }
-                      },
-                      child: AnimatedSize(
-                        duration: CineTokens.motion,
-                        child: visible
-                            ? PlayerControls(
-                                controller: controller,
-                                onInteraction: showControls,
-                                onScrubbing: (active) {
-                                  if (active) {
-                                    idle?.cancel();
-                                  } else {
-                                    showControls();
-                                  }
-                                },
-                              )
-                            : ColoredBox(
-                                color: CineTokens.background,
-                                child: Align(
-                                  alignment: Alignment.centerRight,
-                                  child: IconButton(
-                                    onPressed: showControls,
-                                    tooltip: 'Mostrar controles',
-                                    icon: const Icon(Icons.tune),
-                                  ),
-                                ),
-                              ),
-                      ),
-                    ),
-                  ],
-                ),
               ),
               if (desktop && participants)
                 SizedBox(
@@ -289,7 +301,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                     color: CineTokens.surface,
                     child: SingleChildScrollView(
                       padding: CineTokens.pageInsets,
-                      child: Participants(view.members),
+                      child: Participants(widget.controller.view.members),
                     ),
                   ),
                 ),
@@ -305,10 +317,14 @@ class PlayerControls extends StatefulWidget {
   final ApplicationController controller;
   final VoidCallback onInteraction;
   final ValueChanged<bool>? onScrubbing;
+  final VoidCallback? onFullscreen;
+  final bool fullscreen;
   const PlayerControls({
     required this.controller,
     required this.onInteraction,
     this.onScrubbing,
+    this.onFullscreen,
+    this.fullscreen = false,
     super.key,
   });
   @override
@@ -414,6 +430,18 @@ class _PlayerControlsState extends State<PlayerControls> {
                       color: CineTokens.muted,
                       fontSize: 12,
                     ),
+                  ),
+                ),
+                IconButton(
+                  key: const Key('player-fullscreen'),
+                  onPressed: widget.onFullscreen,
+                  tooltip: widget.fullscreen
+                      ? 'Salir de pantalla completa'
+                      : 'Pantalla completa',
+                  icon: Icon(
+                    widget.fullscreen
+                        ? Icons.fullscreen_exit
+                        : Icons.fullscreen,
                   ),
                 ),
                 if (view.connected)

@@ -8,10 +8,13 @@ import 'package:flutter/services.dart';
 import 'bridge.dart';
 import 'room.dart';
 import 'product_app.dart';
+import 'embedding_spike.dart';
 
 // Explicit experiment flags retain fixture/autorun tools; normal builds use product UI.
 void main() => runApp(
-  const bool.fromEnvironment('SPIKE_AUTORUN')
+  Platform.isLinux && Platform.environment.containsKey('CINE_EMBEDDING_SPIKE')
+      ? const MaterialApp(home: EmbeddingSpike())
+      : const bool.fromEnvironment('SPIKE_AUTORUN')
       ? const MaterialApp(home: SpikeScreen())
       : const bool.fromEnvironment('ROOM_AUTORUN')
       ? const MaterialApp(home: RoomScreen())
