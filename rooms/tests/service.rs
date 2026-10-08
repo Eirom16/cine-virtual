@@ -728,7 +728,7 @@ fn social_authority_order_dedup_and_playback_isolation() {
     assert_eq!(e.sender_id, credentials.member_id);
     assert_eq!(e.display_name, "Participant");
     assert_ne!(e.message_id, request.event_id);
-    assert_eq!(e.text, "Hola 😂\nsegunda línea");
+    assert_eq!(e.text(), "Hola 😂\nsegunda línea");
     assert_eq!(e.sent_at_ms, 100);
     let seq = e.social_sequence;
     assert_eq!(f.state(), &before);
@@ -840,9 +840,9 @@ fn social_resume_replays_chat_once_retains_names_and_quota_but_not_reactions() {
             _ => None,
         })
         .unwrap();
-    assert_eq!(entries.iter().filter(|e| e.kind == "chat").count(), 5);
-    assert_eq!(entries.iter().filter(|e| e.kind == "joined").count(), 1);
-    assert_eq!(entries.iter().filter(|e| e.kind == "resumed").count(), 1);
+    assert_eq!(entries.iter().filter(|e| e.kind() == "chat").count(), 5);
+    assert_eq!(entries.iter().filter(|e| e.kind() == "joined").count(), 1);
+    assert_eq!(entries.iter().filter(|e| e.kind() == "resumed").count(), 1);
     assert!(!d.iter().any(|d| matches!(
         d.effect,
         Effect::Social {
@@ -874,11 +874,11 @@ fn social_resume_replays_chat_once_retains_names_and_quota_but_not_reactions() {
     assert_eq!(
         entries
             .iter()
-            .filter(|e| e.kind == "chat" && e.display_name == "Participant")
+            .filter(|e| e.kind() == "chat" && e.display_name == "Participant")
             .count(),
         5
     );
-    assert!(entries.iter().any(|e| e.kind == "left"));
+    assert!(entries.iter().any(|e| e.kind() == "left"));
 }
 #[test]
 fn social_reaction_allowlist_burst_and_no_room_mutation() {
@@ -958,7 +958,7 @@ fn social_ids_cannot_collide_across_members_and_resume_presence_is_coalesced() {
     });
     let d = f.service.execute(connection, r, 30);
     let rotated = credentials(&d);
-    assert_eq!(social_message(&d).kind, "resumed");
+    assert_eq!(social_message(&d).kind(), "resumed");
     f.service.disconnect(connection, 40);
     let connection = Uuid::new_v4();
     let r = f.req(Command::Resume {
@@ -980,4 +980,267 @@ fn social_ids_cannot_collide_across_members_and_resume_presence_is_coalesced() {
             ..
         }
     )));
+}
+
+fn fixture_gif() -> cine_rooms::social::MessageContent {
+    cine_rooms::social::MessageContent::Gif(cine_rooms::social::GifDescriptor {
+        provider: "fixture".into(),
+        provider_content_id: "celebrate".into(),
+        media_url: "https://fixtures.cine.invalid/celebrate.gif".into(),
+        preview_url: None,
+        width: 160,
+        height: 100,
+        alt_text: "Celebración".into(),
+    })
+}
+#[test]
+fn rich_gif_reply_reaction_toggle_dedup_scope_and_authority() {
+    let mut f = Fixture::new();
+    let (b, c) = f.join();
+    let before = f.state().clone();
+    let req = f.req(Command::RichMessage {
+        content: fixture_gif(),
+        reply_to_message_id: None,
+    });
+    let d = f.service.execute(b, req.clone(), 100);
+    let gif = social_message(&d).clone();
+    assert_eq!(gif.sender_id, c.member_id);
+    assert_eq!(gif.display_name, "Participant");
+    assert!(gif.sent_at_utc_ms.unwrap() > 1_700_000_000_000);
+    let retry = f.service.execute(b, req, 101);
+    assert!(!retry.iter().any(|d| matches!(
+        d.effect,
+        Effect::Social {
+            payload: cine_rooms::social::SocialPayload::Message(_),
+            ..
+        }
+    )));
+    let req = f.req(Command::RichMessage {
+        content: cine_rooms::social::MessageContent::Text("JAJAJA".into()),
+        reply_to_message_id: Some(gif.message_id),
+    });
+    let d = f.service.execute(f.host, req, 102);
+    let reply = social_message(&d).clone();
+    assert_eq!(reply.reply_to_message_id, Some(gif.message_id));
+    for (now, count) in [(103, 1), (104, 0)] {
+        let req = f.req(Command::MessageReact {
+            message_id: reply.message_id,
+            emoji: "❤️".into(),
+        });
+        let d = f.service.execute(b, req.clone(), now);
+        assert!(error(&d).is_none());
+        let entries = d
+            .iter()
+            .find_map(|d| {
+                if let Effect::Social {
+                    payload: cine_rooms::social::SocialPayload::MessageReactions { entries, .. },
+                    ..
+                } = &d.effect
+                {
+                    Some(entries)
+                } else {
+                    None
+                }
+            })
+            .unwrap();
+        let e = entries
+            .iter()
+            .find(|e| e.message_id == reply.message_id)
+            .unwrap();
+        assert_eq!(e.message_reactions.get("❤️").map_or(0, |s| s.len()), count);
+        assert!(error(&f.service.execute(b, req, now)).is_none());
+    }
+    let req = f.req(Command::RichMessage {
+        content: fixture_gif(),
+        reply_to_message_id: Some(Uuid::new_v4()),
+    });
+    assert_eq!(
+        error(&f.service.execute(b, req, 105)),
+        Some(ErrorCode::InvalidEvent)
+    );
+    let mut req = f.req(Command::RichMessage {
+        content: fixture_gif(),
+        reply_to_message_id: None,
+    });
+    req.room_id = Some(Uuid::new_v4());
+    assert!(error(&f.service.execute(b, req, 106)).is_some());
+    let mut req = f.req(Command::RichMessage {
+        content: fixture_gif(),
+        reply_to_message_id: None,
+    });
+    req.room_epoch = Some(Uuid::new_v4());
+    assert!(error(&f.service.execute(b, req, 107)).is_some());
+    let req = f.req(Command::MessageReact {
+        message_id: Uuid::new_v4(),
+        emoji: "❤️".into(),
+    });
+    assert_eq!(
+        error(&f.service.execute(b, req, 108)),
+        Some(ErrorCode::InvalidEvent)
+    );
+    assert_eq!(f.state(), &before);
+}
+#[test]
+fn rich_reaction_quota_is_independent_and_aggregation_is_per_member() {
+    let mut f = Fixture::new();
+    let (b, _) = f.join();
+    let req = f.req(Command::RichMessage {
+        content: fixture_gif(),
+        reply_to_message_id: None,
+    });
+    let d = f.service.execute(f.host, req, 100);
+    let id = social_message(&d).message_id;
+    for i in 0..6 {
+        let req = f.req(Command::MessageReact {
+            message_id: id,
+            emoji: "😂".into(),
+        });
+        assert!(error(&f.service.execute(b, req, 101 + i)).is_none());
+    }
+    let req = f.req(Command::MessageReact {
+        message_id: id,
+        emoji: "😂".into(),
+    });
+    assert_eq!(
+        error(&f.service.execute(b, req, 107)),
+        Some(ErrorCode::RateLimited)
+    );
+    for connection in [f.host, b] {
+        let req = f.req(Command::MessageReact {
+            message_id: id,
+            emoji: "❤️".into(),
+        });
+        let d = f.service.execute(connection, req, 1200);
+        assert!(error(&d).is_none());
+        if connection == b {
+            let entries =
+                d.iter()
+                    .find_map(|d| {
+                        if let Effect::Social {
+                            payload:
+                                cine_rooms::social::SocialPayload::MessageReactions { entries, .. },
+                            ..
+                        } = &d.effect
+                        {
+                            Some(entries)
+                        } else {
+                            None
+                        }
+                    })
+                    .unwrap();
+            assert_eq!(
+                entries
+                    .iter()
+                    .find(|e| e.message_id == id)
+                    .unwrap()
+                    .message_reactions["❤️"]
+                    .len(),
+                2
+            );
+        }
+    }
+    let req = f.req(Command::Chat {
+        text: "Cuota independiente".into(),
+    });
+    assert!(error(&f.service.execute(b, req, 1201)).is_none());
+}
+#[test]
+fn mixed_history_soak_bounds_json_reactions_and_evicted_replies() {
+    let mut f = Fixture::new();
+    let mut first = None;
+    let mut retained_reply = None;
+    for i in 0..500 {
+        let req = f.req(Command::RichMessage {
+            content: if i % 2 == 0 {
+                fixture_gif()
+            } else {
+                cine_rooms::social::MessageContent::Text("Texto 😂".repeat(100))
+            },
+            reply_to_message_id: None,
+        });
+        let d = f.service.execute(f.host, req, 100 + i * 2500);
+        assert!(error(&d).is_none());
+        let id = social_message(&d).message_id;
+        if i == 0 {
+            first = Some(id);
+        }
+        if i == 498 {
+            retained_reply = Some(id);
+        }
+        for emoji in cine_rooms::social::REACTIONS.iter().take(2) {
+            let req = f.req(Command::MessageReact {
+                message_id: id,
+                emoji: (*emoji).into(),
+            });
+            assert!(error(&f.service.execute(f.host, req, 100 + i * 2500)).is_none());
+        }
+    }
+    let req = f.req(Command::RichMessage {
+        content: fixture_gif(),
+        reply_to_message_id: retained_reply,
+    });
+    let d = f.service.execute(f.host, req, 1_300_000);
+    assert!(error(&d).is_none());
+    let req = f.req(Command::RichMessage {
+        content: fixture_gif(),
+        reply_to_message_id: first,
+    });
+    assert_eq!(
+        error(&f.service.execute(f.host, req, 1_300_001)),
+        Some(ErrorCode::InvalidEvent)
+    );
+    let req = f.req(Command::Sync);
+    let d = f.service.execute(f.host, req, 1_300_002);
+    let entries = d
+        .iter()
+        .find_map(|d| {
+            if let Effect::Social {
+                payload: cine_rooms::social::SocialPayload::Snapshot { entries, .. },
+                ..
+            } = &d.effect
+            {
+                Some(entries)
+            } else {
+                None
+            }
+        })
+        .unwrap();
+    assert!(entries.len() <= 100);
+    assert!(entries.iter().map(|e| e.budget()).sum::<usize>() <= 48 * 1024);
+    assert!(entries.iter().all(|e| e.message_id != first.unwrap()));
+    assert!(entries.iter().all(|e| e.message_reactions.len() <= 6));
+}
+
+#[test]
+fn actual_cross_room_reply_and_unapproved_provider_are_rejected() {
+    let mut f = Fixture::new();
+    let mut other = Fixture::new();
+    let req = other.req(Command::RichMessage {
+        content: fixture_gif(),
+        reply_to_message_id: None,
+    });
+    let d = other.service.execute(other.host, req, 100);
+    let id = social_message(&d).message_id;
+    let req = f.req(Command::RichMessage {
+        content: fixture_gif(),
+        reply_to_message_id: Some(id),
+    });
+    assert_eq!(
+        error(&f.service.execute(f.host, req, 100)),
+        Some(ErrorCode::InvalidEvent)
+    );
+    let cine_rooms::social::MessageContent::Gif(mut gif) = fixture_gif() else {
+        unreachable!()
+    };
+    gif.provider = "giphy".into();
+    gif.provider_content_id = "abc".into();
+    gif.media_url = "https://media.giphy.com/media/abc/a.gif".into();
+    let req = f.req(Command::RichMessage {
+        content: cine_rooms::social::MessageContent::Gif(gif),
+        reply_to_message_id: None,
+    });
+    assert_eq!(
+        error(&f.service.execute(f.host, req, 101)),
+        Some(ErrorCode::FeatureNotSupported)
+    );
 }

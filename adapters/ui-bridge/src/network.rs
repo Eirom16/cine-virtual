@@ -31,6 +31,14 @@ pub enum Intent {
     Chat {
         text: String,
     },
+    Message {
+        content: cine_protocol::MessageContentDto,
+        reply_to_message_id: Option<Uuid>,
+    },
+    MessageReaction {
+        message_id: Uuid,
+        emoji: String,
+    },
     Reaction {
         emoji: String,
     },
@@ -313,7 +321,7 @@ impl Network {
                         let Some(cmd)=cmd else{break};
                         if cmd.generation!=*current.lock().unwrap() && !matches!(cmd.intent,Intent::Suspend){continue;}
                         published.lock().unwrap()["busy"]=json!(true);
-                        let intent_name=String::from(match &cmd.intent {Intent::Connect{..}=>"connect",Intent::Create=>"create",Intent::Chat{..}=>"chat",Intent::Reaction{..}=>"reaction",Intent::Join{..}=>"join",Intent::Attach=>"attach",Intent::Revalidate=>"revalidate",Intent::Ready=>"ready",Intent::Play=>"play",Intent::Pause=>"pause",Intent::Seek{..}=>"seek",Intent::Disconnect=>"disconnect",Intent::Reconnect=>"reconnect",Intent::Leave=>"leave",Intent::Suspend=>"suspend",Intent::Foreground=>"foreground"});
+                        let intent_name=String::from(match &cmd.intent {Intent::Connect{..}=>"connect",Intent::Create=>"create",Intent::Chat{..}=>"chat",Intent::Message{..}=>"message",Intent::MessageReaction{..}=>"message_reaction",Intent::Reaction{..}=>"reaction",Intent::Join{..}=>"join",Intent::Attach=>"attach",Intent::Revalidate=>"revalidate",Intent::Ready=>"ready",Intent::Play=>"play",Intent::Pause=>"pause",Intent::Seek{..}=>"seek",Intent::Disconnect=>"disconnect",Intent::Reconnect=>"reconnect",Intent::Leave=>"leave",Intent::Suspend=>"suspend",Intent::Foreground=>"foreground"});
                         let operation=async {
                             if let Intent::Connect{url,name,allow_lan}=&cmd.intent {
                                 if let Some(mut old)=client.take(){old.disconnect().await;}
@@ -324,6 +332,8 @@ impl Network {
                             let c=client.as_mut().ok_or("NETWORK_DISCONNECTED")?;
                             match cmd.intent {
                                 Intent::Chat{text}=>{c.send_chat(&text).await?;Ok(json!({}))},
+                                Intent::Message{content,reply_to_message_id}=>{c.send_message(content,reply_to_message_id).await?;Ok(json!({}))},
+                                Intent::MessageReaction{message_id,emoji}=>{c.react_message(message_id,&emoji).await?;Ok(json!({}))},
                                 Intent::Reaction{emoji}=>{c.send_reaction(&emoji).await?;Ok(json!({}))},
                                 Intent::Create=>{let v=c.create().await?;Ok(json!({"room_id":v["room_id"],"room_epoch":v["room_epoch"],"invite_token":v["invite_token"]}))},
                                 Intent::Join{room_id,room_epoch,invite_token}=>{verified_generation=None;c.join(room_id,room_epoch,&invite_token).await?;Ok(json!({}))},

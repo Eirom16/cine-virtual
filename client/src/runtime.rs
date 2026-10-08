@@ -160,7 +160,7 @@ impl<P: ApplicationPlayer + Send + 'static> Client<P> {
                 sender_id: None,
                 sequence: None,
                 sent_at_ms: now(),
-                payload: json!({"supported_versions":[1],"client_name":name,"capabilities":["social_v1"]}),
+                payload: json!({"supported_versions":[1],"client_name":name,"capabilities":["social_v1", "rich_social_v1"]}),
             };
             if ws
                 .send(Message::Text(encode(&hello).unwrap().into()))
@@ -255,6 +255,7 @@ impl<P: ApplicationPlayer + Send + 'static> Client<P> {
                                 let Some(epoch)=message.payload["clock_epoch"].as_str().and_then(|s|Uuid::parse_str(s).ok()) else{break};
                                 let mut s=shared.lock().unwrap();
                                 if s.replica.clock_epoch.is_some_and(|old|old!=epoch){s.credentials=None;}
+                                s.social.rich_supported=message.payload["capabilities"].as_array().is_some_and(|a|a.iter().any(|v|v.as_str()==Some("rich_social_v1")));
                                 s.social.supported=message.payload["capabilities"].as_array().is_some_and(|a|a.iter().any(|v|v.as_str()==Some("social_v1")));
                                 s.replica.set_clock_epoch(epoch);negotiated=true;
                             },
@@ -388,8 +389,10 @@ impl<P: ApplicationPlayer + Send + 'static> Client<P> {
             s.replica.clear_room(self.now());
             s.credentials = None;
             let supported = s.social.supported;
+            let rich_supported = s.social.rich_supported;
             s.social = crate::social::SocialReplica::default();
             s.social.supported = supported;
+            s.social.rich_supported = rich_supported;
         }
         if reply.kind == "ACK"
             && kind != "ROOM_LEAVE"
@@ -699,6 +702,31 @@ impl<P: ApplicationPlayer + Send + 'static> Client<P> {
     pub async fn send_chat(&self, text: &str) -> Result<(), ClientError> {
         cine_rooms::social::validate_text(text).map_err(|c| c.as_str())?;
         self.send_social("CHAT_SEND", json!({"text":text})).await
+    }
+    pub async fn send_message(
+        &self,
+        content: cine_protocol::MessageContentDto,
+        reply: Option<Uuid>,
+    ) -> Result<(), ClientError> {
+        content.domain().validate().map_err(|c| c.as_str())?;
+        if !self.session.lock().unwrap().social.rich_supported {
+            return Err("FEATURE_NOT_SUPPORTED".into());
+        }
+        self.send_social(
+            "MESSAGE_SEND",
+            json!({"content":content,"reply_to_message_id":reply}),
+        )
+        .await
+    }
+    pub async fn react_message(&self, message_id: Uuid, emoji: &str) -> Result<(), ClientError> {
+        if !self.session.lock().unwrap().social.rich_supported {
+            return Err("FEATURE_NOT_SUPPORTED".into());
+        }
+        self.send_social(
+            "MESSAGE_REACTION_SEND",
+            json!({"message_id":message_id,"emoji":emoji}),
+        )
+        .await
     }
     pub async fn send_reaction(&self, emoji: &str) -> Result<(), ClientError> {
         if !cine_rooms::social::REACTIONS.contains(&emoji) {

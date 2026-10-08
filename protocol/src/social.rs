@@ -1,4 +1,5 @@
 use crate::WireMessage;
+use cine_rooms::social::{GifDescriptor, MessageContent};
 use cine_rooms::{
     model::ErrorCode,
     social::{
@@ -7,6 +8,60 @@ use cine_rooms::{
 };
 use serde::{Deserialize, Serialize};
 use serde_json::json;
+use std::collections::{BTreeMap, BTreeSet};
+
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct GifDto {
+    pub provider: String,
+    pub provider_content_id: String,
+    pub media_url: String,
+    pub preview_url: Option<String>,
+    pub width: u16,
+    pub height: u16,
+    pub alt_text: String,
+}
+impl From<&GifDescriptor> for GifDto {
+    fn from(g: &GifDescriptor) -> Self {
+        Self {
+            provider: g.provider.clone(),
+            provider_content_id: g.provider_content_id.clone(),
+            media_url: g.media_url.clone(),
+            preview_url: g.preview_url.clone(),
+            width: g.width,
+            height: g.height,
+            alt_text: g.alt_text.clone(),
+        }
+    }
+}
+impl From<GifDto> for GifDescriptor {
+    fn from(g: GifDto) -> Self {
+        Self {
+            provider: g.provider,
+            provider_content_id: g.provider_content_id,
+            media_url: g.media_url,
+            preview_url: g.preview_url,
+            width: g.width,
+            height: g.height,
+            alt_text: g.alt_text,
+        }
+    }
+}
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(tag = "type", rename_all = "snake_case", deny_unknown_fields)]
+pub enum MessageContentDto {
+    Text { text: String },
+    Gif { gif: GifDto },
+}
+impl MessageContentDto {
+    pub fn domain(&self) -> MessageContent {
+        match self {
+            Self::Text { text } => MessageContent::Text(text.clone()),
+            Self::Gif { gif } => MessageContent::Gif(gif.clone().into()),
+        }
+    }
+}
+
 use uuid::Uuid;
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
@@ -18,6 +73,14 @@ pub struct SocialEntryDto {
     pub sent_at_ms: u64,
     pub kind: String,
     pub text: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub content: Option<MessageContentDto>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reply_to_message_id: Option<Uuid>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub sent_at_utc_ms: Option<u64>,
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub message_reactions: BTreeMap<String, BTreeSet<Uuid>>,
 }
 impl From<&SocialEntry> for SocialEntryDto {
     fn from(e: &SocialEntry) -> Self {
@@ -27,8 +90,16 @@ impl From<&SocialEntry> for SocialEntryDto {
             display_name: e.display_name.clone(),
             social_sequence: e.social_sequence,
             sent_at_ms: e.sent_at_ms,
-            kind: e.kind.clone(),
-            text: e.text.clone(),
+            kind: e.kind().into(),
+            text: e.text().into(),
+            content: match &e.content {
+                MessageContent::Text(text) => Some(MessageContentDto::Text { text: text.clone() }),
+                MessageContent::Gif(gif) => Some(MessageContentDto::Gif { gif: gif.into() }),
+                MessageContent::System(_) => None,
+            },
+            reply_to_message_id: e.reply_to_message_id,
+            sent_at_utc_ms: e.sent_at_utc_ms,
+            message_reactions: e.message_reactions.clone(),
         }
     }
 }
@@ -37,6 +108,33 @@ impl SocialEntryDto {
         if self.display_name.is_empty() || self.display_name.len() > 64 || self.social_sequence == 0
         {
             return Err(ErrorCode::InvalidEvent);
+        }
+        if self.message_reactions.len() > 6
+            || self.message_reactions.iter().any(|(emoji, ids)| {
+                !REACTIONS.contains(&emoji.as_str())
+                    || ids.is_empty()
+                    || ids.len() > 16
+                    || ids.iter().any(|id| id.get_version_num() != 4)
+            })
+            || self.sent_at_utc_ms.is_some_and(|t| t > crate::MAX_INTEGER)
+            || (self.kind != "chat"
+                && (self.content.is_some()
+                    || self.reply_to_message_id.is_some()
+                    || !self.message_reactions.is_empty()))
+        {
+            return Err(ErrorCode::InvalidEvent);
+        }
+        if let Some(content) = &self.content {
+            content.domain().validate()?;
+            match content {
+                MessageContentDto::Text { text } if text != &self.text => {
+                    return Err(ErrorCode::InvalidEvent);
+                }
+                MessageContentDto::Gif { .. } if self.text != "[GIF]" => {
+                    return Err(ErrorCode::InvalidEvent);
+                }
+                _ => {}
+            }
         }
         match self.kind.as_str() {
             "chat" => {
@@ -50,7 +148,24 @@ impl SocialEntryDto {
         Ok(())
     }
     pub fn budget(&self) -> usize {
-        cine_rooms::social::entry_budget(&self.text, &self.display_name)
+        let legacy = cine_rooms::social::entry_budget(&self.text, &self.display_name);
+        if self.content.is_none()
+            && self.reply_to_message_id.is_none()
+            && self.message_reactions.is_empty()
+        {
+            return legacy;
+        }
+        legacy * 2
+            + 128
+            + match &self.content {
+                Some(MessageContentDto::Gif { gif }) => GifDescriptor::from(gif.clone()).budget(),
+                _ => 0,
+            }
+            + self
+                .message_reactions
+                .values()
+                .map(|ids| 64 + ids.len() * 40)
+                .sum::<usize>()
     }
 }
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
@@ -64,6 +179,8 @@ pub struct ReactionDto {
 pub struct SocialSnapshotDto {
     pub social_sequence: u64,
     pub entries: Vec<SocialEntryDto>,
+    #[serde(default)]
+    pub live_update: bool,
 }
 impl SocialSnapshotDto {
     pub fn validate(&self) -> Result<(), ErrorCode> {
@@ -98,6 +215,10 @@ pub fn social_message(
             "SOCIAL_STATE",
             json!({"social_sequence":sequence,"entries":entries.iter().map(SocialEntryDto::from).collect::<Vec<_>>()}),
         ),
+        SocialPayload::MessageReactions { sequence, entries } => (
+            "SOCIAL_STATE",
+            json!({"social_sequence":sequence,"entries":entries.iter().map(SocialEntryDto::from).collect::<Vec<_>>(),"live_update":true}),
+        ),
         SocialPayload::Message(e) => ("CHAT_MESSAGE", json!(SocialEntryDto::from(e))),
         SocialPayload::Reaction {
             reaction_id,
@@ -124,5 +245,32 @@ pub fn validate_reaction(r: &ReactionDto) -> Result<(), ErrorCode> {
         Ok(())
     } else {
         Err(ErrorCode::InvalidEvent)
+    }
+}
+
+/// Old social_v1 receives exactly its original representation and no rich metadata.
+pub fn legacy_social(message: &mut WireMessage) {
+    fn strip(value: &mut serde_json::Value) {
+        if let Some(entry) = value.as_object_mut() {
+            for key in [
+                "content",
+                "reply_to_message_id",
+                "sent_at_utc_ms",
+                "message_reactions",
+            ] {
+                entry.remove(key);
+            }
+        }
+    }
+    match message.kind.as_str() {
+        "CHAT_MESSAGE" => strip(&mut message.payload),
+        "SOCIAL_STATE" => {
+            if let Some(entries) = message.payload["entries"].as_array_mut() {
+                for entry in entries {
+                    strip(entry);
+                }
+            }
+        }
+        _ => {}
     }
 }

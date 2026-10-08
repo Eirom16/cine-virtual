@@ -478,6 +478,67 @@ impl RoomService {
                     room.social_delivery(room.recipients(), SocialPayload::Message(entry)),
                 ]);
             }
+            Command::RichMessage {
+                content,
+                reply_to_message_id,
+            } => {
+                content.validate()?;
+                // External provider remains policy-blocked pending cache approval.
+                if matches!(content, crate::social::MessageContent::Gif(gif) if gif.provider != "fixture")
+                {
+                    return Err(FeatureNotSupported);
+                }
+                room.social.validate_reply(*reply_to_message_id)?;
+                if !room.social.allow(mid, false, now) {
+                    return Err(RateLimited);
+                }
+                let member = room
+                    .state
+                    .members
+                    .iter()
+                    .find(|m| m.member_id == mid)
+                    .unwrap();
+                let content = match content {
+                    crate::social::MessageContent::Text(text) => {
+                        crate::social::MessageContent::Text(validate_text(text)?.into())
+                    }
+                    other => other.clone(),
+                };
+                let entry =
+                    room.social
+                        .message(Uuid::new_v4(), member, content, *reply_to_message_id, now);
+                return Ok(vec![
+                    private(
+                        connection,
+                        Effect::Ack {
+                            request_event_id: req.event_id,
+                            sequence: None,
+                            result: AckResult::Empty,
+                        },
+                    ),
+                    room.social_delivery(room.recipients(), SocialPayload::Message(entry)),
+                ]);
+            }
+            Command::MessageReact { message_id, emoji } => {
+                room.social.toggle(*message_id, mid, emoji, now)?;
+                return Ok(vec![
+                    private(
+                        connection,
+                        Effect::Ack {
+                            request_event_id: req.event_id,
+                            sequence: None,
+                            result: AckResult::Empty,
+                        },
+                    ),
+                    room.social_delivery(
+                        room.recipients(),
+                        SocialPayload::MessageReactions {
+                            sequence: room.social.sequence,
+                            entries: room.social.history.iter().cloned().collect(),
+                        },
+                    ),
+                ]);
+            }
             Command::React { emoji } => {
                 if !REACTIONS.contains(&emoji.as_str()) {
                     return Err(InvalidEvent);

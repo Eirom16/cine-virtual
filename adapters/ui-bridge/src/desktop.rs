@@ -72,7 +72,7 @@ impl Desktop {
                             let action = match &cmd {
                                 DesktopIntent::Select(s) => { let _ = &s.action; "select" },
                                 DesktopIntent::Room(i) => match i {
-                                    Intent::Connect{..}=>"connect",Intent::Create=>"create",Intent::Chat{..}=>"chat",Intent::Reaction{..}=>"reaction",Intent::Join{..}=>"join",
+                                    Intent::Connect{..}=>"connect",Intent::Create=>"create",Intent::Chat{..}=>"chat",Intent::Message{..}=>"message",Intent::MessageReaction{..}=>"message_reaction",Intent::Reaction{..}=>"reaction",Intent::Join{..}=>"join",
                                     Intent::Ready=>"ready",Intent::Play=>"play",Intent::Pause=>"pause",Intent::Seek{..}=>"seek",
                                     Intent::Disconnect=>"disconnect",Intent::Reconnect=>"reconnect",Intent::Leave=>"leave",
                                     Intent::Suspend=>"suspend",Intent::Foreground=>"foreground",Intent::Attach=>"attach",Intent::Revalidate=>"revalidate",
@@ -99,6 +99,8 @@ impl Desktop {
                                     },
                                     DesktopIntent::Room(i) => match i {
                                         Intent::Chat{text} => {c.send_chat(&text).await?;Ok(json!({}))},
+                                Intent::Message{content,reply_to_message_id}=>{c.send_message(content,reply_to_message_id).await?;Ok(json!({}))},
+                                Intent::MessageReaction{message_id,emoji}=>{c.react_message(message_id,&emoji).await?;Ok(json!({}))},
                                         Intent::Reaction{emoji} => {c.send_reaction(&emoji).await?;Ok(json!({}))},
                                         Intent::Create => { let v=c.create().await?; Ok(json!({"room_id":v["room_id"],"room_epoch":v["room_epoch"],"invite_token":v["invite_token"]})) },
                                         Intent::Join{room_id,room_epoch,invite_token} => {c.join(room_id,room_epoch,&invite_token).await?;Ok(json!({}))},

@@ -167,6 +167,7 @@ async fn connection(mut socket: WebSocket, server: Server) {
     let (tx, mut rx) = mpsc::channel(QUEUE_CAPACITY);
     server.hub.lock().unwrap().senders.insert(id, tx);
     let mut negotiated = false;
+    let mut rich_social = false;
     let mut hello_payload = None;
     let mut heartbeat = time::interval(Duration::from_secs(5));
     heartbeat.tick().await;
@@ -178,7 +179,8 @@ async fn connection(mut socket: WebSocket, server: Server) {
             item=rx.recv()=>{
                 let Some(effect)=item else {let _=socket.send(Message::Close(None)).await;break;};
                 let (clock_epoch,at)={let h=server.hub.lock().unwrap();(h.clock_epoch,h.now())};
-                let message=effect_message(&effect,clock_epoch,at);
+                let mut message=effect_message(&effect,clock_epoch,at);
+                if !rich_social && let Some(message) = &mut message { cine_protocol::legacy_social(message); }
                 if let Some(message)=message && !send(&mut socket,&message).await {break;}
             },
             _=heartbeat.tick()=>{
@@ -227,9 +229,10 @@ async fn connection(mut socket: WebSocket, server: Server) {
                             if !send(&mut socket,&error_message(Some(message.event_id),ErrorCode::InvalidEvent,t2)).await {break;}continue;
                         }
                         let social=message.payload.get("capabilities").and_then(|v|v.as_array()).is_some_and(|a|a.iter().any(|v|v.as_str()==Some("social_v1")));
+                        rich_social=social && message.payload.get("capabilities").and_then(|v|v.as_array()).is_some_and(|a|a.iter().any(|v|v.as_str()==Some("rich_social_v1")));
                         if social {server.hub.lock().unwrap().social.insert(id);}
                         negotiated=true;hello_payload=Some(message.payload);
-                        let response={let h=server.hub.lock().unwrap();WireMessage::server("SESSION_ACCEPT",json!({"capabilities":if social {vec!["social_v1"]} else {vec![]},"selected_version":1,"connection_id":id,"clock_epoch":h.clock_epoch,
+                        let response={let h=server.hub.lock().unwrap();WireMessage::server("SESSION_ACCEPT",json!({"capabilities":if rich_social {vec!["social_v1", "rich_social_v1"]} else if social {vec!["social_v1"]} else {vec![]},"selected_version":1,"connection_id":id,"clock_epoch":h.clock_epoch,
                             "limits":{"max_message_bytes":MAX_MESSAGE_BYTES,"max_members":16,"queue_capacity":QUEUE_CAPACITY,"lease_ms":30_000}}),h.now())};
                         if !send(&mut socket,&response).await {break;}
                     },
@@ -242,6 +245,9 @@ async fn connection(mut socket: WebSocket, server: Server) {
                     },
                     Incoming::Room(request)=>{
                         if matches!(request.command,cine_rooms::model::Command::Chat{..}|cine_rooms::model::Command::React{..}) && !server.hub.lock().unwrap().social.contains(&id) {
+                            if !send(&mut socket,&error_message(Some(message.event_id),ErrorCode::FeatureNotSupported,t2)).await {break;}continue;
+                        }
+                        if matches!(request.command,cine_rooms::model::Command::RichMessage{..}|cine_rooms::model::Command::MessageReact{..}) && !rich_social {
                             if !send(&mut socket,&error_message(Some(message.event_id),ErrorCode::FeatureNotSupported,t2)).await {break;}continue;
                         }
                         let created=matches!(request.command,cine_rooms::model::Command::Create{..});

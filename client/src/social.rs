@@ -15,6 +15,7 @@ pub struct SocialReplica {
     reactions: VecDeque<(ReactionDto, u64)>,
     pub dropped_reactions: u64,
     pub supported: bool,
+    pub rich_supported: bool,
 }
 impl SocialReplica {
     pub fn install(&mut self, message: &WireMessage, now: u64) -> Result<bool, &'static str> {
@@ -41,7 +42,9 @@ impl SocialReplica {
                     self.history = snapshot.entries.into();
                 }
                 // Ephemeral animations never survive resume/snapshot.
-                self.reactions.clear();
+                if !snapshot.live_update {
+                    self.reactions.clear();
+                }
             }
             "CHAT_MESSAGE" => {
                 let entry: SocialEntryDto =
@@ -85,7 +88,7 @@ impl SocialReplica {
         Ok(false)
     }
     pub fn summary(&self, now: u64) -> Value {
-        json!({"supported":self.supported,"social_sequence":self.sequence,"entries":self.history,
+        json!({"supported":self.supported,"rich_supported":self.rich_supported,"social_sequence":self.sequence,"entries":self.history,
             "reactions":self.reactions.iter().filter(|(_,until)|now<*until).map(|(r,_)|r).collect::<Vec<_>>(),
             "buffer_count":self.history.len(),"buffer_bytes":self.history.iter().map(|e|e.budget()).sum::<usize>(),"dropped_reactions":self.dropped_reactions})
     }

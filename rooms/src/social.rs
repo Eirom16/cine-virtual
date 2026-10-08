@@ -1,6 +1,6 @@
 //! Bounded, in-memory social state. Never participates in playback authority.
 use crate::model::{ErrorCode, Member};
-use std::collections::{HashMap, VecDeque};
+use std::collections::{BTreeMap, BTreeSet, HashMap, VecDeque};
 use uuid::Uuid;
 
 pub const CHAT_MAX_BYTES: usize = 2048;
@@ -38,6 +38,117 @@ pub fn entry_budget(text: &str, display_name: &str) -> usize {
     }
     384 + escaped_bytes(text) + escaped_bytes(display_name)
 }
+/// Provider identity is stable; URLs are bounded delivery hints, never arbitrary input.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct GifDescriptor {
+    pub provider: String,
+    pub provider_content_id: String,
+    pub media_url: String,
+    pub preview_url: Option<String>,
+    pub width: u16,
+    pub height: u16,
+    pub alt_text: String,
+}
+impl GifDescriptor {
+    pub fn validate(&self) -> Result<(), ErrorCode> {
+        let id = &self.provider_content_id;
+        if id.is_empty()
+            || id.len() > 64
+            || !id
+                .bytes()
+                .all(|b| b.is_ascii_alphanumeric() || b == b'-' || b == b'_')
+            || !(1..=640).contains(&self.width)
+            || !(1..=640).contains(&self.height)
+            || self.alt_text.len() > 256
+            || self.alt_text.chars().any(char::is_control)
+        {
+            return Err(ErrorCode::InvalidEvent);
+        }
+        self.validate_url(&self.media_url)?;
+        if let Some(url) = &self.preview_url {
+            self.validate_url(url)?;
+        }
+        Ok(())
+    }
+    fn validate_url(&self, raw: &str) -> Result<(), ErrorCode> {
+        if raw.len() > 1024 || raw.bytes().any(|b| b <= 0x20 || b == b'\\') {
+            return Err(ErrorCode::InvalidEvent);
+        }
+        if !raw.starts_with("https://")
+            || raw[8..]
+                .split('/')
+                .next()
+                .is_some_and(|authority| authority.contains(':') || authority.contains('@'))
+        {
+            return Err(ErrorCode::InvalidEvent);
+        }
+        let url = url::Url::parse(raw).map_err(|_| ErrorCode::InvalidEvent)?;
+        if url.scheme() != "https"
+            || !url.username().is_empty()
+            || url.password().is_some()
+            || url.port().is_some()
+            || url.fragment().is_some()
+        {
+            return Err(ErrorCode::InvalidEvent);
+        }
+        let allowed = match self.provider.as_str() {
+            "fixture" => {
+                self.provider_content_id == "celebrate"
+                    && raw == "https://fixtures.cine.invalid/celebrate.gif"
+            }
+            "giphy" => {
+                matches!(
+                    url.host_str(),
+                    Some(
+                        "media.giphy.com"
+                            | "media0.giphy.com"
+                            | "media1.giphy.com"
+                            | "media2.giphy.com"
+                            | "media3.giphy.com"
+                            | "media4.giphy.com"
+                    )
+                ) && url
+                    .path()
+                    .starts_with(&format!("/media/{}/", self.provider_content_id))
+                    && !url.path().contains('%')
+                    && !url.path().contains("..")
+                    && (url.path().ends_with(".gif") || url.path().ends_with(".webp"))
+                    && url.query_pairs().all(|(k, v)| {
+                        matches!(k.as_ref(), "cid" | "ep" | "rid" | "ct") && v.len() <= 128
+                    })
+            }
+            _ => false,
+        };
+        if allowed {
+            Ok(())
+        } else {
+            Err(ErrorCode::InvalidEvent)
+        }
+    }
+    pub fn budget(&self) -> usize {
+        512 + self.media_url.len() * 2
+            + self.preview_url.as_ref().map_or(0, |s| s.len() * 2)
+            + self.alt_text.len() * 6
+    }
+}
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum MessageContent {
+    Text(String),
+    Gif(GifDescriptor),
+    System(String),
+}
+impl MessageContent {
+    pub fn validate(&self) -> Result<(), ErrorCode> {
+        match self {
+            Self::Text(text) => {
+                validate_text(text)?;
+                Ok(())
+            }
+            Self::Gif(gif) => gif.validate(),
+            Self::System(_) => Err(ErrorCode::InvalidEvent),
+        }
+    }
+}
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct SocialEntry {
     pub message_id: Uuid,
@@ -45,13 +156,38 @@ pub struct SocialEntry {
     pub display_name: String,
     pub social_sequence: u64,
     pub sent_at_ms: u64,
-    /// chat | joined | left | resumed. System entries contain no user text.
-    pub kind: String,
-    pub text: String,
+    /// UTC epoch milliseconds for presentation only; never sequence or sync.
+    pub sent_at_utc_ms: Option<u64>,
+    pub content: MessageContent,
+    pub reply_to_message_id: Option<Uuid>,
+    pub message_reactions: BTreeMap<String, BTreeSet<Uuid>>,
 }
 impl SocialEntry {
+    pub fn kind(&self) -> &str {
+        match &self.content {
+            MessageContent::System(kind) => kind,
+            _ => "chat",
+        }
+    }
+    pub fn text(&self) -> &str {
+        match &self.content {
+            MessageContent::Text(text) => text,
+            MessageContent::Gif(_) => "[GIF]",
+            MessageContent::System(_) => "",
+        }
+    }
     pub fn budget(&self) -> usize {
-        entry_budget(&self.text, &self.display_name)
+        entry_budget(self.text(), &self.display_name) * 2
+            + 128
+            + match &self.content {
+                MessageContent::Gif(gif) => gif.budget(),
+                _ => 0,
+            }
+            + self
+                .message_reactions
+                .values()
+                .map(|members| 64 + members.len() * 40)
+                .sum::<usize>()
     }
 }
 struct Bucket {
@@ -75,6 +211,7 @@ pub struct SocialState {
     pub history: VecDeque<SocialEntry>,
     pub bytes: usize,
     quotas: HashMap<Uuid, (Bucket, Bucket)>,
+    message_quotas: HashMap<Uuid, Bucket>,
     last_resumed: HashMap<Uuid, u64>,
 }
 impl SocialState {
@@ -99,6 +236,7 @@ impl SocialState {
     }
     pub fn forget(&mut self, member: Uuid) {
         self.quotas.remove(&member);
+        self.message_quotas.remove(&member);
         self.last_resumed.remove(&member);
     }
     pub fn presence(&mut self, member: &Member, kind: &str, now: u64) -> Option<SocialEntry> {
@@ -122,6 +260,32 @@ impl SocialState {
         text: &str,
         now: u64,
     ) -> SocialEntry {
+        let content = if kind == "chat" {
+            MessageContent::Text(text.into())
+        } else {
+            MessageContent::System(kind.into())
+        };
+        self.message(id, member, content, None, now)
+    }
+    pub fn validate_reply(&self, reply: Option<Uuid>) -> Result<(), ErrorCode> {
+        if reply.is_some_and(|id| {
+            !self
+                .history
+                .iter()
+                .any(|e| e.message_id == id && e.kind() == "chat")
+        }) {
+            return Err(ErrorCode::InvalidEvent);
+        }
+        Ok(())
+    }
+    pub fn message(
+        &mut self,
+        id: Uuid,
+        member: &Member,
+        content: MessageContent,
+        reply: Option<Uuid>,
+        now: u64,
+    ) -> SocialEntry {
         self.sequence += 1;
         let entry = SocialEntry {
             message_id: id,
@@ -129,20 +293,75 @@ impl SocialState {
             display_name: member.display_name.clone(),
             social_sequence: self.sequence,
             sent_at_ms: now,
-            kind: kind.into(),
-            text: text.into(),
+            sent_at_utc_ms: std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .ok()
+                .map(|t| t.as_millis() as u64),
+            content,
+            reply_to_message_id: reply,
+            message_reactions: BTreeMap::new(),
         };
         self.bytes += entry.budget();
         self.history.push_back(entry.clone());
+        self.trim();
+        entry
+    }
+    fn trim(&mut self) {
         while self.history.len() > HISTORY_MAX_COUNT || self.bytes > HISTORY_MAX_BYTES {
             self.bytes -= self.history.pop_front().unwrap().budget();
         }
-        entry
+    }
+    pub fn toggle(
+        &mut self,
+        message: Uuid,
+        member: Uuid,
+        emoji: &str,
+        now: u64,
+    ) -> Result<(), ErrorCode> {
+        if !REACTIONS.contains(&emoji)
+            || !self
+                .history
+                .iter()
+                .any(|e| e.message_id == message && e.kind() == "chat")
+        {
+            return Err(ErrorCode::InvalidEvent);
+        }
+        let quota = self.message_quotas.entry(member).or_insert(Bucket {
+            units: 6 * 1000,
+            at: now,
+        });
+        if !quota.take(now, 6, 1000) {
+            return Err(ErrorCode::RateLimited);
+        }
+        let entry = self
+            .history
+            .iter_mut()
+            .find(|e| e.message_id == message)
+            .unwrap();
+        let old = entry.budget();
+        let members = entry.message_reactions.entry(emoji.into()).or_default();
+        if !members.remove(&member) {
+            if members.len() >= 16 {
+                return Err(ErrorCode::RateLimited);
+            }
+            members.insert(member);
+        }
+        if members.is_empty() {
+            entry.message_reactions.remove(emoji);
+        }
+        self.bytes = self.bytes - old + entry.budget();
+        self.sequence += 1;
+        self.trim();
+        Ok(())
     }
 }
 #[derive(Clone)]
 pub enum SocialPayload {
     Snapshot {
+        sequence: u64,
+        entries: Vec<SocialEntry>,
+    },
+    MessageReactions {
         sequence: u64,
         entries: Vec<SocialEntry>,
     },

@@ -7,7 +7,8 @@ use uuid::Uuid;
 
 #[tokio::test]
 #[ignore = "requires libmpv and generated synthetic corpus; no visual assertion"]
-async fn two_real_libmpv_clients_social_resume_preserves_playback() -> Result<(), ClientError> {
+async fn two_real_libmpv_clients_rich_social_resume_preserves_playback() -> Result<(), ClientError>
+{
     let listener = TcpListener::bind("127.0.0.1:0").await?;
     let url = format!("ws://{}", listener.local_addr()?);
     let (stop_tx, stop_rx) = oneshot::channel();
@@ -36,13 +37,57 @@ async fn two_real_libmpv_clients_social_resume_preserves_playback() -> Result<()
     let _ = tokio::try_join!(a.wait_execution(seq), b.wait_execution(seq))?;
     let before = a.state().unwrap();
     a.send_chat("¿Viste eso? 😂").await?;
-    b.send_chat("Sí jajaja").await?;
+    b.send_message(
+        cine_protocol::MessageContentDto::Gif {
+            gif: cine_protocol::GifDto {
+                provider: "fixture".into(),
+                provider_content_id: "celebrate".into(),
+                media_url: "https://fixtures.cine.invalid/celebrate.gif".into(),
+                preview_url: None,
+                width: 160,
+                height: 100,
+                alt_text: "Celebración".into(),
+            },
+        },
+        None,
+    )
+    .await?;
+    tokio::time::timeout(Duration::from_secs(4), async {
+        while a.social_summary()["buffer_count"] != 3 {
+            tokio::time::sleep(Duration::from_millis(10)).await;
+        }
+    })
+    .await?;
+    let id = Uuid::parse_str(
+        a.social_summary()["entries"][2]["message_id"]
+            .as_str()
+            .unwrap(),
+    )?;
+    a.send_message(
+        cine_protocol::MessageContentDto::Text {
+            text: "JAJAJA".into(),
+        },
+        Some(id),
+    )
+    .await?;
+    tokio::time::timeout(Duration::from_secs(4), async {
+        while b.social_summary()["buffer_count"] != 4 {
+            tokio::time::sleep(Duration::from_millis(10)).await;
+        }
+    })
+    .await?;
+    let reply_id = Uuid::parse_str(
+        b.social_summary()["entries"][3]["message_id"]
+            .as_str()
+            .unwrap(),
+    )?;
+    b.react_message(reply_id, "❤️").await?;
     a.send_reaction("❤️").await?;
     b.send_reaction("😂").await?;
     tokio::time::timeout(Duration::from_secs(4), async {
         loop {
-            if a.social_summary()["buffer_count"] == 3
-                && b.social_summary()["buffer_count"] == 3
+            if a.social_summary()["buffer_count"] == 4
+                && b.social_summary()["buffer_count"] == 4
                 && a.social_summary()["reactions"].as_array().unwrap().len() == 2
                 && b.social_summary()["reactions"].as_array().unwrap().len() == 2
             {
@@ -59,12 +104,20 @@ async fn two_real_libmpv_clients_social_resume_preserves_playback() -> Result<()
     a.send_chat("Durante reconnect").await?;
     b.resume().await?;
     tokio::time::timeout(Duration::from_secs(4), async {
-        while b.social_summary()["buffer_count"] != 5 {
+        while b.social_summary()["buffer_count"] != 6 {
             tokio::time::sleep(Duration::from_millis(10)).await;
         }
     })
     .await?;
     let history = b.social_summary()["entries"].clone();
+    assert_eq!(history[3]["reply_to_message_id"], id.to_string());
+    assert_eq!(
+        history[3]["message_reactions"]["❤️"]
+            .as_array()
+            .unwrap()
+            .len(),
+        1
+    );
     assert!(
         b.social_summary()["reactions"]
             .as_array()

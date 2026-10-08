@@ -9,6 +9,7 @@ publish = false
 crate-type = ["cdylib", "staticlib", "rlib"]
 
 [dependencies]
+cine-protocol = { path = "../../protocol" }
 cine-core = { path = "../../core" }
 cine-local-media = { path = "../local-media" }
 cine-client = { path = "../../client" }

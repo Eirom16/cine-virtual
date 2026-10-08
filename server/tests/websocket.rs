@@ -410,3 +410,200 @@ async fn social_spoofing_duplicate_ack_drop_and_resume() -> Result<(), ClientErr
     server.await??;
     Ok(())
 }
+
+fn rich_fixture() -> cine_protocol::MessageContentDto {
+    cine_protocol::MessageContentDto::Gif {
+        gif: cine_protocol::GifDto {
+            provider: "fixture".into(),
+            provider_content_id: "celebrate".into(),
+            media_url: "https://fixtures.cine.invalid/celebrate.gif".into(),
+            preview_url: None,
+            width: 160,
+            height: 100,
+            alt_text: "Celebración".into(),
+        },
+    }
+}
+#[tokio::test]
+async fn rich_two_clients_gif_reply_reactions_replay_and_player_isolation()
+-> Result<(), ClientError> {
+    let listener = TcpListener::bind("127.0.0.1:0").await?;
+    let url = format!("ws://{}", listener.local_addr()?);
+    let (stop_tx, stop_rx) = oneshot::channel();
+    let server = tokio::spawn(Server::default().serve(listener, async {
+        let _ = stop_rx.await;
+    }));
+    let mut a = Client::connect(&url, "Alex").await?;
+    let mut b = Client::connect(&url, "Sam").await?;
+    let invite = a.create().await?;
+    b.join(
+        Uuid::parse_str(invite["room_id"].as_str().unwrap())?,
+        Uuid::parse_str(invite["room_epoch"].as_str().unwrap())?,
+        invite["invite_token"].as_str().unwrap(),
+    )
+    .await?;
+    a.media_demo().await?;
+    b.wait_state(a.state().unwrap().sequence).await?;
+    a.ready().await?;
+    b.ready().await?;
+    a.wait_state(b.state().unwrap().sequence).await?;
+    let ack = a.control("PLAY_REQUEST", Some(1000)).await?;
+    require_ack(&ack)?;
+    a.wait_execution(ack.payload["room_sequence"].as_u64().unwrap())
+        .await?;
+    let before = a.state().unwrap();
+    a.send_chat("¿Viste esa escena?").await?;
+    b.send_message(rich_fixture(), None).await?;
+    let s = wait_social(&a, |v| v["social_sequence"] == 3).await;
+    assert_eq!(s["rich_supported"], true);
+    let gif_id = Uuid::parse_str(s["entries"][2]["message_id"].as_str().unwrap())?;
+    a.send_message(
+        cine_protocol::MessageContentDto::Text {
+            text: "JAJAJA".into(),
+        },
+        Some(gif_id),
+    )
+    .await?;
+    let s = wait_social(&b, |v| v["social_sequence"] == 4).await;
+    let reply_id = Uuid::parse_str(s["entries"][3]["message_id"].as_str().unwrap())?;
+    b.react_message(reply_id, "❤️").await?;
+    let s = wait_social(&a, |v| v["social_sequence"] == 5).await;
+    assert_eq!(
+        s["entries"][3]["message_reactions"]["❤️"]
+            .as_array()
+            .unwrap()
+            .len(),
+        1
+    );
+    a.send_reaction("😂").await?;
+    b.send_reaction("😂").await?;
+    wait_social(&a, |v| v["reactions"].as_array().unwrap().len() == 2).await;
+    b.react_message(reply_id, "❤️").await?;
+    let s = wait_social(&a, |v| v["social_sequence"] == 6).await;
+    assert!(s["entries"][3].get("message_reactions").is_none());
+    assert_eq!(s["reactions"].as_array().unwrap().len(), 2);
+    b.react_message(reply_id, "❤️").await?;
+    wait_social(&a, |v| v["social_sequence"] == 7).await;
+    assert_eq!(a.state().unwrap(), before);
+    assert!(a.player().playing && b.player().playing);
+    b.disconnect().await;
+    a.wait_state(before.sequence + 1).await?;
+    a.send_message(rich_fixture(), Some(reply_id)).await?;
+    b.resume().await?;
+    let s = wait_social(&b, |v| v["social_sequence"] == 9).await;
+    let ids = s["entries"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|e| e["message_id"].as_str().unwrap())
+        .collect::<std::collections::HashSet<_>>();
+    assert_eq!(ids.len(), s["entries"].as_array().unwrap().len());
+    assert_eq!(s["entries"][3]["reply_to_message_id"], gif_id.to_string());
+    assert_eq!(
+        s["entries"][3]["message_reactions"]["❤️"]
+            .as_array()
+            .unwrap()
+            .len(),
+        1
+    );
+    let ack = b
+        .request(
+            "SYNC_REQUEST",
+            json!({"last_sequence":b.state().unwrap().sequence,"reason":"manual"}),
+        )
+        .await?;
+    assert_eq!(ack.kind, "ROOM_STATE");
+    assert_eq!(
+        wait_social(&b, |v| v["social_sequence"] == 9).await["entries"],
+        s["entries"]
+    );
+    assert!(b.player().ready);
+    a.disconnect().await;
+    b.disconnect().await;
+    let _ = stop_tx.send(());
+    server.await??;
+    Ok(())
+}
+
+#[tokio::test]
+async fn legacy_social_client_receives_safe_gif_fallback_and_cannot_send_rich()
+-> Result<(), ClientError> {
+    use cine_protocol::{WireMessage, decode, encode};
+    use futures_util::{SinkExt, StreamExt};
+    use tokio_tungstenite::{connect_async, tungstenite::Message};
+    let listener = TcpListener::bind("127.0.0.1:0").await?;
+    let url = format!("ws://{}", listener.local_addr()?);
+    let (stop_tx, stop_rx) = oneshot::channel();
+    let server = tokio::spawn(Server::default().serve(listener, async {
+        let _ = stop_rx.await;
+    }));
+    let mut host = Client::connect(&url, "Alex").await?;
+    let invite = host.create().await?;
+    let (mut raw, _) = connect_async(&url).await?;
+    let mut m = WireMessage {
+        protocol_version: 1,
+        event_id: Uuid::new_v4(),
+        kind: "SESSION_HELLO".into(),
+        room_id: None,
+        room_epoch: None,
+        sender_id: None,
+        sequence: None,
+        sent_at_ms: 0,
+        payload: json!({"supported_versions":[1],"client_name":"old social","capabilities":["social_v1"]}),
+    };
+    raw.send(Message::Text(encode(&m).unwrap().into())).await?;
+    let response = decode(raw.next().await.unwrap()?.to_text()?).unwrap();
+    assert_eq!(response.payload["capabilities"], json!(["social_v1"]));
+    m.event_id = Uuid::new_v4();
+    m.kind = "ROOM_JOIN".into();
+    m.room_id = Some(Uuid::parse_str(invite["room_id"].as_str().unwrap())?);
+    m.room_epoch = Some(Uuid::parse_str(invite["room_epoch"].as_str().unwrap())?);
+    m.payload = json!({"display_name":"Legacy","invite_token":invite["invite_token"]});
+    raw.send(Message::Text(encode(&m).unwrap().into())).await?;
+    host.wait_state(2).await?;
+    host.send_message(rich_fixture(), None).await?;
+    let id = tokio::time::timeout(std::time::Duration::from_secs(4), async {
+        loop {
+            let frame = raw.next().await.unwrap().unwrap();
+            if !frame.is_text() {
+                continue;
+            }
+            let msg = decode(frame.to_text().unwrap()).unwrap();
+            if msg.kind == "CHAT_MESSAGE" && msg.payload["kind"] == "chat" {
+                assert_eq!(msg.payload["text"], "[GIF]");
+                assert!(msg.payload.get("content").is_none());
+                assert!(msg.payload.get("reply_to_message_id").is_none());
+                break Uuid::parse_str(msg.payload["message_id"].as_str().unwrap()).unwrap();
+            }
+        }
+    })
+    .await?;
+    host.react_message(id, "❤️").await?;
+    tokio::time::timeout(std::time::Duration::from_secs(4),async {
+        loop {let frame=raw.next().await.unwrap().unwrap();if !frame.is_text(){continue;}let msg=decode(frame.to_text().unwrap()).unwrap();
+        if msg.kind=="SOCIAL_STATE" && msg.payload["social_sequence"]==3 { let snapshot:cine_protocol::SocialSnapshotDto=serde_json::from_value(msg.payload.clone()).unwrap();snapshot.validate().unwrap();assert!(msg.payload["entries"].as_array().unwrap().iter().all(|e|e.get("content").is_none()&&e.get("message_reactions").is_none()));break;}}
+    }).await?;
+    m.event_id = Uuid::new_v4();
+    m.kind = "MESSAGE_SEND".into();
+    m.payload = json!({"content":rich_fixture(),"reply_to_message_id":null});
+    raw.send(Message::Text(encode(&m).unwrap().into())).await?;
+    tokio::time::timeout(std::time::Duration::from_secs(4), async {
+        loop {
+            let frame = raw.next().await.unwrap().unwrap();
+            if !frame.is_text() {
+                continue;
+            }
+            let msg = decode(frame.to_text().unwrap()).unwrap();
+            if msg.kind == "ERROR" {
+                assert_eq!(msg.payload["error"]["code"], "FEATURE_NOT_SUPPORTED");
+                break;
+            }
+        }
+    })
+    .await?;
+    raw.close(None).await?;
+    host.disconnect().await;
+    let _ = stop_tx.send(());
+    server.await??;
+    Ok(())
+}

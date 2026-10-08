@@ -154,6 +154,14 @@ pub enum Command {
     Chat {
         text: String,
     },
+    RichMessage {
+        content: crate::social::MessageContent,
+        reply_to_message_id: Option<Uuid>,
+    },
+    MessageReact {
+        message_id: Uuid,
+        emoji: String,
+    },
     React {
         emoji: String,
     },

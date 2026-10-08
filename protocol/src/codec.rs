@@ -82,7 +82,10 @@ fn validate_value(v: &Value, key: &str) -> Result<(), ErrorCode> {
                 return Err(ErrorCode::InvalidEvent);
             }
         }
-        Value::String(s) if key.ends_with("_id") || key.ends_with("_epoch") => {
+        Value::String(s)
+            if (key.ends_with("_id") && key != "provider_content_id")
+                || key.ends_with("_epoch") =>
+        {
             if key == "sender_id" && s == "server" {
                 return Ok(());
             }
@@ -260,6 +263,13 @@ enum RequestDto {
     },
     #[serde(rename = "CHAT_SEND")]
     Chat { text: String },
+    #[serde(rename = "MESSAGE_SEND")]
+    RichMessage {
+        content: MessageContentDto,
+        reply_to_message_id: Option<Uuid>,
+    },
+    #[serde(rename = "MESSAGE_REACTION_SEND")]
+    MessageReact { message_id: Uuid, emoji: String },
     #[serde(rename = "REACTION_SEND")]
     React { emoji: String },
     #[serde(rename = "SYNC_REQUEST")]
@@ -337,6 +347,23 @@ pub fn incoming(message: &WireMessage) -> Result<Incoming, ErrorCode> {
     {
         return Err(ErrorCode::InvalidEvent);
     }
+    if matches!(
+        message.kind.as_str(),
+        "MESSAGE_SEND" | "MESSAGE_REACTION_SEND"
+    ) {
+        let allowed = if message.kind == "MESSAGE_SEND" {
+            ["content", "reply_to_message_id"]
+        } else {
+            ["message_id", "emoji"]
+        };
+        if message
+            .payload
+            .as_object()
+            .is_none_or(|p| p.keys().any(|key| !allowed.contains(&key.as_str())))
+        {
+            return Err(ErrorCode::InvalidEvent);
+        }
+    }
     let dto: RequestDto =
         serde_json::from_value(json!({"type":message.kind,"payload":message.payload}))
             .map_err(|_| ErrorCode::InvalidEvent)?;
@@ -397,6 +424,23 @@ pub fn incoming(message: &WireMessage) -> Result<Incoming, ErrorCode> {
         RequestDto::Chat { text } => {
             cine_rooms::social::validate_text(&text)?;
             Command::Chat { text }
+        }
+        RequestDto::RichMessage {
+            content,
+            reply_to_message_id,
+        } => {
+            let content = content.domain();
+            content.validate()?;
+            Command::RichMessage {
+                content,
+                reply_to_message_id,
+            }
+        }
+        RequestDto::MessageReact { message_id, emoji } => {
+            if !cine_rooms::social::REACTIONS.contains(&emoji.as_str()) {
+                return Err(ErrorCode::InvalidEvent);
+            }
+            Command::MessageReact { message_id, emoji }
         }
         RequestDto::React { emoji } => {
             if !cine_rooms::social::REACTIONS.contains(&emoji.as_str()) {

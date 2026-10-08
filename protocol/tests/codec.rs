@@ -213,3 +213,132 @@ fn social_snapshot_encoding_stays_below_transport_limit_with_escaped_unicode() {
         serde_json::from_value(decode(&text).unwrap().payload).unwrap();
     snapshot.validate().unwrap();
 }
+
+fn rich_request() -> Value {
+    let mut v = hello();
+    v["type"] = json!("MESSAGE_SEND");
+    v["room_id"] = json!(Uuid::new_v4());
+    v["room_epoch"] = json!(Uuid::new_v4());
+    v["payload"] = json!({"content":{"type":"gif","gif":{"provider":"fixture","provider_content_id":"celebrate","media_url":"https://fixtures.cine.invalid/celebrate.gif","preview_url":null,"width":160,"height":100,"alt_text":"Celebración"}},"reply_to_message_id":null});
+    v
+}
+#[test]
+fn rich_content_validates_strict_descriptors_schemes_identity_and_sizes() {
+    assert!(incoming(&decode(&rich_request().to_string()).unwrap()).is_ok());
+    for url in [
+        "http://fixtures.cine.invalid/celebrate.gif",
+        "file:///tmp/a.gif",
+        "javascript:alert(1)",
+        "data:image/gif;base64,a",
+        "https://127.0.0.1/a.gif",
+        "https://localhost/a.gif",
+        "https://10.0.0.1/a.gif",
+        "https://fixtures.cine.invalid.evil/a.gif",
+        "https://u:p@fixtures.cine.invalid/celebrate.gif",
+        "https://fixtures.cine.invalid:443/celebrate.gif",
+    ] {
+        let mut v = rich_request();
+        v["payload"]["content"]["gif"]["media_url"] = json!(url);
+        assert_eq!(rejected(v), ErrorCode::InvalidEvent, "{url}");
+    }
+    for (field, value) in [
+        ("provider", json!("evil")),
+        ("provider_content_id", json!("../evil")),
+        ("width", json!(0)),
+        ("height", json!(4000)),
+        ("alt_text", json!("a".repeat(257))),
+        ("media_url", json!("a".repeat(1025))),
+        ("extra", json!("metadata")),
+    ] {
+        let mut v = rich_request();
+        v["payload"]["content"]["gif"][field] = value;
+        assert_eq!(rejected(v), ErrorCode::InvalidEvent);
+    }
+    let mut v = rich_request();
+    v["payload"]["sender_id"] = json!(Uuid::new_v4());
+    assert_eq!(rejected(v), ErrorCode::InvalidEvent);
+    let mut v = rich_request();
+    v["payload"]["reply_to_message_id"] = json!("wrong");
+    assert_eq!(rejected(v), ErrorCode::InvalidEvent);
+    let mut v = rich_request();
+    v["payload"]["content"]["type"] = json!("system");
+    assert_eq!(rejected(v), ErrorCode::InvalidEvent);
+}
+#[test]
+fn giphy_urls_are_host_and_content_bound_without_server_fetch() {
+    let mut v = rich_request();
+    let g = &mut v["payload"]["content"]["gif"];
+    g["provider"] = json!("giphy");
+    g["provider_content_id"] = json!("abc123");
+    g["media_url"] =
+        json!("https://media2.giphy.com/media/abc123/200w_d.gif?cid=test&rid=200w_d.gif&ct=g");
+    assert!(incoming(&decode(&v.to_string()).unwrap()).is_ok());
+    for url in [
+        "https://media.giphy.com/media/other/a.gif",
+        "https://evil.giphy.com/media/abc123/a.gif",
+        "https://media.giphy.com/media/abc123/a.mp4",
+        "https://media.giphy.com/media/abc123/a.gif?api_key=secret",
+    ] {
+        let mut bad = v.clone();
+        bad["payload"]["content"]["gif"]["media_url"] = json!(url);
+        assert_eq!(rejected(bad), ErrorCode::InvalidEvent);
+    }
+}
+
+#[test]
+fn rich_snapshot_budget_covers_encoded_json_with_maximum_reaction_metadata() {
+    use cine_rooms::{
+        model::{Member, MemberStatus, Role},
+        social::{GifDescriptor, MessageContent, SocialPayload, SocialState},
+    };
+    let member = Member {
+        member_id: Uuid::new_v4(),
+        display_name: "😂".repeat(16),
+        role: Role::Host,
+        connected: true,
+        ready: false,
+        verified_media_revision: None,
+        status: MemberStatus::Idle,
+        joined_at_ms: 0,
+        lease_expires_at_ms: None,
+    };
+    let mut state = SocialState::default();
+    let reaction_members: Vec<_> = (0..16).map(|_| Uuid::new_v4()).collect();
+    for i in 0..400 {
+        let content = if i % 2 == 0 {
+            MessageContent::Text("\"\\\t😂".repeat(200))
+        } else {
+            MessageContent::Gif(GifDescriptor {
+                provider: "fixture".into(),
+                provider_content_id: "celebrate".into(),
+                media_url: "https://fixtures.cine.invalid/celebrate.gif".into(),
+                preview_url: None,
+                width: 160,
+                height: 100,
+                alt_text: "\"\\😂".repeat(30),
+            })
+        };
+        let entry = state.message(Uuid::new_v4(), &member, content, None, i * 10000);
+        for member_id in &reaction_members {
+            for emoji in cine_rooms::social::REACTIONS {
+                state
+                    .toggle(entry.message_id, *member_id, emoji, i * 10000)
+                    .unwrap();
+            }
+        }
+        let wire = social_message(
+            Uuid::new_v4(),
+            Uuid::new_v4(),
+            &SocialPayload::Snapshot {
+                sequence: state.sequence,
+                entries: state.history.iter().cloned().collect(),
+            },
+            i * 10000,
+        );
+        let encoded = encode(&wire).unwrap();
+        assert!(encoded.len() < 48 * 1024);
+        assert!(state.bytes <= 48 * 1024);
+        let snapshot: SocialSnapshotDto = serde_json::from_value(wire.payload).unwrap();
+        snapshot.validate().unwrap();
+    }
+}
