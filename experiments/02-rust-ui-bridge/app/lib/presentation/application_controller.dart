@@ -143,7 +143,9 @@ class NativeSessionGateway implements SessionGateway {
       await video.invokeMethod('fullscreen', enabled);
     } else if (Platform.isAndroid) {
       await SystemChrome.setEnabledSystemUIMode(
-        enabled ? SystemUiMode.immersiveSticky : SystemUiMode.edgeToEdge,
+        enabled ? SystemUiMode.immersiveSticky : SystemUiMode.manual,
+        // On API 28 edgeToEdge is ignored, leaving immersive flags enabled.
+        overlays: enabled ? null : SystemUiOverlay.values,
       );
     }
   }
