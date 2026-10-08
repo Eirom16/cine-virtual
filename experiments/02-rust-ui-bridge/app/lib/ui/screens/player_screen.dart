@@ -7,6 +7,7 @@ import '../../presentation/application_controller.dart';
 import '../../presentation/view_state.dart';
 import '../components/product_components.dart';
 import '../components/desktop_video.dart';
+import '../components/social_panel.dart';
 import '../theme/product_theme.dart';
 
 class PlayerScreen extends StatefulWidget {
@@ -83,24 +84,15 @@ class _PlayerScreenState extends State<PlayerScreen> {
       return;
     }
     sheet = true;
-    await showModalBottomSheet<void>(
-      context: context,
-      useSafeArea: true,
-      isScrollControlled: true,
-      builder: (context) => AnimatedBuilder(
-        animation: widget.controller,
-        builder: (context, _) => SingleChildScrollView(
-          padding: CineTokens.pageInsets,
-          child: Participants(widget.controller.view.members),
-        ),
-      ),
-    );
+    await showSocialSheet(context, widget.controller);
     sheet = false;
     if (mounted) showControls();
   }
 
   void escape() {
-    if (widget.fullscreen) {
+    if (participants) {
+      setState(() => participants = false);
+    } else if (widget.fullscreen) {
       widget.onFullscreen?.call();
     } else {
       setState(() {
@@ -129,10 +121,10 @@ class _PlayerScreenState extends State<PlayerScreen> {
             overflow: TextOverflow.ellipsis,
           ),
         ),
-        IconButton(
+        ReactionPicker(controller: widget.controller),
+        ChatButton(
+          controller: widget.controller,
           onPressed: () => showParticipants(desktop),
-          tooltip: 'Participantes',
-          icon: const Icon(Icons.people_outline),
         ),
       ],
     ),
@@ -189,6 +181,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
             )
           else
             const Center(child: Text('Reproductor no disponible')),
+          ReactionOverlay(controller: controller),
           ValueListenableBuilder<PlaybackView>(
             valueListenable: controller.playback,
             builder: (context, p, _) {
@@ -266,59 +259,71 @@ class _PlayerScreenState extends State<PlayerScreen> {
         },
         child: Focus(
           autofocus: true,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+          child: Stack(
             children: [
-              Expanded(
-                child: composite
-                    ? Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          surface,
-                          Positioned(
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            child: overlay(header(desktop)),
-                          ),
-                          Positioned(
-                            bottom: 0,
-                            left: 0,
-                            right: 0,
-                            child: overlay(controls()),
-                          ),
-                        ],
-                      )
-                    : Column(
-                        children: [
-                          if (visible) header(desktop),
-                          Expanded(
-                            key: const ValueKey('player-video-region'),
-                            child: surface,
-                          ),
-                          if (visible)
-                            controls()
-                          else
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: IconButton(
-                                onPressed: showControls,
-                                tooltip: 'Mostrar controles',
-                                icon: const Icon(Icons.tune),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                    child: composite
+                        ? Stack(
+                            fit: StackFit.expand,
+                            children: [
+                              surface,
+                              Positioned(
+                                top: 0,
+                                left: 0,
+                                right: 0,
+                                child: overlay(header(desktop)),
                               ),
-                            ),
-                        ],
+                              Positioned(
+                                bottom: 0,
+                                left: 0,
+                                right: 0,
+                                child: overlay(controls()),
+                              ),
+                            ],
+                          )
+                        : Column(
+                            children: [
+                              if (visible) header(desktop),
+                              Expanded(
+                                key: const ValueKey('player-video-region'),
+                                child: surface,
+                              ),
+                              if (visible)
+                                controls()
+                              else
+                                Align(
+                                  alignment: Alignment.centerRight,
+                                  child: IconButton(
+                                    onPressed: showControls,
+                                    tooltip: 'Mostrar controles',
+                                    icon: const Icon(Icons.tune),
+                                  ),
+                                ),
+                            ],
+                          ),
+                  ),
+                  if (desktop && participants && !widget.fullscreen)
+                    SizedBox(
+                      width: 300,
+                      child: SocialPanel(
+                        controller: widget.controller,
+                        onClose: () => setState(() => participants = false),
                       ),
-              ),
-              if (desktop && participants)
-                SizedBox(
-                  width: 300,
-                  child: ColoredBox(
-                    color: CineTokens.surface,
-                    child: SingleChildScrollView(
-                      padding: CineTokens.pageInsets,
-                      child: Participants(widget.controller.view.members),
                     ),
+                ],
+              ),
+              if (desktop && participants && widget.fullscreen)
+                Positioned(
+                  top: 48,
+                  bottom: 110,
+                  right: 12,
+                  width: 320,
+                  child: SocialPanel(
+                    controller: widget.controller,
+                    onClose: () => setState(() => participants = false),
                   ),
                 ),
             ],

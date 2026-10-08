@@ -192,6 +192,7 @@ class _ProductShellState extends State<ProductShell> {
         }
       },
       child: Scaffold(
+        resizeToAvoidBottomInset: page != ProductPage.player,
         appBar:
             page == ProductPage.player &&
                 (fullscreen ||

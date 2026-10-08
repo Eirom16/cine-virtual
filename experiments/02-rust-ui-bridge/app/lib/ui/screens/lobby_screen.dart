@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../presentation/application_controller.dart';
 import '../../presentation/view_state.dart';
 import '../components/product_components.dart';
+import '../components/social_panel.dart';
 import '../theme/product_theme.dart';
 
 class LobbyScreen extends StatelessWidget {
@@ -50,6 +51,10 @@ class LobbyScreen extends StatelessWidget {
                           ),
                         ],
                       ),
+                      ChatButton(
+                        controller: controller,
+                        onPressed: () => showSocialSheet(context, controller),
+                      ),
                       OutlinedButton.icon(
                         onPressed: controller.invitation == null
                             ? null
@@ -77,7 +82,10 @@ class LobbyScreen extends StatelessWidget {
                       ),
                       if (desktop)
                         Expanded(
-                          child: SectionCard(child: Participants(view.members)),
+                          child: SizedBox(
+                            height: 480,
+                            child: SocialPanel(controller: controller),
+                          ),
                         )
                       else
                         SizedBox(

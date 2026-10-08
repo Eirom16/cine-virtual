@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 
 import '../bridge.dart';
 import 'view_state.dart';
+import 'social_view.dart';
 
 /// Replaceable only at the presentation boundary for widget tests.
 abstract class SessionGateway {
@@ -191,6 +192,10 @@ class Invitation {
 /// Intents and observation only. Rust remains the only room/network state machine.
 class ApplicationController extends ChangeNotifier with WidgetsBindingObserver {
   final SessionGateway gateway;
+  final social = ValueNotifier(const SocialView());
+  String chatDraft = '', socialError = '', _socialKey = '', _socialEpoch = '';
+  bool socialPending = false;
+  int _socialVisible = 0, _lastSocialSequence = 0, _unread = 0;
   final playback = ValueNotifier(const PlaybackView());
   final hashProgress = ValueNotifier<double?>(null);
   final diagnostics = ValueNotifier<Map<String, dynamic>>({});
@@ -262,6 +267,7 @@ class ApplicationController extends ChangeNotifier with WidgetsBindingObserver {
     final changed = next.layoutKey != view.layoutKey;
     view = next;
     playback.value = PlaybackView.from(next);
+    _publishSocial();
     hashProgress.value = next.hashProgress;
     // Explicit allowlist: never invitation/resume token, local path, URI or full room descriptor.
     diagnostics.value = {
@@ -288,6 +294,15 @@ class ApplicationController extends ChangeNotifier with WidgetsBindingObserver {
           'elapsed_ms',
         ])
           key: next.hash[key],
+      },
+      'social': {
+        'buffer_count': social.value.data['buffer_count'],
+        'buffer_bytes': social.value.data['buffer_bytes'],
+        'last_social_sequence': social.value.data['social_sequence'],
+        'dropped_reactions': social.value.data['dropped_reactions'],
+        'pending_sends': socialPending ? 1 : 0,
+        'rate_limited': socialError == 'RATE_LIMITED',
+        'last_error': socialError,
       },
       'raw_error': error,
       'video': gateway.videoDiagnostics,
@@ -328,7 +343,7 @@ class ApplicationController extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   Future<bool> _run(String label, Future<void> Function() work) async {
-    if (busy || !active) return false;
+    if (busy || socialPending || !active) return false;
     busy = true;
     action = label;
     error = '';
@@ -350,6 +365,106 @@ class ApplicationController extends ChangeNotifier with WidgetsBindingObserver {
       action = '';
       poll();
       _publish();
+    }
+  }
+
+  void _publishSocial() {
+    final data = session ? object(view.network['social']) : <String, dynamic>{};
+    final epoch = '${view.room['room_epoch'] ?? ''}';
+    if (epoch != _socialEpoch) {
+      _socialEpoch = epoch;
+      _lastSocialSequence = 0;
+      _unread = 0;
+      chatDraft = '';
+      socialError = '';
+    }
+    final member = '${view.presentation['member_id'] ?? ''}';
+    for (final entry in (data['entries'] as List? ?? []).map(object)) {
+      if (number(entry['social_sequence']) > _lastSocialSequence &&
+          entry['kind'] == 'chat' &&
+          entry['sender_id'] != member &&
+          _socialVisible == 0) {
+        _unread++;
+      }
+    }
+    _lastSocialSequence = number(data['social_sequence']);
+    if (_socialVisible > 0) _unread = 0;
+    final key = jsonEncode([
+      data,
+      member,
+      socialError,
+      _unread,
+      socialPending,
+      busy,
+      view.connected,
+      suspended,
+    ]);
+    if (key == _socialKey) return;
+    _socialKey = key;
+    social.value = SocialView(
+      data: data,
+      memberId: member,
+      error: socialError,
+      unread: _unread,
+      pending: socialPending,
+      blocked: busy,
+      connected: view.connected && !suspended,
+    );
+  }
+
+  void socialOpened() {
+    _socialVisible++;
+    _unread = 0;
+    _publishSocial();
+  }
+
+  void socialClosed() {
+    if (_socialVisible > 0) _socialVisible--;
+  }
+
+  Future<bool> sendChat(String text) => _sendSocial('chat', {'text': text});
+  Future<bool> sendReaction(String emoji) =>
+      _sendSocial('reaction', {'emoji': emoji});
+  Future<bool> _sendSocial(String action, Map<String, dynamic> fields) async {
+    if (socialPending || busy || !active) return false;
+    socialError = '';
+    if (!social.value.connected) {
+      socialError = 'NETWORK_DISCONNECTED';
+      _publishSocial();
+      return false;
+    }
+    if (action == 'chat') {
+      final text = fields['text'] as String;
+      if (utf8.encode(text).length > 2048) {
+        socialError = 'PAYLOAD_TOO_LARGE';
+        _publishSocial();
+        return false;
+      }
+      if (text.trim().isEmpty ||
+          '\n'.allMatches(text.trim()).length > 8 ||
+          RegExp(r'[\x00-\x08\x0b-\x1f\x7f]').hasMatch(text)) {
+        socialError = 'INVALID_EVENT';
+        _publishSocial();
+        return false;
+      }
+    }
+    socialPending = true;
+    _publishSocial();
+    try {
+      await _intent(action, fields);
+      return true;
+    } on BridgeFailure catch (e) {
+      socialError = e.code;
+      return false;
+    } catch (_) {
+      socialError = 'SEND_FAILED';
+      return false;
+    } finally {
+      socialPending = false;
+      if (active) {
+        poll();
+        _publishSocial();
+      }
     }
   }
 
@@ -547,6 +662,7 @@ class ApplicationController extends ChangeNotifier with WidgetsBindingObserver {
     _timer?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     unawaited(gateway.dispose());
+    social.dispose();
     playback.dispose();
     hashProgress.dispose();
     diagnostics.dispose();
