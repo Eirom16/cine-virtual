@@ -39,7 +39,8 @@ polling y lifecycle. `RoomView`/`PlaybackView` son proyecciones; sus predicados
 limitan botones, pero la autoridad final sigue en Rust/servidor.
 
 No se modificaron algoritmos, thresholds, predictor, scheduler ni protocolo.
-No hay cuentas, chat, providers, transferencia de medios ni datos ficticios.
+No hay cuentas, providers, transferencia de medios ni datos ficticios.
+La extensión social se describe al final de este documento.
 
 ## Navegación y flujo
 
@@ -154,3 +155,36 @@ Android conserva la misma platform view durante auto-hide/show de controles;
 la región Expanded tiene key estable. El test regresivo verifica una creación y
 un dispose al salir, sin adjudicarle validación física de frames. SafeArea y
 layout de controles permanecen fuera de SurfaceView para recibir touch.
+
+## Social Experience Phase 1
+
+IMPLEMENTED: conversación compartida en Lobby/Player, texto plano SelectableText,
+autores históricos con nombre autoritativo y distinción «tú»/otros/sistema.
+Panel desktop 300 px (fullscreen overlay 320 px), tabs Chat/Participantes.
+Lobby desktop muestra la misma conversación; móvil abre bottom sheet SafeArea,
+con inset del teclado. Player no se comprime con teclado; superficie continúa
+montada. Fullscreen desktop abre overlay conservando región de vídeo; móvil
+sheet sobre Player. Reaccionar no cambia fullscreen ni playback.
+
+Enter envía en desktop, Shift+Enter permite nueva línea, IME móvil normal y
+composición activa no se envía. El editor consume shortcuts Space/flechas/F;
+Esc cierra panel antes de salir fullscreen. Límite 2 KiB y reglas de texto se
+validan localmente y en servidor. UI espera eco autoritativo: nunca añade burbuja
+optimista. Pending solo en botón, timeout/error conserva draft para retry manual.
+RATE_LIMITED/error humano inline; error de reacción mediante snackbar.
+
+Unread local cuenta chats ajenos cuando conversación está cerrada; abrir Chat
+marca vistos. Al leer arriba no se fuerza scroll; aparece «Nuevos mensajes».
+Si está al final se sigue la lista. Draft y conversación sobreviven Lobby/Player;
+salir/cambiar epoch limpia draft/unread. No persistencia local durable.
+
+Picker pequeño ❤️ 😂 😮 😢 🔥 👏 con nombres semánticos. ReactionOverlay aislado:
+12 simultáneas, cinco lanes deterministas, subida 70 px, scale/fade durante 2,2 s;
+exceso se descarta visualmente. Posición sobre región de vídeo, lejos de timeline.
+IgnorePointer/ExcludeSemantics evita tap interception y anuncios caóticos de
+cada emoji a screen readers. No notificaciones del SO. Indicadores de presencia
+usan connected/Ready/Host existentes; no away/busy/online inventados.
+
+Developer muestra count/budget/sequence/dropped reactions/pending/rate limit/error,
+sin conversación, tokens, paths, URI o hashes. Cadencia UI sigue 2 Hz; latencia
+visual puede incluir hasta 500 ms de polling. No se declara entrega instantánea.

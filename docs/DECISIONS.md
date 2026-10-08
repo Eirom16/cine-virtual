@@ -358,3 +358,28 @@ Cambio del contexto del engine se detecta y presenta error; requiere reiniciar
 la app. No se ha inyectado pérdida real de GPU. glFinish prioriza orden y
 corrección; optimizar con fences exige nuevas mediciones. No hwdecode nuevo,
 ni garantía de HDR/color management, Windows/macOS o empaquetado distribuible.
+
+## ADR-012 — Social opt-in sobre la sesión de sala (Implementada)
+
+**Context:** chat debe recuperar contexto con la identidad/resume existentes;
+las reacciones son efímeras y no deben invalidar expected_sequence de playback.
+Clientes v1 anteriores rechazan eventos desconocidos.
+
+**Decision:** negociar `social_v1` mediante capabilities opcional en HELLO/ACCEPT.
+Solo sockets que lo negociaron reciben eventos sociales en el WebSocket de sala.
+RoomService conserva historial y cuotas por miembro; el Client compartido conserva
+una réplica acotada. Chat/presencia usan social_sequence independiente; reacciones
+no consumen ninguna secuencia y no tienen replay. ROOM_STATE en create/join/resume/
+sync/retry se acompaña de SOCIAL_STATE privado, sin modificar RoomState/Core.
+
+**Alternatives:** secuencia global (conflictos de controles y snapshots completos
+por emoji); otro socket/servidor (segunda sesión y autoridad); historial durable
+(fuera de alcance); eventos nuevos no negociados (rompe clientes anteriores).
+
+**Consequences:** v1 permanece compatible mediante opt-in explícito. UUIDs sociales
+los genera servidor; dedup de intents sigue ligado a epoch/member/event_id por
+120 s. Historial in-memory compartido chat/presencia: hasta 100 entradas y 48 KiB
+de presupuesto conservador de JSON escapado. No persistencia ni envío optimista.
+Resume recupera historial disponible, no conversación ilimitada. Pérdida breve
+solo cambia participants; resumed visible como máximo una vez por miembro/30 s.
+Reinicio pierde todo. GIF/voz/vídeo/cuentas siguen NOT IMPLEMENTED.

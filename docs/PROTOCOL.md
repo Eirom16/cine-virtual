@@ -408,3 +408,63 @@ conexiones configurable. Antes de exposición pública deben implementarse estos
 límites y pruebas de abuso. El spike aplica 20/s con burst 40 por conexión y
 colas acotadas; presupuestos por origen y telemetría específica siguen pendientes.
 Ver [SECURITY](SECURITY.md) para boundary, observabilidad y contenido no confiable.
+
+## Extensión social v1 negociada
+
+IMPLEMENTED: HELLO puede incluir `capabilities:["social_v1"]`; ACCEPT devuelve
+capabilities aceptadas. Ausencia equivale a ninguna capacidad social. Servidor
+anterior ignora el campo opcional; cliente nuevo deshabilita social si ACCEPT no
+lo confirma. Cliente anterior no recibe los eventos nuevos. protocol_version=1
+se conserva, sin alterar eventos/semántica de playback.
+
+| Tipo | Dirección | Payload / conducta |
+| --- | --- | --- |
+| CHAT_SEND | C→S miembro | `{text}` exclusivamente. Identidad y nombre proceden de binding/membership. |
+| CHAT_MESSAGE | S→R negociados | Entrada autoritativa de chat o presencia; envelope scope room/epoch, sequence=null. |
+| SOCIAL_STATE | S→C negociado | `{social_sequence,entries}`. Snapshot del historial reciente; enviado después del ROOM_STATE de create/join/resume/sync/retry. |
+| REACTION_SEND | C→S miembro | `{emoji}` exclusivamente; allowlist. |
+| REACTION | S→R negociados | `{reaction_id,sender_id,emoji,sent_at_ms}`; sin history/sequence. |
+
+Entrada: message_id UUIDv4 generado por servidor; sender_id del miembro ligado a
+conexión; display_name copiado del registro autoritativo; social_sequence >0;
+sent_at_ms monotónico del servidor; kind `chat|joined|left|resumed`; text plano
+(chat) o vacío (sistema). Nombre permanece aunque miembro salga. UUID de request
+solo correlaciona ACK/ERROR; nunca concede identidad ni se usa como ID global de
+mensaje. Distintos miembros pueden reutilizar el mismo event_id sin colisionar.
+Room/epoch ya están en envelope; no se duplican por entrada.
+
+Social no consume room sequence, no exige expected_sequence/media/Ready/reloj
+confiable y no aplica timeline/scheduler/SyncEngine. Envelope cliente sequence
+no nulo continúa rechazado; epoch/scope/sesión deben ser vigentes. Controles
+con expected_sequence obsoleto conservan OUT_OF_SEQUENCE. Secuencia social ordena
+chat/presencia determinísticamente; snapshot inferior se ignora y delta repetido
+se descarta. Gap pide SYNC_REQUEST existente; snapshot reemplaza buffer acotado.
+
+Texto: máximo 2048 bytes UTF-8 antes de trim; extremos Unicode whitespace se
+recortan, vacío se rechaza, hasta 8 saltos de línea interiores (9 líneas).
+Se permiten Unicode/emoji, tab y LF; controles restantes se rechazan. No HTML/
+Markdown/embeds. Invalid format → INVALID_EVENT; exceso → PAYLOAD_TOO_LARGE.
+Payload con sender_id/display_name adicional se rechaza; envelope sender_id no
+concede identidad. Validación repetida en RoomService además de codec/cliente.
+
+Cuotas independientes por miembro, token bucket con tiempo servidor inyectado:
+chat burst 5, refill 1/2000 ms; reactions burst 8, refill 1/500 ms. Resume no
+reinicia cuota. Duplicado idéntico responde resultado cacheado y snapshot sin
+rebroadcast/consumir cuota; payload/tipo distinto con mismo ID → INVALID_EVENT.
+RATE_LIMITED queda cacheado para ese intent: nuevo intento voluntario usa otro ID.
+También aplica límite general existente de conexión y cache de idempotencia.
+
+Allowlist exacta: ❤️ 😂 😮 😢 🔥 👏. Reacciones no se retienen en servidor ni
+SOCIAL_STATE. Client conserva máximo 32 recibidas durante 3 s; descarta entrega
+con más de 3 s de edad al serializar. Snapshot/resume limpia reacciones locales.
+No reproducir reacciones antiguas. UI limita 12 simultáneas y elimina a los 2,2 s.
+
+Historial compartido de chat/presencia: máximo 100 entradas y 48 KiB de presupuesto
+conservador `512 + 6*(text_bytes + display_name_bytes)` por entrada, incluyendo
+peor escape JSON. Se expulsa más antiguo primero. El límite de bytes puede reducir
+la cantidad efectiva por debajo de 100; wire completo permanece bajo 64 KiB.
+Client aplica los mismos límites. La cache de intents existente conserva payloads
+hasta 120 s dentro de sus límites; no equivale a historial durable.
+Solo joined/left/expired/resumed producen entradas de presencia. Disconnect
+transitorio no crea entrada; resumed se coalesce a una por miembro cada 30 s.
+Play/Pause/Seek/Ready no llenan chat. No texto social en logs por defecto.

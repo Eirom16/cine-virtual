@@ -224,3 +224,20 @@ QA físico: Create/Join/SAF/hash/Ready, controles reales Linux ↔ Android, resi
 fullscreen/exit, Lobby/Player, reconnect y cinco foreground recoveries. Guardar
 solo corpus sintético y telemetría saneada; nunca tokens, URI privadas o hashes.
 La pérdida real del contexto GPU y multi-monitor requieren evidencia adicional.
+
+## Social Phase 1
+
+Pruebas nuevas de RoomService/codec/Client/WebSocket: identidad ligada a binding,
+spoof en envelope y payload, Unicode/control/longitud, scope/epoch, dedup tras
+ACK y socket cerrado/resume, ordering, buffers por count/bytes/escape JSON,
+cuotas por miembro conservadas tras resume, allowlist y ausencia de replay de
+reacciones. Dos clientes FakePlayer reales por TCP conservan Ready/Play/Pause/Seek.
+Clientes v1 sin capability no reciben social. Ráfagas y retención prolongada usan
+reloj inyectado, sin spam externo ni sleeps en RoomService.
+
+`app/test/social_test.dart`: cerrado/abierto, autores/sistema, Enter/Shift+Enter,
+error/draft, unread, scroll/indicador, picker accesible, cleanup/cap de animaciones,
+foco que bloquea playback, ausencia de rebuild de estructura y redacción.
+Viewports: 1366×768, 1920×1080, 390×844, 844×390, 568×320, incluyendo teclado.
+Los widget tests no prueban frames ni dispositivos físicos. Evidencia física,
+limitaciones y comandos en [experimento 11](../experiments/11-social-chat-reactions/README.md).

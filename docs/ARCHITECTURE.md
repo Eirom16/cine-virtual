@@ -264,3 +264,19 @@ Android foreground distingue revalidación local de selección explícita. El
 Client valida descriptor/identidad de la selección vigente sin publicar un
 MEDIA_SELECT_REQUEST. Hash/generation/Ready y reconciliación se conservan. No
 se cambia el protocolo ni se persiste una posición Flutter como autoridad.
+
+## Social Experience Phase 1
+
+ADR-012 añade social negociado en el WebSocket existente; no reemplaza RoomService
+ni añade dependencias a Core. `rooms::social` posee historial/cuotas autoritativos
+sin Tokio/JSON; devuelve efectos sociales acotados. El hub filtra recipients por
+capability y encola sin await; serialización/socket permanecen fuera del mutex.
+El Client Rust común valida scope/entries, dedup, gap y SOCIAL_STATE. No envía
+social a Replica de playback ni modifica SyncEngine/Player/Ready.
+
+Bridge amplía Intent con chat/reaction y proyecta un solo snapshot social junto
+al snapshot Application existente. Publicación Rust 100 ms, Flutter 500 ms
+conservados; no polling 20 ms ni WebSocket Dart. ReactionOverlay/message list/
+unread observan un ValueNotifier independiente; escribir es estado local del
+editor. Retención/quotas en [PROTOCOL](PROTOCOL.md). Rust es fuente de verdad;
+Flutter solo draft, visibilidad, unread, scroll y animación. Chat no es durable.
