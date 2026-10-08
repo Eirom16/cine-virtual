@@ -154,6 +154,10 @@ fn social_intents_are_plain_bounded_and_server_events_are_not_client_intents() {
             ErrorCode::InvalidEvent | ErrorCode::PayloadTooLarge
         ));
     }
+    v["payload"] = json!({"text":"valid"});
+    v["sequence"] = json!(1);
+    assert_eq!(rejected(v.clone()), ErrorCode::NotAuthorized);
+    v["sequence"] = json!(null);
     v["type"] = json!("REACTION_SEND");
     v["payload"] = json!({"emoji":"😂"});
     assert!(incoming(&decode(&v.to_string()).unwrap()).is_ok());

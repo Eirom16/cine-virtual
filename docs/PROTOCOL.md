@@ -460,8 +460,8 @@ con más de 3 s de edad al serializar. Snapshot/resume limpia reacciones locales
 No reproducir reacciones antiguas. UI limita 12 simultáneas y elimina a los 2,2 s.
 
 Historial compartido de chat/presencia: máximo 100 entradas y 48 KiB de presupuesto
-conservador `512 + 6*(text_bytes + display_name_bytes)` por entrada, incluyendo
-peor escape JSON. Se expulsa más antiguo primero. El límite de bytes puede reducir
+conservador `384 + escaped_json_bytes(text) + escaped_json_bytes(display_name)` por entrada,
+incluyendo metadata y escapes JSON sin multiplicar UTF-8 normal por seis. Se expulsa más antiguo primero. El límite de bytes puede reducir
 la cantidad efectiva por debajo de 100; wire completo permanece bajo 64 KiB.
 Client aplica los mismos límites. La cache de intents existente conserva payloads
 hasta 120 s dentro de sus límites; no equivale a historial durable.

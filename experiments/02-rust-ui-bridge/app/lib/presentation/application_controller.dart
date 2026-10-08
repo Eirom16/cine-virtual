@@ -442,7 +442,7 @@ class ApplicationController extends ChangeNotifier with WidgetsBindingObserver {
       }
       if (text.trim().isEmpty ||
           '\n'.allMatches(text.trim()).length > 8 ||
-          RegExp(r'[\x00-\x08\x0b-\x1f\x7f]').hasMatch(text)) {
+          RegExp(r'[\x00-\x08\x0b-\x1f\x7f-\x9f]').hasMatch(text)) {
         socialError = 'INVALID_EVENT';
         _publishSocial();
         return false;

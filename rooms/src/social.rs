@@ -24,6 +24,20 @@ pub fn validate_text(text: &str) -> Result<&str, ErrorCode> {
     }
     Ok(text)
 }
+/// Fixed metadata allowance plus the actual upper bound for JSON string escaping.
+/// Count UTF-8 normally: multiplying all Unicode by six would evict useful history.
+pub fn entry_budget(text: &str, display_name: &str) -> usize {
+    fn escaped_bytes(text: &str) -> usize {
+        text.chars()
+            .map(|c| match c {
+                '"' | '\\' | '\n' | '\r' | '\t' | '\u{8}' | '\u{c}' => 2,
+                c if c < '\u{20}' => 6,
+                c => c.len_utf8(),
+            })
+            .sum()
+    }
+    384 + escaped_bytes(text) + escaped_bytes(display_name)
+}
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct SocialEntry {
     pub message_id: Uuid,
@@ -37,7 +51,7 @@ pub struct SocialEntry {
 }
 impl SocialEntry {
     pub fn budget(&self) -> usize {
-        512 + 6 * (self.text.len() + self.display_name.len())
+        entry_budget(&self.text, &self.display_name)
     }
 }
 struct Bucket {

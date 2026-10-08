@@ -50,7 +50,7 @@ impl SocialEntryDto {
         Ok(())
     }
     pub fn budget(&self) -> usize {
-        512 + 6 * (self.text.len() + self.display_name.len())
+        cine_rooms::social::entry_budget(&self.text, &self.display_name)
     }
 }
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
