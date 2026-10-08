@@ -191,3 +191,36 @@ medida posterior de pérdida de avance al reanudar Play. Tests Python verifican
 offset entre dominios, preservación de OTHER y rechazo de callbacks de completion
 invalidados por comandos opuestos, conservando la evidencia. El diagnóstico no aprueba frame/audio perceptual ni todos
 los dispositivos; functional PASS y p95 gate se publican separadamente.
+
+
+## Product UI Phase 2: render y recovery
+
+[Experimento 10](../experiments/10-player-integration/README.md) conserva spike,
+backend, screenshots y resultados separados de Phase 1. Los frames no se validan
+con widget tests. El test nativo puro comprueba dimensiones inválidas, límite
+4096, clear/reveal, generation vieja y recreate. El test SDK de lease comprueba
+que el owner sobrevive al drop de su referencia inicial hasta liberar la lease.
+
+```sh
+c++ -std=c++14 -Wall -Werror experiments/02-rust-ui-bridge/app/linux/runner/presentation_state_test.cc -o /tmp/cine-presentation-test
+/tmp/cine-presentation-test
+cargo test -p cine-ui-bridge video_lease_retains_owner_until_render_detach --locked -- --ignored --test-threads=1
+```
+
+El test WebSocket Host revalidation conserva selección/timeline pausada en 45 s
+con SDK temporalmente en 0, bloquea identidad incorrecta/Ready y confirma que
+selección explícita sigue creando revisión nueva. Los tests previos cubren
+generation vieja y suspend/resume. Flutter cubre fullscreen/Escape Participant
+sin autoridad y scrub con un único seek al commit, además de todos los anteriores. Otro test prueba un único platform view Android
+al ocultar/mostrar controles y un único dispose al desmontar.
+
+```sh
+cd experiments/02-rust-ui-bridge/app
+CINE_BRIDGE_LIBRARY="$PWD/../../../target/debug/libcine_ui_bridge.so" flutter test
+flutter analyze
+```
+
+QA físico: Create/Join/SAF/hash/Ready, controles reales Linux ↔ Android, resize,
+fullscreen/exit, Lobby/Player, reconnect y cinco foreground recoveries. Guardar
+solo corpus sintético y telemetría saneada; nunca tokens, URI privadas o hashes.
+La pérdida real del contexto GPU y multi-monitor requieren evidencia adicional.

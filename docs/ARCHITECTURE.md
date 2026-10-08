@@ -4,7 +4,8 @@ Estado: fundaciones conservadas; el Spike A implementa adapters WebSocket,
 RoomService, codec y cliente CLI con FakePlayer. Spike B añade un Player libmpv
 experimental Linux. El vertical slice 1 integra red + vídeo real con LocalMedia;
 Spike C añade UI de ingeniería/bridge aislados; el vertical slice 2 reutiliza
-Application para Linux/Android. No hay UI de producto.
+Application para Linux/Android. Product UI Phases 1–2 añaden el shell de producto,
+Player Linux embebido, fullscreen y recovery Android; véase [UI](UI.md).
 [PRODUCT](PRODUCT.md) delimita v0.1 y [PROTOCOL](PROTOCOL.md)
 define el contrato normativo de control. [DECISIONS](DECISIONS.md) registra motivos.
 
@@ -247,3 +248,19 @@ Los fixtures anteriores quedan solo en modo local de Spike C.
 Implementación y evidencia física (distinguir ejecuciones aprobadas y fallidas)
 en [experimento 07](../experiments/07-linux-android-room/README.md).
 No fija Flutter, libmpv o Media3 ni completa v0.1.
+
+
+## Presentación de vídeo Linux (Phase 2)
+
+La UI desktop usa RealPlayer::embedded (vo=libmpv); la CLI conserva su salida
+headless/nativa. El owner Rust continúa ejecutando SDK/control. El runner Linux
+adquiere una lease privada del owner por C ABI y presenta mediante Render API en
+un worker EGL propio. FlTextureGL copia únicamente píxeles GPU completados a su
+textura consumidora. Flutter recibe un ID, resize/clear y estado; no recibe mpv
+internals ni frames CPU. Separación, orden de destrucción y límites en ADR-011
+[DECISIONS](DECISIONS.md) y [spike](../experiments/10-player-integration/embedding-spike.md).
+
+Android foreground distingue revalidación local de selección explícita. El
+Client valida descriptor/identidad de la selección vigente sin publicar un
+MEDIA_SELECT_REQUEST. Hash/generation/Ready y reconciliación se conservan. No
+se cambia el protocolo ni se persiste una posición Flutter como autoridad.

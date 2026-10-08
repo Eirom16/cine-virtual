@@ -1,0 +1,820 @@
+{
+  "backend": "GdkWaylandDisplay / KDE KWin 6.7.5",
+  "measurements": [
+    {
+      "label": "playing-normal",
+      "seconds": 10.0,
+      "cpu_one_core_percent": 30.1,
+      "before": {
+        "ticks": 3313,
+        "rss_kib": 476196,
+        "threads": 48,
+        "fds": 60
+      },
+      "after": {
+        "ticks": 3614,
+        "rss_kib": 482180,
+        "threads": 47,
+        "fds": 60
+      }
+    },
+    {
+      "label": "playing-fullscreen",
+      "seconds": 10.0,
+      "cpu_one_core_percent": 26.1,
+      "before": {
+        "ticks": 3907,
+        "rss_kib": 481028,
+        "threads": 47,
+        "fds": 60
+      },
+      "after": {
+        "ticks": 4168,
+        "rss_kib": 486472,
+        "threads": 49,
+        "fds": 60
+      }
+    },
+    {
+      "label": "transition-to-play-host (excluded from idle measurement)",
+      "seconds": 10.0,
+      "cpu_one_core_percent": 32.8,
+      "before": {
+        "ticks": 2369,
+        "rss_kib": 480484,
+        "threads": 50,
+        "fds": 60
+      },
+      "after": {
+        "ticks": 2697,
+        "rss_kib": 483692,
+        "threads": 48,
+        "fds": 60
+      }
+    },
+    {
+      "label": "idle-confirmed-paused-host",
+      "seconds": 10.0,
+      "cpu_one_core_percent": 7.2,
+      "before": {
+        "ticks": 3662,
+        "rss_kib": 502564,
+        "threads": 49,
+        "fds": 59
+      },
+      "after": {
+        "ticks": 3734,
+        "rss_kib": 503160,
+        "threads": 47,
+        "fds": 59
+      }
+    }
+  ],
+  "navigation_cycles": {
+    "before": {
+      "rss_kib": 528928,
+      "threads": 47,
+      "fds": 60
+    },
+    "video_before": {
+      "context": true,
+      "ready": true,
+      "error": 0,
+      "frames": 3819,
+      "width": 1366,
+      "height": 652,
+      "backend": "GdkWaylandDisplay",
+      "generation": 5,
+      "completed_generation": 5
+    },
+    "cycles": [
+      {
+        "number": 1,
+        "resources": {
+          "rss_kib": 543440,
+          "threads": 50,
+          "fds": 60
+        },
+        "video": {
+          "context": true,
+          "ready": true,
+          "error": 0,
+          "frames": 3882,
+          "width": 1366,
+          "height": 652,
+          "backend": "GdkWaylandDisplay",
+          "generation": 5,
+          "completed_generation": 5
+        }
+      },
+      {
+        "number": 2,
+        "resources": {
+          "rss_kib": 543376,
+          "threads": 50,
+          "fds": 60
+        },
+        "video": {
+          "context": true,
+          "ready": true,
+          "error": 0,
+          "frames": 3945,
+          "width": 1366,
+          "height": 652,
+          "backend": "GdkWaylandDisplay",
+          "generation": 5,
+          "completed_generation": 5
+        }
+      },
+      {
+        "number": 3,
+        "resources": {
+          "rss_kib": 542812,
+          "threads": 48,
+          "fds": 60
+        },
+        "video": {
+          "context": true,
+          "ready": true,
+          "error": 0,
+          "frames": 4023,
+          "width": 1366,
+          "height": 652,
+          "backend": "GdkWaylandDisplay",
+          "generation": 5,
+          "completed_generation": 5
+        }
+      },
+      {
+        "number": 4,
+        "resources": {
+          "rss_kib": 543764,
+          "threads": 47,
+          "fds": 60
+        },
+        "video": {
+          "context": true,
+          "ready": true,
+          "error": 0,
+          "frames": 4086,
+          "width": 1366,
+          "height": 652,
+          "backend": "GdkWaylandDisplay",
+          "generation": 5,
+          "completed_generation": 5
+        }
+      },
+      {
+        "number": 5,
+        "resources": {
+          "rss_kib": 554468,
+          "threads": 51,
+          "fds": 60
+        },
+        "video": {
+          "context": true,
+          "ready": true,
+          "error": 0,
+          "frames": 4149,
+          "width": 1366,
+          "height": 652,
+          "backend": "GdkWaylandDisplay",
+          "generation": 5,
+          "completed_generation": 5
+        }
+      }
+    ],
+    "after": {
+      "rss_kib": 555596,
+      "threads": 51,
+      "fds": 60
+    },
+    "video_after": {
+      "context": true,
+      "ready": true,
+      "error": 0,
+      "frames": 4165,
+      "width": 1366,
+      "height": 652,
+      "backend": "GdkWaylandDisplay",
+      "generation": 5,
+      "completed_generation": 5
+    }
+  },
+  "navigation_cycles_warm": {
+    "before": {
+      "rss_kib": 473832,
+      "threads": 47,
+      "fds": 60
+    },
+    "video_before": {
+      "context": true,
+      "ready": true,
+      "error": 0,
+      "frames": 4659,
+      "width": 1366,
+      "height": 652,
+      "backend": "GdkWaylandDisplay",
+      "generation": 5,
+      "completed_generation": 5
+    },
+    "cycles": [
+      {
+        "number": 1,
+        "resources": {
+          "rss_kib": 482728,
+          "threads": 48,
+          "fds": 60
+        },
+        "video": {
+          "context": true,
+          "ready": true,
+          "error": 0,
+          "frames": 4720,
+          "width": 1366,
+          "height": 652,
+          "backend": "GdkWaylandDisplay",
+          "generation": 5,
+          "completed_generation": 5
+        }
+      },
+      {
+        "number": 2,
+        "resources": {
+          "rss_kib": 473324,
+          "threads": 50,
+          "fds": 60
+        },
+        "video": {
+          "context": true,
+          "ready": true,
+          "error": 0,
+          "frames": 4781,
+          "width": 1366,
+          "height": 652,
+          "backend": "GdkWaylandDisplay",
+          "generation": 5,
+          "completed_generation": 5
+        }
+      },
+      {
+        "number": 3,
+        "resources": {
+          "rss_kib": 482672,
+          "threads": 48,
+          "fds": 60
+        },
+        "video": {
+          "context": true,
+          "ready": true,
+          "error": 0,
+          "frames": 4827,
+          "width": 1366,
+          "height": 652,
+          "backend": "GdkWaylandDisplay",
+          "generation": 5,
+          "completed_generation": 5
+        }
+      },
+      {
+        "number": 4,
+        "resources": {
+          "rss_kib": 476756,
+          "threads": 47,
+          "fds": 60
+        },
+        "video": {
+          "context": true,
+          "ready": true,
+          "error": 0,
+          "frames": 4888,
+          "width": 1366,
+          "height": 652,
+          "backend": "GdkWaylandDisplay",
+          "generation": 5,
+          "completed_generation": 5
+        }
+      },
+      {
+        "number": 5,
+        "resources": {
+          "rss_kib": 480916,
+          "threads": 49,
+          "fds": 60
+        },
+        "video": {
+          "context": true,
+          "ready": true,
+          "error": 0,
+          "frames": 4950,
+          "width": 1366,
+          "height": 652,
+          "backend": "GdkWaylandDisplay",
+          "generation": 5,
+          "completed_generation": 5
+        }
+      }
+    ],
+    "after": {
+      "rss_kib": 486304,
+      "threads": 49,
+      "fds": 60
+    },
+    "video_after": {
+      "context": true,
+      "ready": true,
+      "error": 0,
+      "frames": 4979,
+      "width": 1366,
+      "height": 652,
+      "backend": "GdkWaylandDisplay",
+      "generation": 5,
+      "completed_generation": 5
+    }
+  },
+  "window_count": {
+    "cine": 1,
+    "mpv": 0,
+    "source": "KWin workspace.windowList filtered by resourceClass"
+  },
+  "resize": {
+    "slow_fast_configure_changes": 30,
+    "interval_ms": 150,
+    "range_width": [
+      700,
+      1285
+    ],
+    "range_height": [
+      450,
+      630
+    ],
+    "restored": [
+      1366,
+      700
+    ],
+    "result": "TESTED; native error=0 after cycles"
+  },
+  "qa_1920": {
+    "window_pixels": [
+      1920,
+      1080
+    ],
+    "physical_monitor_pixels": [
+      1366,
+      768
+    ],
+    "backend": "Wayland KWin; actual oversized window capture; no upscaling",
+    "second_monitor": false
+  },
+  "reconnect": {
+    "before": {
+      "generation": 1,
+      "connected": true,
+      "member_id": "71edd96a-f3c5-4f0a-89f1-81b4359c700e",
+      "room_id": "6f847b41-9849-4e79-a123-a6d0f6dd847d",
+      "sequence": 19,
+      "media_revision": 1,
+      "timeline": {
+        "position_ms": 0,
+        "status": "playing",
+        "anchor_time_ms": 1585721,
+        "duration_ms": 620000
+      },
+      "position_ms": 351467,
+      "target_ms": 351490,
+      "playing": true,
+      "ready": true,
+      "room_ready": true,
+      "snapshot_required": false,
+      "trusted": true,
+      "seeking": false,
+      "corrections": {
+        "rate": 0,
+        "restore": 0,
+        "seek": 1
+      },
+      "identity_match": true,
+      "hash_state": "complete",
+      "last_action": "ready",
+      "error": null,
+      "ui_error": "",
+      "recovering": false,
+      "sample": {
+        "position_ms": 0,
+        "playing": false,
+        "loaded": false,
+        "seeking": false,
+        "buffering": false
+      }
+    },
+    "video_before": {
+      "context": true,
+      "ready": true,
+      "error": 0,
+      "frames": 5324,
+      "width": 1366,
+      "height": 652,
+      "backend": "GdkWaylandDisplay",
+      "generation": 5,
+      "completed_generation": 5
+    },
+    "disconnected": {
+      "generation": 1,
+      "connected": false,
+      "member_id": "71edd96a-f3c5-4f0a-89f1-81b4359c700e",
+      "room_id": "6f847b41-9849-4e79-a123-a6d0f6dd847d",
+      "sequence": 19,
+      "media_revision": 1,
+      "timeline": {
+        "position_ms": 0,
+        "status": "playing",
+        "anchor_time_ms": 1585721,
+        "duration_ms": 620000
+      },
+      "position_ms": 352400,
+      "target_ms": 354188,
+      "playing": false,
+      "ready": true,
+      "room_ready": false,
+      "snapshot_required": true,
+      "trusted": true,
+      "seeking": false,
+      "corrections": {
+        "rate": 0,
+        "restore": 0,
+        "seek": 1
+      },
+      "identity_match": true,
+      "hash_state": "complete",
+      "last_action": "disconnect",
+      "error": null,
+      "ui_error": "",
+      "recovering": false,
+      "sample": {
+        "position_ms": 0,
+        "playing": false,
+        "loaded": false,
+        "seeking": false,
+        "buffering": false
+      }
+    },
+    "after": {
+      "generation": 1,
+      "connected": true,
+      "member_id": "71edd96a-f3c5-4f0a-89f1-81b4359c700e",
+      "room_id": "6f847b41-9849-4e79-a123-a6d0f6dd847d",
+      "sequence": 22,
+      "media_revision": 1,
+      "timeline": {
+        "position_ms": 0,
+        "status": "playing",
+        "anchor_time_ms": 1585721,
+        "duration_ms": 620000
+      },
+      "position_ms": 358733,
+      "target_ms": 358790,
+      "playing": true,
+      "ready": true,
+      "room_ready": true,
+      "snapshot_required": false,
+      "trusted": true,
+      "seeking": false,
+      "corrections": {
+        "rate": 0,
+        "restore": 0,
+        "seek": 1
+      },
+      "identity_match": true,
+      "hash_state": "complete",
+      "last_action": "ready",
+      "error": null,
+      "ui_error": "",
+      "recovering": false,
+      "sample": {
+        "position_ms": 0,
+        "playing": false,
+        "loaded": false,
+        "seeking": false,
+        "buffering": false
+      }
+    },
+    "video_after": {
+      "context": true,
+      "ready": true,
+      "error": 0,
+      "frames": 5373,
+      "width": 1366,
+      "height": 652,
+      "backend": "GdkWaylandDisplay",
+      "generation": 5,
+      "completed_generation": 5
+    },
+    "checks": {
+      "same_room_member": true,
+      "ready": true,
+      "render_survived": true,
+      "nonzero_timeline": true
+    },
+    "result": "PASS"
+  },
+  "host_controls": {
+    "playing": {
+      "generation": 1,
+      "connected": true,
+      "member_id": "19761eba-c472-48a6-8fab-849f1c44aa20",
+      "room_id": "453ad1c2-c00f-4499-871a-353ce15bd696",
+      "sequence": 6,
+      "media_revision": 1,
+      "timeline": {
+        "position_ms": 243933,
+        "status": "playing",
+        "anchor_time_ms": 2107030,
+        "duration_ms": 620000
+      },
+      "position_ms": 274667,
+      "target_ms": 274697,
+      "playing": true,
+      "ready": true,
+      "room_ready": true,
+      "snapshot_required": false,
+      "trusted": true,
+      "seeking": false,
+      "corrections": {
+        "rate": 0,
+        "restore": 0,
+        "seek": 0
+      },
+      "identity_match": true,
+      "hash_state": "complete",
+      "last_action": "play",
+      "error": null,
+      "ui_error": "",
+      "recovering": false,
+      "sample": {
+        "position_ms": 0,
+        "playing": false,
+        "loaded": false,
+        "seeking": false,
+        "buffering": false
+      }
+    },
+    "paused": {
+      "generation": 1,
+      "connected": true,
+      "member_id": "19761eba-c472-48a6-8fab-849f1c44aa20",
+      "room_id": "453ad1c2-c00f-4499-871a-353ce15bd696",
+      "sequence": 7,
+      "media_revision": 1,
+      "timeline": {
+        "position_ms": 275759,
+        "status": "paused",
+        "anchor_time_ms": 2138856,
+        "duration_ms": 620000
+      },
+      "position_ms": 275733,
+      "target_ms": 275759,
+      "playing": false,
+      "ready": true,
+      "room_ready": true,
+      "snapshot_required": false,
+      "trusted": true,
+      "seeking": false,
+      "corrections": {
+        "rate": 0,
+        "restore": 0,
+        "seek": 0
+      },
+      "identity_match": true,
+      "hash_state": "complete",
+      "last_action": "pause",
+      "error": null,
+      "ui_error": "",
+      "recovering": false,
+      "sample": {
+        "position_ms": 0,
+        "playing": false,
+        "loaded": false,
+        "seeking": false,
+        "buffering": false
+      }
+    },
+    "seek_right": {
+      "generation": 1,
+      "connected": true,
+      "member_id": "19761eba-c472-48a6-8fab-849f1c44aa20",
+      "room_id": "453ad1c2-c00f-4499-871a-353ce15bd696",
+      "sequence": 8,
+      "media_revision": 1,
+      "timeline": {
+        "position_ms": 275759,
+        "status": "paused",
+        "anchor_time_ms": 2138856,
+        "duration_ms": 620000
+      },
+      "position_ms": 285733,
+      "target_ms": 285733,
+      "playing": false,
+      "ready": true,
+      "room_ready": true,
+      "snapshot_required": false,
+      "trusted": true,
+      "seeking": false,
+      "corrections": {
+        "rate": 0,
+        "restore": 0,
+        "seek": 0
+      },
+      "identity_match": true,
+      "hash_state": "complete",
+      "last_action": "seek",
+      "error": null,
+      "ui_error": "",
+      "recovering": false,
+      "sample": {
+        "position_ms": 0,
+        "playing": false,
+        "loaded": false,
+        "seeking": false,
+        "buffering": false
+      }
+    },
+    "seek_left": {
+      "generation": 1,
+      "connected": true,
+      "member_id": "19761eba-c472-48a6-8fab-849f1c44aa20",
+      "room_id": "453ad1c2-c00f-4499-871a-353ce15bd696",
+      "sequence": 9,
+      "media_revision": 1,
+      "timeline": {
+        "position_ms": 275733,
+        "status": "paused",
+        "anchor_time_ms": 2178524,
+        "duration_ms": 620000
+      },
+      "position_ms": 275733,
+      "target_ms": 275733,
+      "playing": false,
+      "ready": true,
+      "room_ready": true,
+      "snapshot_required": false,
+      "trusted": true,
+      "seeking": false,
+      "corrections": {
+        "rate": 0,
+        "restore": 0,
+        "seek": 0
+      },
+      "identity_match": true,
+      "hash_state": "complete",
+      "last_action": "seek",
+      "error": null,
+      "ui_error": "",
+      "recovering": false,
+      "sample": {
+        "position_ms": 0,
+        "playing": false,
+        "loaded": false,
+        "seeking": false,
+        "buffering": false
+      }
+    },
+    "fullscreen": {
+      "generation": 1,
+      "connected": true,
+      "member_id": "19761eba-c472-48a6-8fab-849f1c44aa20",
+      "room_id": "453ad1c2-c00f-4499-871a-353ce15bd696",
+      "sequence": 8,
+      "media_revision": 1,
+      "timeline": {
+        "position_ms": 285733,
+        "status": "paused",
+        "anchor_time_ms": 2141937,
+        "duration_ms": 620000
+      },
+      "position_ms": 285733,
+      "target_ms": 285733,
+      "playing": false,
+      "ready": true,
+      "room_ready": true,
+      "snapshot_required": false,
+      "trusted": true,
+      "seeking": false,
+      "corrections": {
+        "rate": 0,
+        "restore": 0,
+        "seek": 0
+      },
+      "identity_match": true,
+      "hash_state": "complete",
+      "last_action": "seek",
+      "error": null,
+      "ui_error": "",
+      "recovering": false,
+      "sample": {
+        "position_ms": 0,
+        "playing": false,
+        "loaded": false,
+        "seeking": false,
+        "buffering": false
+      }
+    },
+    "exit_fullscreen": {
+      "generation": 1,
+      "connected": true,
+      "member_id": "19761eba-c472-48a6-8fab-849f1c44aa20",
+      "room_id": "453ad1c2-c00f-4499-871a-353ce15bd696",
+      "sequence": 8,
+      "media_revision": 1,
+      "timeline": {
+        "position_ms": 285733,
+        "status": "paused",
+        "anchor_time_ms": 2141937,
+        "duration_ms": 620000
+      },
+      "position_ms": 285733,
+      "target_ms": 285733,
+      "playing": false,
+      "ready": true,
+      "room_ready": true,
+      "snapshot_required": false,
+      "trusted": true,
+      "seeking": false,
+      "corrections": {
+        "rate": 0,
+        "restore": 0,
+        "seek": 0
+      },
+      "identity_match": true,
+      "hash_state": "complete",
+      "last_action": "seek",
+      "error": null,
+      "ui_error": "",
+      "recovering": false,
+      "sample": {
+        "position_ms": 0,
+        "playing": false,
+        "loaded": false,
+        "seeking": false,
+        "buffering": false
+      }
+    },
+    "checks": {
+      "pause": true,
+      "seek_right": true,
+      "seek_left": true,
+      "fullscreen_preserves_session": true
+    },
+    "result": "PASS",
+    "initial_left_while_transition_unsettled": {
+      "generation": 1,
+      "connected": true,
+      "member_id": "19761eba-c472-48a6-8fab-849f1c44aa20",
+      "room_id": "453ad1c2-c00f-4499-871a-353ce15bd696",
+      "sequence": 8,
+      "media_revision": 1,
+      "timeline": {
+        "position_ms": 285733,
+        "status": "paused",
+        "anchor_time_ms": 2141937,
+        "duration_ms": 620000
+      },
+      "position_ms": 285733,
+      "target_ms": 285733,
+      "playing": false,
+      "ready": true,
+      "room_ready": true,
+      "snapshot_required": false,
+      "trusted": true,
+      "seeking": false,
+      "corrections": {
+        "rate": 0,
+        "restore": 0,
+        "seek": 0
+      },
+      "identity_match": true,
+      "hash_state": "complete",
+      "last_action": "seek",
+      "error": null,
+      "ui_error": "",
+      "recovering": false,
+      "sample": {
+        "position_ms": 0,
+        "playing": false,
+        "loaded": false,
+        "seeking": false,
+        "buffering": false
+      }
+    }
+  },
+  "android_surface_regression": {
+    "without_stable_key": "Flutter native platform view create count 2 on controls hide; deterministic test failed",
+    "with_stable_key": "create count 1 across hide/show, dispose once on unmount; test passed",
+    "black_frame_causality": "INFERRED only; EOS and surface churn were observed, no claim this alone explains every black frame"
+  },
+  "normal_window_close": {
+    "result": "PASS",
+    "exit_code": 0,
+    "method": "GTK titlebar close while mpv render context attached",
+    "note": "One optional libcuda loader diagnostic; hwdec remains no. No crash or hang observed."
+  }
+}

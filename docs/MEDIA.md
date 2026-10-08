@@ -118,3 +118,18 @@ streaming ni P2P. Spike C ensaya SAF/FD + Media3 en un prototipo separado:
 [experimento 02](../experiments/02-rust-ui-bridge/README.md). Su build/runtime y
 límites se distinguen por plataforma; no modifica el pipeline de sala Linux.
 Apple sigue como investigación y libmpv continúa provisional Linux.
+
+
+## Phase 2: render integrado y revalidación
+
+Linux Flutter usa libmpv Render API OpenGL con textura EGL compartida; una copia
+GPU, sin readback CPU/Dart. libmpv controla contain/letterbox, Rust controla
+playback. CLI y pruebas headless conservan outputs anteriores. libmpv sigue
+PROVISIONAL; Wayland se valida por compositor/GPU, no de forma universal.
+[ADR-011](DECISIONS.md) y [resultados 10](../experiments/10-player-integration/RESULTS.md).
+
+Recovery Android mantiene lectura SAF, hash completo, generation y observación
+Media3 nueva. Revalidate vincula el descriptor validado a la selección vigente;
+no es otra selección del Host. Un mismatch bloquea Ready; MEDIA_METADATA y
+MEDIA_READY existentes validan metadata/identidad. La timeline de sala sigue
+siendo la fuente del seek tras reload, aunque Media3 arranque temporalmente en 0.

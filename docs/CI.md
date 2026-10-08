@@ -81,10 +81,13 @@ un build hermético; reproducibilidad bit a bit no está demostrada.
 
 ## Builds y límites por plataforma
 
-Linux instala solo clang/CMake/Ninja/pkg-config/GTK/libstdc++ y libmpv2/ffmpeg para
-los tests SDK headless opt-in. Ubuntu usa apt, no pacman. Compila workspace release,
+Linux instala clang/CMake/Ninja/pkg-config/GTK/libstdc++, libmpv-dev, libepoxy-dev
+y ffmpeg. El runner Linux enlaza Render API y epoxy; el adapter Rust conserva
+carga dinámica. Los headers nuevos pertenecen al mismo SDK libmpv existente. Ubuntu usa apt, no pacman. Compila workspace release,
 CLI y bundle Flutter con bridge .so dentro de lib/. Los seis tests SDK decodifican
 corpus sintético con outputs null: no equivalen a display/audio físico validado.
+El test de lease y el test C++ puro verifican ownership/estado; frames y Wayland
+se validan físicamente en experimento 10, fuera de hosted CI.
 
 Windows compila workspace/tests y Flutter runner nativo con DLL Rust junto al exe.
 El adapter libmpv usa carga dinámica: no requiere un SDK en link-time. **SDK mpv

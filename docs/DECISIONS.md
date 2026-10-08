@@ -317,3 +317,44 @@ fullscreen requieren la siguiente pasada. iOS Player NOT IMPLEMENTED;
 Windows/macOS runtime NOT TESTED. Arquitectura y auditoría en [UI](UI.md),
 validación física y screenshots en [experimento 09](../experiments/09-product-ui/RESULTS.md).
 No se crea un ADR para cambios de estilo/presentación.
+
+## ADR-011 — Presentación Linux libmpv mediante textura EGL (Provisional)
+
+**Context:** Phase 1 controla libmpv real, pero vo=gpu crea otra ventana. El
+Player Flutter necesita vídeo integrado, overlays y fullscreen bajo Wayland.
+Flutter fijado usa su propio EGL, no el contexto GTK; compartir GtkGLArea por
+suposición no es válido. La presentación no puede convertirse en autoridad.
+
+**Alternatives:** Render API con FlTextureGL y EGL compartido; render directo en
+raster Flutter; GtkGLArea/surface hermano; wid X11; subsurface Wayland; buffers
+CPU. Comparación y fuentes primarias en
+[spike 10](../experiments/10-player-integration/embedding-spike.md).
+
+**Decision:** libmpv Render API OpenGL en un worker con contexto EGL propio,
+compartido desde el contexto actual en FlTextureGL.populate. Renderiza un FBO
+productor; raster copia por GPU a una textura consumidora estable. Una copia
+GPU por frame, sin readback ni bytes Dart; no se afirma zero-copy. glFinish y
+mutex GPU fijan el límite entre ambos contextos. El callback mpv solamente
+señala una condición, y advanced_control evita bloquear al owner por frames.
+
+Rust conserva Client/Player/control, ownership !Send/!Sync y la cola acotada.
+Una lease nativa mantiene vivo el owner hasta liberar mpv_render_context.
+C ABI acquire/release es Linux-only, privada de presentación; Dart recibe solo
+texture ID y estado. No se añade otro Player trait, wire message o SyncEngine.
+
+**Consequences:** composición/input Flutter funcionan sobre vídeo. Resize
+explícito conserva contain de libmpv; textura persiste al navegar Lobby/Player.
+Detach detiene y une worker antes de soltar lease. El registrar retiene el
+GObject hasta shutdown del engine y su finalizer libera EGL antes de que el
+engine termine EGL. Dependencia de build Linux: headers de libmpv y epoxy;
+CLI/headless conserva carga dinámica y su salida anterior.
+
+**Wayland/X11 status:** Wayland TESTED solamente en KDE KWin 6.7.5 y driver del
+entorno de experimento 10. X11 compatible por diseño EGL/FlTextureGL, NOT TESTED
+hasta evidencia explícita. No se utiliza wl_surface, XID o reparenting.
+
+**Limits:** pipeline PROVISIONAL; no promesa de soporte universal GPU/compositor.
+Cambio del contexto del engine se detecta y presenta error; requiere reiniciar
+la app. No se ha inyectado pérdida real de GPU. glFinish prioriza orden y
+corrección; optimizar con fences exige nuevas mediciones. No hwdecode nuevo,
+ni garantía de HDR/color management, Windows/macOS o empaquetado distribuible.

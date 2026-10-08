@@ -1,4 +1,4 @@
-# Product UI — Phase 1
+# Product UI — Phases 1–2
 
 ## Estado y alcance
 
@@ -8,8 +8,8 @@ Flutter permanece en `experiments/02-rust-ui-bridge/app`; no se mueve el proyect
 nativo ni se sustituye el Core. Evidencia y limitaciones en
 [experimento 09](../experiments/09-product-ui/RESULTS.md).
 
-Android presenta la SurfaceView de Media3. Linux controla el Client/libmpv real
-y abre su ventana nativa: vídeo embebido en Flutter NOT IMPLEMENTED. Media3 y
+Android presenta la SurfaceView de Media3. Linux integra libmpv Render API en
+una textura Flutter, sin segunda ventana mpv (ADR-011). Media3 y
 libmpv continúan PROVISIONAL. iOS Player NOT IMPLEMENTED; Windows/macOS runtime
 NOT TESTED y selección/reproducción deshabilitadas. Compilar no demuestra runtime.
 
@@ -69,8 +69,11 @@ acciones en fila o columna compacta. Lobby comparte componentes: columna en
 móvil, media más participantes lateral en desktop. SafeArea y scroll para
 viewports pequeños. Player oculta app bar en landscape, utiliza vídeo ajustado
 con letterbox, controles táctiles separados de la superficie y participantes
-en panel desktop/bottom sheet móvil. No locking de orientación ni fullscreen
-del sistema en esta fase.
+en panel desktop/bottom sheet móvil. Fullscreen Linux utiliza GTK; Android
+immersiveSticky, layout adaptativo y SafeArea, sin locking de orientación.
+Salir restaura chrome/system UI sin recrear la sesión o el Player. En API 28 se
+restauran ambas barras explícitamente con modo manual: edgeToEdge no se aplica
+en esa versión. Android 15/16 y sus restricciones de system UI NOT TESTED.
 
 ## Estados, errores y recuperación
 
@@ -100,7 +103,7 @@ Los autoruns antiguos siguen disponibles explícitamente para scripts.
 
 Material aporta focus/touch targets; tooltips/semántica, etiquetas, estados con
 texto además de color y tests de text scaling. Space Play/Pause y flechas ±10 s
-solo Host; Esc cierra panel/muestra controles. Mouse/tap muestran controles y
+solo Host; F/doble click Linux alternan fullscreen, Esc sale o cierra panel. Mouse/tap muestran controles y
 fade discreto tras inactividad. Scrubbing suspende el ocultamiento. Auditoría
 WCAG completa NOT TESTED.
 
@@ -120,12 +123,34 @@ reinterpretan como medición de esta UI.
 
 ## Deudas observadas en el smoke
 
-PREEXISTING BUG: el recovery de Host Android ejecuta hashAndAttach y
-Client::attach_media emite MEDIA_SELECT_REQUEST aun para el mismo medio. La
-posición pausada volvió a cero en el smoke. La UI anterior tenía el mismo flujo;
-se conserva la deuda de startup/recovery, sin alterar semánticas de Client/media.
-Corregir esto requiere una pasada autorizada sobre la frontera de revalidación.
-El resume de socket del Participant sí preservó posición y Ready en esta fase.
+Phase 2 reprodujo físicamente el bug preexistente de recovery Host: attach
+volvía a seleccionar el medio, fallaba INVALID_STATE mientras Playing y dejaba
+Media3 en 0. Recovery ahora usa el intent local revalidate, valida hash/identidad
+y después Ready; no publica MEDIA_SELECT_REQUEST. La selección explícita sigue
+usando attach. La reconciliación existente restaura la timeline autoritativa.
+La evidencia anterior de Phase 1 permanece en experimento 09; resultados
+actuales, capturas reales y límites en [experimento 10](../experiments/10-player-integration/RESULTS.md).
 Para compartir entre dispositivos, configurar al crear un endpoint alcanzable
 por todos; localhost es solo para uso en el mismo dispositivo. El invite no
 inventa discovery ni transforma direcciones automáticamente.
+
+
+## Presentación Linux
+
+Render nativo por eventos de libmpv → FBO EGL compartido → copia GPU a
+FlTextureGL → Texture Flutter. Los frames no pasan por Dart ni reconstruyen
+widgets. Controles/header Flutter se componen encima; participants puede reducir
+la región de vídeo. `DesktopVideo` comunica tamaño físico, observa errores a 1 Hz
+y muestra un mensaje de producto ante fallo. Developer incluye estado del render,
+backend, dimensiones, generación de presentación y frames.
+
+El surface conserva textura al navegar y descarta frames durante cambio de medio.
+Fullscreen no cambia generación de media. Scrubbing previsualiza localmente y
+solo envía Seek al terminar. No auto-hide durante scrub, panel, modal o error.
+El contexto EGL perdido requiere reiniciar la app; no se afirma recovery GPU.
+
+
+Android conserva la misma platform view durante auto-hide/show de controles;
+la región Expanded tiene key estable. El test regresivo verifica una creación y
+un dispose al salir, sin adjudicarle validación física de frames. SafeArea y
+layout de controles permanecen fuera de SurfaceView para recibir touch.

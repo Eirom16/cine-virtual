@@ -4,7 +4,7 @@ Base de un proyecto con vocación open source para ver contenido juntos desde
 Windows, Linux, macOS, Android e iOS. Cada dispositivo conserva su archivo y el
 servidor coordina la sala; el control de reproducción no transporta el vídeo.
 
-**Estado: Product UI Phase 1 sobre el vertical slice real Linux ↔ Android, previo al MVP v0.1.** Servidor WebSocket
+**Estado: Product UI Phase 2 sobre el vertical slice real Linux ↔ Android, previo al MVP v0.1.** Servidor WebSocket
 y dos clientes CLI integran libmpv in-process, archivo local, metadata, SHA-256
 completo, Ready, controles programados, correcciones y resume con snapshot.
 FakePlayer y los instrumentos anteriores se conservan. La licencia está
@@ -15,7 +15,7 @@ open source definitiva.
 | Estado | Alcance real |
 | --- | --- |
 | Implemented | Core determinista, RoomService en memoria, codec v1, autoridad/Ready, controles programados y resume; FakePlayer y dos libmpv reales sobre WebSocket localhost, archivo/probe/hash locales y control Linux ↔ Android físico; UI de producto Home → sala → archivo → Ready → Play/Pause/Seek; evidencia física de sync previa en experimento 07. |
-| Planned | Completar recuperación/startup, embedding desktop, packaging y hardening antes de v0.1. |
+| Planned | Completar startup, packaging y hardening antes de v0.1. |
 | Experimental | Spikes A/B, vertical slice Linux (libmpv PROVISIONAL) y Spike C: Flutter, C ABI/Rust y candidato Media3; ingeniería conservada bajo autoruns/Developer; evidencia y límites por plataforma en experimentos 02, 07 y 09. |
 
 El objetivo de v0.1 es demostrar dos clientes con el mismo vídeo local,
@@ -25,8 +25,10 @@ capacidades disponibles. El soporte de las cinco plataformas es un objetivo;
 la evidencia de cada plataforma se detalla en [Spike C](experiments/02-rust-ui-bridge/RESULTS.md); no existe soporte universal demostrado.
 
 La UI y sus límites actuales se describen en [UI](docs/UI.md) y
-[Product UI Phase 1](experiments/09-product-ui/RESULTS.md). Linux usa vídeo en
-ventana libmpv aparte; Android integra su superficie Media3.
+[Product UI Phase 1](experiments/09-product-ui/RESULTS.md). [Player integration Phase 2](experiments/10-player-integration/RESULTS.md). Linux
+integra vídeo libmpv en Flutter mediante Render API/EGL; Android conserva Media3.
+Fullscreen y revalidación Host separada de selección están implementados.
+Evidencia y límites por plataforma/compositor se detallan en el experimento.
 
 ## Arquitectura
 
