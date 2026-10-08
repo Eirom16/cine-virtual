@@ -1,4 +1,8 @@
 import 'dart:convert';
+import 'dart:io';
+import 'dart:ui' as ui;
+
+import 'package:flutter/rendering.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -6,6 +10,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:cine_mobile_spike/presentation/application_controller.dart';
 import 'package:cine_mobile_spike/ui/components/social_panel.dart';
 import 'package:cine_mobile_spike/ui/screens/player_screen.dart';
+
+import 'package:cine_mobile_spike/ui/theme/product_theme.dart';
 
 import 'product_ui_test.dart' show TestGateway;
 
@@ -71,13 +77,74 @@ Future<ApplicationController> setup(WidgetTester t) async {
 }
 
 Future<void> socialScreen(WidgetTester tester, Widget child) async {
+  var theme = productTheme();
+  if (Platform.environment['CINE_SOCIAL_CAPTURE'] != null) {
+    final text = theme.textTheme.apply(fontFamily: 'Roboto');
+    theme = theme.copyWith(
+      textTheme: text.copyWith(
+        bodyMedium: text.bodyMedium!.copyWith(
+          fontFamilyFallback: ['Noto Color Emoji'],
+        ),
+        bodyLarge: text.bodyLarge!.copyWith(
+          fontFamilyFallback: ['Noto Color Emoji'],
+        ),
+      ),
+    );
+  }
   await tester.pumpWidget(
-    MaterialApp(home: Scaffold(resizeToAvoidBottomInset: false, body: child)),
+    RepaintBoundary(
+      key: const Key('social-capture'),
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: theme,
+        home: Scaffold(resizeToAvoidBottomInset: false, body: child),
+      ),
+    ),
   );
   await tester.pump();
 }
 
+Future<void> capture(WidgetTester t, String name) async {
+  final path = Platform.environment['CINE_SOCIAL_CAPTURE'];
+  if (path == null) return;
+  final boundary = t.renderObject<RenderRepaintBoundary>(
+    find.byKey(const Key('social-capture')),
+  );
+  await t.runAsync(() async {
+    final image = await boundary.toImage(pixelRatio: 1);
+    final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
+    await File('$path/$name.png').writeAsBytes(bytes!.buffer.asUint8List());
+    image.dispose();
+  });
+}
+
 void main() {
+  setUpAll(() async {
+    final fonts = Platform.environment['CINE_SOCIAL_FONT_DIR'];
+    if (Platform.environment['CINE_SOCIAL_CAPTURE'] == null || fonts == null) {
+      return;
+    }
+    for (final pair in [
+      ['Roboto', 'Roboto-Regular.ttf'],
+      ['MaterialIcons', 'MaterialIcons-Regular.otf'],
+    ]) {
+      final loader = FontLoader(pair[0]);
+      loader.addFont(
+        File('$fonts/${pair[1]}')
+            .readAsBytes()
+            .then((bytes) => ByteData.sublistView(bytes)),
+      );
+      await loader.load();
+    }
+    final emoji = Platform.environment['CINE_SOCIAL_EMOJI_FONT'];
+    if (emoji != null) {
+      final loader = FontLoader('Noto Color Emoji');
+      loader.addFont(
+        File(emoji).readAsBytes().then((bytes) => ByteData.sublistView(bytes)),
+      );
+      await loader.load();
+    }
+  });
   testWidgets(
     'closed chat unread then open renders mine other and system safely',
     (t) async {
@@ -164,7 +231,32 @@ void main() {
       );
       await t.tap(find.byKey(const Key('open-chat')));
       await t.pumpAndSettle();
-      await t.tap(find.byKey(const Key('chat-input')));
+      await t.enterText(find.byKey(const Key('chat-input')), 'texto');
+      final editor = t
+          .widget<TextField>(find.byKey(const Key('chat-input')))
+          .controller!;
+      await t.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+      await t.pump();
+      expect(editor.selection.baseOffset, 4);
+      t.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        SystemChannels.platform,
+        (call) async {
+          if (call.method == 'Clipboard.getData') {
+            return {'text': '¿Viste eso? 😂'};
+          }
+          return null;
+        },
+      );
+      await t.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+      await t.sendKeyEvent(LogicalKeyboardKey.keyA);
+      await t.sendKeyEvent(LogicalKeyboardKey.keyV);
+      await t.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+      await t.pumpAndSettle();
+      expect(editor.text, '¿Viste eso? 😂');
+      t.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        SystemChannels.platform,
+        null,
+      );
       for (final key in [
         LogicalKeyboardKey.space,
         LogicalKeyboardKey.arrowLeft,
@@ -274,6 +366,13 @@ void main() {
       await t.pumpAndSettle();
       expect(find.byKey(const Key('chat-input')), findsOneWidget);
       expect(t.takeException(), isNull);
+      g.social['reactions'] = [
+        {'reaction_id': 'capture-${size.width}', 'emoji': '😂'},
+      ];
+      c.poll();
+      await t.pump();
+      await t.pump(const Duration(milliseconds: 400));
+      await capture(t, 'widget-${size.width.toInt()}x${size.height.toInt()}');
       if (size.width < 900) {
         t.view.viewInsets = FakeViewPadding(
           bottom: size.height > 400 ? 300 : 200,

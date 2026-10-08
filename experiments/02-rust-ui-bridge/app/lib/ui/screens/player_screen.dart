@@ -321,9 +321,12 @@ class _PlayerScreenState extends State<PlayerScreen> {
                   bottom: 110,
                   right: 12,
                   width: 320,
-                  child: SocialPanel(
-                    controller: widget.controller,
-                    onClose: () => setState(() => participants = false),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(CineTokens.radius),
+                    child: SocialPanel(
+                      controller: widget.controller,
+                      onClose: () => setState(() => participants = false),
+                    ),
                   ),
                 ),
             ],

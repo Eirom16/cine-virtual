@@ -17,6 +17,12 @@ Future<void> showSocialSheet(
   context: context,
   useSafeArea: true,
   isScrollControlled: true,
+  clipBehavior: Clip.antiAlias,
+  shape: const RoundedRectangleBorder(
+    borderRadius: BorderRadius.vertical(
+      top: Radius.circular(CineTokens.radius),
+    ),
+  ),
   builder: (context) {
     final media = MediaQuery.of(context);
     final available =
@@ -369,44 +375,49 @@ class _ChatConversationState extends State<ChatConversation> {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Expanded(
-                child: Focus(
-                  onKeyEvent: (_, event) {
-                    // A focused editor consumes player keys, including F and arrows.
-                    if (event is KeyDownEvent &&
-                        event.logicalKey == LogicalKeyboardKey.enter &&
-                        !HardwareKeyboard.instance.isShiftPressed &&
-                        !Platform.isAndroid &&
-                        !Platform.isIOS &&
-                        input.value.composing.isCollapsed) {
-                      unawaited(send());
-                      return KeyEventResult.handled;
-                    }
-                    if (event.logicalKey == LogicalKeyboardKey.escape) {
+                child: DefaultTextEditingShortcuts(
+                  child: Focus(
+                    onKeyEvent: (_, event) {
+                      // Keep editing shortcuts closer than the player shortcuts.
+                      if (event is KeyDownEvent &&
+                          event.logicalKey == LogicalKeyboardKey.enter &&
+                          !HardwareKeyboard.instance.isShiftPressed &&
+                          !Platform.isAndroid &&
+                          !Platform.isIOS &&
+                          input.value.composing.isCollapsed) {
+                        unawaited(send());
+                        return KeyEventResult.handled;
+                      }
+                      if (event.logicalKey == LogicalKeyboardKey.keyF &&
+                          !HardwareKeyboard.instance.isControlPressed &&
+                          !HardwareKeyboard.instance.isMetaPressed &&
+                          !HardwareKeyboard.instance.isAltPressed) {
+                        return KeyEventResult.skipRemainingHandlers;
+                      }
                       return KeyEventResult.ignored;
-                    }
-                    return KeyEventResult.skipRemainingHandlers;
-                  },
-                  child: TextField(
-                    key: const Key('chat-input'),
-                    controller: input,
-                    focusNode: focus,
-                    minLines: 1,
-                    maxLines:
-                        MediaQuery.orientationOf(context) ==
-                                Orientation.landscape &&
-                            MediaQuery.viewInsetsOf(context).bottom > 0
-                        ? 1
-                        : 4,
-                    keyboardType: TextInputType.multiline,
-                    textInputAction: TextInputAction.newline,
-                    decoration: const InputDecoration(
-                      labelText: 'Mensaje a la sala',
-                      hintText: 'Escribe un mensaje…',
-                    ),
-                    onChanged: (value) {
-                      controller.chatDraft = value;
-                      setState(() {});
                     },
+                    child: TextField(
+                      key: const Key('chat-input'),
+                      controller: input,
+                      focusNode: focus,
+                      minLines: 1,
+                      maxLines:
+                          MediaQuery.orientationOf(context) ==
+                                  Orientation.landscape &&
+                              MediaQuery.viewInsetsOf(context).bottom > 0
+                          ? 1
+                          : 4,
+                      keyboardType: TextInputType.multiline,
+                      textInputAction: TextInputAction.newline,
+                      decoration: const InputDecoration(
+                        labelText: 'Mensaje a la sala',
+                        hintText: 'Escribe un mensaje…',
+                      ),
+                      onChanged: (value) {
+                        controller.chatDraft = value;
+                        setState(() {});
+                      },
+                    ),
                   ),
                 ),
               ),
