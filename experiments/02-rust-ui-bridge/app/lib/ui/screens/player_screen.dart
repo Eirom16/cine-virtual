@@ -283,7 +283,10 @@ class _PlayerScreenState extends State<PlayerScreen> {
                     : Column(
                         children: [
                           if (visible) header(desktop),
-                          Expanded(child: surface),
+                          Expanded(
+                            key: const ValueKey('player-video-region'),
+                            child: surface,
+                          ),
                           if (visible)
                             controls()
                           else

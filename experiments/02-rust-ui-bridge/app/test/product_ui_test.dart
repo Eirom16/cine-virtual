@@ -21,8 +21,9 @@ const credentials = {
 };
 
 class TestGateway extends SessionGateway {
+  bool mobile = false;
   @override
-  bool get android => false;
+  bool get android => mobile;
   @override
   bool get supportsPlayer => true;
   final intents = <String>[];
@@ -623,4 +624,52 @@ void main() {
       expect(observations, before);
     },
   );
+  testWidgets('Android surface survives controls hide and show', (
+    tester,
+  ) async {
+    var created = 0, disposed = 0;
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+      SystemChannels.platform_views,
+      (call) async {
+        if (call.method == 'create') {
+          created++;
+          return 1;
+        }
+        if (call.method == 'dispose') disposed++;
+        if (call.method == 'resize') {
+          return {
+            'width': call.arguments['width'],
+            'height': call.arguments['height'],
+          };
+        }
+        return null;
+      },
+    );
+    addTearDown(
+      () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        SystemChannels.platform_views,
+        null,
+      ),
+    );
+    final c = await fixture(tester);
+    final g = c.gateway as TestGateway;
+    g.mobile = true;
+    g.sync['playing'] = true;
+    c.poll();
+    await screen(tester, PlayerScreen(controller: c, onLobby: () {}));
+    await tester.pumpAndSettle();
+    expect(created, 1);
+    await tester.pump(const Duration(seconds: 5));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('player-toggle')), findsNothing);
+    expect(created, 1);
+    expect(disposed, 0);
+    await tester.tap(find.byTooltip('Mostrar controles'));
+    await tester.pumpAndSettle();
+    expect(created, 1);
+    expect(disposed, 0);
+    await tester.pumpWidget(const SizedBox());
+    await tester.pump();
+    expect(disposed, 1);
+  });
 }
