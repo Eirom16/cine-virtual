@@ -338,3 +338,42 @@ fn real_tls_malicious_chunk_header_and_payload_are_rejected_without_allocation_g
         std::fs::remove_dir(path).unwrap();
     }
 }
+
+#[test]
+fn unauthenticated_tls_trickle_has_an_absolute_handshake_deadline() {
+    use std::net::TcpStream;
+    use std::time::Instant;
+    let path = root();
+    let source = path.join("source");
+    std::fs::write(&source, b"abc").unwrap();
+    let m = manifest(b"abc");
+    let credential = Credential::new(&m, Uuid::new_v4()).unwrap();
+    let tls = Identity::generate().unwrap();
+    let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+    let address = listener.local_addr().unwrap();
+    let sender = std::thread::spawn(move || {
+        let (stream, _) = listener.accept().unwrap();
+        let start = Instant::now();
+        let result = transport::send(
+            stream,
+            tls.server,
+            &m,
+            &mut File::open(source).unwrap(),
+            &Authorization::new(credential, Duration::from_secs(30)),
+            &Control::default(),
+            |_| panic!("no authenticated data"),
+        );
+        (result, start.elapsed())
+    });
+    let mut attack = TcpStream::connect(address).unwrap();
+    // Each fragment arrives before the idle timeout; the record never completes.
+    for byte in [0x16, 0x03, 0x03] {
+        attack.write_all(&[byte]).unwrap();
+        std::thread::sleep(Duration::from_secs(2));
+    }
+    let (result, elapsed) = sender.join().unwrap();
+    assert!(result.is_err());
+    assert!(elapsed < Duration::from_secs(7));
+    drop(attack);
+    std::fs::remove_dir_all(path).unwrap();
+}

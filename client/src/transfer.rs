@@ -210,6 +210,7 @@ impl Transfers {
                 && !d.worker.control.cancel.load(Ordering::Acquire)
                 && d.worker.join.as_ref().is_some_and(|j| !j.is_finished())
         }) {
+            self.waiting();
             return Ok(offer.manifest.transfer_id);
         }
         self.download = None;

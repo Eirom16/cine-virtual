@@ -14,6 +14,61 @@ class ProductError {
   const ProductError(this.category, this.message, this.help);
   factory ProductError.from(String code) {
     switch (code) {
+      case 'TRANSFER_SPACE':
+        return const ProductError(
+          ErrorCategory.media,
+          'No hay espacio suficiente.',
+          'Libera el tamaño del archivo y 64 MiB de margen antes de recibirlo.',
+        );
+      case 'TRANSFER_STORAGE':
+        return const ProductError(
+          ErrorCategory.media,
+          'El destino no está disponible.',
+          'Elige otra carpeta o revisa el almacenamiento del dispositivo.',
+        );
+      case 'TRANSFER_MANIFEST':
+        return const ProductError(
+          ErrorCategory.media,
+          'El archivo no es compatible con esta transferencia.',
+          'Esta fase admite archivos completos de hasta 16 GiB. Verifica la oferta del anfitrión.',
+        );
+      case 'TRANSFER_MODIFIED':
+        return const ProductError(
+          ErrorCategory.media,
+          'El archivo del anfitrión cambió.',
+          'El anfitrión debe verificarlo y volver a ofrecerlo.',
+        );
+      case 'TRANSFER_INTEGRITY':
+        return const ProductError(
+          ErrorCategory.media,
+          'El archivo no superó la verificación.',
+          'No se cargará ese archivo. Solicita una nueva transferencia.',
+        );
+      case 'TRANSFER_EXPIRED':
+        return const ProductError(
+          ErrorCategory.permission,
+          'La autorización de transferencia expiró.',
+          'Solicita otra autorización para reanudar los bloques verificados.',
+        );
+      case 'TRANSFER_TLS':
+      case 'TLS_PIN_REQUIRED':
+        return const ProductError(
+          ErrorCategory.connection,
+          'No se pudo verificar la conexión segura.',
+          'Usa el endpoint completo de una sala WSS obtenido por un canal de confianza.',
+        );
+      case 'TRANSFER_CONNECTION':
+        return const ProductError(
+          ErrorCategory.connection,
+          'Se interrumpió la conexión de transferencia.',
+          'Revisa la LAN y solicita reanudar. Se conservan los bloques verificados.',
+        );
+      case 'TRANSFER_LOAD_FAILED':
+        return const ProductError(
+          ErrorCategory.player,
+          'No se pudo abrir la película recibida.',
+          'El archivo se verificó, pero el reproductor no pudo cargarlo. Puedes volver a intentar o seleccionar otra copia.',
+        );
       case 'MEDIA_MISMATCH':
         return const ProductError(
           ErrorCategory.media,

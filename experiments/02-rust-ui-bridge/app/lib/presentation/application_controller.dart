@@ -348,22 +348,17 @@ class ApplicationController extends ChangeNotifier with WidgetsBindingObserver {
         object(data['progress'])['state'] == 'completed' &&
         transferId.isNotEmpty &&
         transferId != _loadedTransfer) {
-      _loadingTransfer = true;
-      Future<void>(() async {
-        final loaded = await _run('load_transfer', () async {
-          final result = await _intent('load_transfer');
-          filename = 'Película recibida y verificada';
-          if (gateway.android) {
-            await gateway.loadReceived('${result['path']}');
-            await _hashAndAttach(++_mediaOperation);
-          } else {
-            await gateway.finishVideoChange();
-          }
-        });
+      if (next.media['identity_match'] == true &&
+          next.hashState == 'complete' &&
+          next.sync['ready'] == true) {
+        // Preserve an already loaded copy of this same room media during playback.
         _loadedTransfer = transferId;
-        if (!loaded) error = 'TRANSFER_LOAD_FAILED';
-        _loadingTransfer = false;
-      });
+      } else {
+        _loadingTransfer = true;
+        Future<void>(() async {
+          await _loadTransferredMedia(transferId);
+        });
+      }
     }
 
     hashProgress.value = next.hashProgress;
@@ -715,6 +710,36 @@ class ApplicationController extends ChangeNotifier with WidgetsBindingObserver {
   });
   Future<String> transferAddress() async =>
       '${(await _intent('transfer_address'))['address']}';
+  Future<bool> _loadTransferredMedia(String id) async {
+    final loaded = await _run('load_transfer', () async {
+      final result = await _intent('load_transfer');
+      filename = 'Película recibida y verificada';
+      if (gateway.android) {
+        await gateway.loadReceived('${result['path']}');
+        await _hashAndAttach(++_mediaOperation);
+      } else {
+        await gateway.finishVideoChange();
+      }
+    });
+    _loadedTransfer = id;
+    if (!loaded) error = 'TRANSFER_LOAD_FAILED';
+    _loadingTransfer = false;
+    poll();
+    return loaded;
+  }
+
+  Future<bool> retryTransferredMedia() async {
+    final id = '${object(transfer.value['offer'])['transfer_id'] ?? ''}';
+    if (busy ||
+        _loadingTransfer ||
+        !session ||
+        id.isEmpty ||
+        object(transfer.value['progress'])['state'] != 'completed')
+      return false;
+    _loadingTransfer = true;
+    return _loadTransferredMedia(id);
+  }
+
   Future<bool> shareMedia(String address) => _run('share', () async {
     await _intent('share', {'address': address});
   });

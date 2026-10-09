@@ -330,7 +330,10 @@ impl<P: ApplicationPlayer + Send + 'static> Client<P> {
                                 if message.room_id!=Some(room.room_id) || message.room_epoch!=Some(room.room_epoch){break}
                                 let Ok(snapshot)=serde_json::from_value(message.payload["snapshot"].clone())else{break};
                                 let grant=if message.payload["grant"].is_null(){None}else{let Ok(g)=serde_json::from_value(message.payload["grant"].clone())else{break};Some(g)};
-                                if let Some(member)=s.replica.member_id && transfers.lock().unwrap().install(snapshot,grant,room,member,s.replica.server_now(t4).unwrap_or(0)).is_err(){break;}
+                                // Signaling is authenticated by WSS; receiving a file
+                                // does not require the playback clock to be trusted yet.
+                                let server_now=s.replica.server_now(t4).unwrap_or(message.sent_at_ms);
+                                if let Some(member)=s.replica.member_id && transfers.lock().unwrap().install(snapshot,grant,room,member,server_now).is_err(){break;}
                             },
                             "SOCIAL_STATE"|"CHAT_MESSAGE"|"REACTION"=>{
                                 let need_snapshot={let mut s=shared.lock().unwrap();

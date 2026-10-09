@@ -10,6 +10,53 @@ use std::{
     sync::Arc,
     time::{Duration, Instant},
 };
+struct DeadlineSocket<'a> {
+    stream: TcpStream,
+    handshake_until: Option<Instant>,
+    control: &'a Control,
+    auth: Option<&'a Authorization>,
+}
+impl DeadlineSocket<'_> {
+    fn check(&self, writing: bool) -> std::io::Result<()> {
+        self.control
+            .check()
+            .map_err(|_| std::io::ErrorKind::ConnectionAborted)?;
+        if let Some(auth) = self.auth {
+            auth.check()
+                .map_err(|_| std::io::ErrorKind::PermissionDenied)?;
+        }
+        let timeout = if let Some(until) = self.handshake_until {
+            let remaining = until.saturating_duration_since(Instant::now());
+            if remaining.is_zero() {
+                return Err(std::io::ErrorKind::TimedOut.into());
+            }
+            remaining.min(Duration::from_secs(3))
+        } else {
+            return Ok(());
+        };
+        if writing {
+            self.stream.set_write_timeout(Some(timeout))
+        } else {
+            self.stream.set_read_timeout(Some(timeout))
+        }
+    }
+}
+impl Read for DeadlineSocket<'_> {
+    fn read(&mut self, buf: &mut [u8]) -> std::io::Result<usize> {
+        self.check(false)?;
+        self.stream.read(buf)
+    }
+}
+impl Write for DeadlineSocket<'_> {
+    fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
+        self.check(true)?;
+        self.stream.write(buf)
+    }
+    fn flush(&mut self) -> std::io::Result<()> {
+        self.check(true)?;
+        self.stream.flush()
+    }
+}
 fn socket(stream: &TcpStream) -> Result<(), Error> {
     stream.set_read_timeout(Some(Duration::from_secs(3)))?;
     stream.set_write_timeout(Some(Duration::from_secs(3)))?;
@@ -54,7 +101,15 @@ pub fn send(
     }
     let mut conn = ServerConnection::new(config).map_err(|_| Error::Tls)?;
     conn.set_buffer_limit(Some(64 * 1024));
-    let mut tls = StreamOwned::new(conn, stream);
+    let mut tls = StreamOwned::new(
+        conn,
+        DeadlineSocket {
+            stream,
+            handshake_until: Some(Instant::now() + Duration::from_secs(5)),
+            control,
+            auth: Some(auth),
+        },
+    );
     let candidate = read_control(&mut tls)?;
     auth.consume(&candidate)?;
     if candidate.manifest_hash != manifest.fingerprint() {
@@ -62,6 +117,8 @@ pub fn send(
     }
     tls.write_all(b"CVP1")?;
     tls.flush()?;
+    tls.sock.handshake_until = None;
+    socket(&tls.sock.stream)?;
     let mut data = vec![0; manifest.chunk_size as usize];
     let mut transferred = 0;
     let start = Instant::now();
@@ -139,13 +196,23 @@ pub fn receive_observed(
     )
     .map_err(|_| Error::Tls)?;
     conn.set_buffer_limit(Some(64 * 1024));
-    let mut tls = StreamOwned::new(conn, stream);
+    let mut tls = StreamOwned::new(
+        conn,
+        DeadlineSocket {
+            stream,
+            handshake_until: Some(Instant::now() + Duration::from_secs(5)),
+            control,
+            auth: None,
+        },
+    );
     send_control(&mut tls, credential)?;
     let mut accept = [0; 4];
     tls.read_exact(&mut accept)?;
     if &accept != b"CVP1" {
         return Err(Error::Unauthorized);
     }
+    tls.sock.handshake_until = None;
+    socket(&tls.sock.stream)?;
     let mut data = vec![0; partial.manifest.chunk_size as usize];
     let start = Instant::now();
     let initial = partial.verified;

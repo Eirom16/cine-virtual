@@ -195,6 +195,11 @@ class TransferCard extends StatelessWidget {
                   ),
               ],
             ],
+            if (supported && !view.isHost && offer.isEmpty)
+              const Text(
+                'El anfitrión todavía no ha ofrecido un archivo para recibir.',
+                style: TextStyle(color: CineTokens.muted),
+              ),
             if (supported && !view.isHost && offer.isNotEmpty) ...[
               Text(
                 'El anfitrión tiene este archivo',
@@ -240,6 +245,14 @@ class TransferCard extends StatelessWidget {
                 spacing: CineTokens.sm,
                 runSpacing: CineTokens.sm,
                 children: [
+                  if (state == 'completed' &&
+                      controller.error == 'TRANSFER_LOAD_FAILED')
+                    FilledButton(
+                      onPressed: enabled
+                          ? controller.retryTransferredMedia
+                          : null,
+                      child: const Text('Reintentar carga del archivo'),
+                    ),
                   if ([
                     'connecting',
                     'transferring',
