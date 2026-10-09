@@ -27,6 +27,18 @@ pub enum Intent {
         name: String,
         allow_lan: bool,
     },
+    TransferAddress,
+    Share {
+        address: std::net::SocketAddr,
+    },
+    Receive {
+        root: std::path::PathBuf,
+    },
+    TransferControl {
+        operation: String,
+        receiver_id: Option<Uuid>,
+    },
+    LoadTransfer,
     Create,
     Chat {
         text: String,
@@ -286,6 +298,7 @@ struct Command {
     intent: Intent,
     generation: u64,
     descriptor: Option<MediaDescriptor>,
+    source: Option<std::fs::File>,
 }
 pub struct Network {
     tx: mpsc::Sender<Command>,
@@ -314,14 +327,14 @@ impl Network {
                 loop { tokio::select! {
                     _=stopped.changed()=>break,
                     _=tick.tick()=>{
-                        if let Some(c)=&client {let mut v=published.lock().unwrap();v["state"]=c.state_summary();v["sync"]=c.sync_summary();v["media"]=c.media_summary();v["presentation"]=c.presentation_summary();v["social"]=c.social_summary();
+                        if let Some(c)=&client {let mut v=published.lock().unwrap();v["state"]=c.state_summary();v["sync"]=c.sync_summary();v["media"]=c.media_summary();v["presentation"]=c.presentation_summary();v["social"]=c.social_summary();v["transfer"]=c.transfer_summary();
                             v["connected"]=json!(c.connected());v["executions"]=json!(c.executions().iter().map(|e|json!({"sequence":e.sequence,"expected_server_ms":e.expected_server_ms,"actual_server_ms":e.actual_server_ms,"lateness_ms":e.lateness_ms})).collect::<Vec<_>>());}
                     },
                     cmd=rx.recv()=>{
                         let Some(cmd)=cmd else{break};
                         if cmd.generation!=*current.lock().unwrap() && !matches!(cmd.intent,Intent::Suspend){continue;}
                         published.lock().unwrap()["busy"]=json!(true);
-                        let intent_name=String::from(match &cmd.intent {Intent::Connect{..}=>"connect",Intent::Create=>"create",Intent::Chat{..}=>"chat",Intent::Message{..}=>"message",Intent::MessageReaction{..}=>"message_reaction",Intent::Reaction{..}=>"reaction",Intent::Join{..}=>"join",Intent::Attach=>"attach",Intent::Revalidate=>"revalidate",Intent::Ready=>"ready",Intent::Play=>"play",Intent::Pause=>"pause",Intent::Seek{..}=>"seek",Intent::Disconnect=>"disconnect",Intent::Reconnect=>"reconnect",Intent::Leave=>"leave",Intent::Suspend=>"suspend",Intent::Foreground=>"foreground"});
+                        let intent_name=String::from(match &cmd.intent {Intent::TransferAddress=>"transfer_address",Intent::Share{..}=>"share",Intent::Receive{..}=>"receive",Intent::TransferControl{..}=>"transfer_control",Intent::LoadTransfer=>"load_transfer",Intent::Connect{..}=>"connect",Intent::Create=>"create",Intent::Chat{..}=>"chat",Intent::Message{..}=>"message",Intent::MessageReaction{..}=>"message_reaction",Intent::Reaction{..}=>"reaction",Intent::Join{..}=>"join",Intent::Attach=>"attach",Intent::Revalidate=>"revalidate",Intent::Ready=>"ready",Intent::Play=>"play",Intent::Pause=>"pause",Intent::Seek{..}=>"seek",Intent::Disconnect=>"disconnect",Intent::Reconnect=>"reconnect",Intent::Leave=>"leave",Intent::Suspend=>"suspend",Intent::Foreground=>"foreground"});
                         let operation=async {
                             if let Intent::Connect{url,name,allow_lan}=&cmd.intent {
                                 if let Some(mut old)=client.take(){old.disconnect().await;}
@@ -331,6 +344,11 @@ impl Network {
                             }
                             let c=client.as_mut().ok_or("NETWORK_DISCONNECTED")?;
                             match cmd.intent {
+                                Intent::TransferAddress=>Ok(json!({"address":c.transfer_address()})),
+                                        Intent::Share{address}=>{c.share_file(address,cmd.source.ok_or("MEDIA_NOT_READY")?).await?;Ok(json!({}))},
+                                Intent::Receive{root}=>{c.receive_file(&root).await?;Ok(json!({}))},
+                                Intent::TransferControl{operation,receiver_id}=>{c.transfer_action(&operation,receiver_id).await?;Ok(json!({}))},
+                                Intent::LoadTransfer=>{let path=c.transfer_completed().ok_or("TRANSFER_INCOMPLETE")?;Ok(json!({"path":path}))},
                                 Intent::Chat{text}=>{c.send_chat(&text).await?;Ok(json!({}))},
                                 Intent::Message{content,reply_to_message_id}=>{c.send_message(content,reply_to_message_id).await?;Ok(json!({}))},
                                 Intent::MessageReaction{message_id,emoji}=>{c.react_message(message_id,&emoji).await?;Ok(json!({}))},
@@ -372,12 +390,22 @@ impl Network {
         generation: u64,
         descriptor: Option<MediaDescriptor>,
     ) -> Result<(), &'static str> {
+        self.enqueue_source(intent, generation, descriptor, None)
+    }
+    pub fn enqueue_source(
+        &self,
+        intent: Intent,
+        generation: u64,
+        descriptor: Option<MediaDescriptor>,
+        source: Option<std::fs::File>,
+    ) -> Result<(), &'static str> {
         let mut s = self.status.lock().unwrap();
         self.tx
             .try_send(Command {
                 intent,
                 generation,
                 descriptor,
+                source,
             })
             .map_err(|_| "NETWORK_QUEUE_FULL")?;
         s["last_action"] = Value::Null;
@@ -424,6 +452,11 @@ async fn ready_when_usable(
 }
 pub(crate) fn safe_error(e: &str) -> &'static str {
     match e {
+        "TLS_PIN_REQUIRED" => "TLS_PIN_REQUIRED",
+        "TRANSFER_Space" => "TRANSFER_SPACE",
+        "TRANSFER_Storage" => "TRANSFER_STORAGE",
+        "TRANSFER_INCOMPLETE" => "TRANSFER_INCOMPLETE",
+        "TRANSFER_Unauthorized" => "NOT_AUTHORIZED",
         "RATE_LIMITED" => "RATE_LIMITED",
         "PAYLOAD_TOO_LARGE" => "PAYLOAD_TOO_LARGE",
         "INVALID_EVENT" => "INVALID_EVENT",

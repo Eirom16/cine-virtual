@@ -49,6 +49,7 @@ fn publish(c: &Client<BackendPlayer>, status: &Mutex<Value>) {
     v["presentation"] = c.presentation_summary();
     v["hash"] = c.hash_status();
     v["social"] = c.social_summary();
+    v["transfer"] = c.transfer_summary();
 }
 impl Desktop {
     pub fn new(boot: Instant) -> Result<Self, &'static str> {
@@ -72,7 +73,7 @@ impl Desktop {
                             let action = match &cmd {
                                 DesktopIntent::Select(s) => { let _ = &s.action; "select" },
                                 DesktopIntent::Room(i) => match i {
-                                    Intent::Connect{..}=>"connect",Intent::Create=>"create",Intent::Chat{..}=>"chat",Intent::Message{..}=>"message",Intent::MessageReaction{..}=>"message_reaction",Intent::Reaction{..}=>"reaction",Intent::Join{..}=>"join",
+                                    Intent::TransferAddress=>"transfer_address",Intent::Share{..}=>"share",Intent::Receive{..}=>"receive",Intent::TransferControl{..}=>"transfer_control",Intent::LoadTransfer=>"load_transfer",Intent::Connect{..}=>"connect",Intent::Create=>"create",Intent::Chat{..}=>"chat",Intent::Message{..}=>"message",Intent::MessageReaction{..}=>"message_reaction",Intent::Reaction{..}=>"reaction",Intent::Join{..}=>"join",
                                     Intent::Ready=>"ready",Intent::Play=>"play",Intent::Pause=>"pause",Intent::Seek{..}=>"seek",
                                     Intent::Disconnect=>"disconnect",Intent::Reconnect=>"reconnect",Intent::Leave=>"leave",
                                     Intent::Suspend=>"suspend",Intent::Foreground=>"foreground",Intent::Attach=>"attach",Intent::Revalidate=>"revalidate",
@@ -98,6 +99,11 @@ impl Desktop {
                                         Ok(json!({}))
                                     },
                                     DesktopIntent::Room(i) => match i {
+                                        Intent::TransferAddress=>Ok(json!({"address":c.transfer_address()})),
+                                        Intent::Share{address}=>{c.share(address).await?;Ok(json!({}))},
+                                        Intent::Receive{root}=>{c.receive_file(&root).await?;Ok(json!({}))},
+                                        Intent::TransferControl{operation,receiver_id}=>{c.transfer_action(&operation,receiver_id).await?;Ok(json!({}))},
+                                        Intent::LoadTransfer=>{let path=c.transfer_completed().ok_or("TRANSFER_INCOMPLETE")?;c.select(&path).await?;Ok(json!({}))},
                                         Intent::Chat{text} => {c.send_chat(&text).await?;Ok(json!({}))},
                                 Intent::Message{content,reply_to_message_id}=>{c.send_message(content,reply_to_message_id).await?;Ok(json!({}))},
                                 Intent::MessageReaction{message_id,emoji}=>{c.react_message(message_id,&emoji).await?;Ok(json!({}))},

@@ -313,7 +313,33 @@ class MainActivity : FlutterActivity() {
                         rustOwner = next; reply.success(null)
                     }
                     "startNetworkDriver" -> { diagnostic = intent.getBooleanExtra("cine_diagnostic", false); networkDriver = true; driverRunning = true; driver.removeCallbacks(drive); postDrive(); reply.success(null) }
-                    "roomConfig" -> reply.success(mapOf("server" to (intent.getStringExtra("cine_server") ?: ""), "invite" to (intent.getStringExtra("cine_invite") ?: ""), "run_id" to (intent.getStringExtra("cine_run_id") ?: "manual")))
+                    "roomConfig" -> reply.success(mapOf("server" to (intent.getStringExtra("cine_server") ?: ""), "invite" to (intent.getStringExtra("cine_invite") ?: ""), "host" to intent.getBooleanExtra("cine_qa_host", false), "run_id" to (intent.getStringExtra("cine_run_id") ?: "manual")))
+                    "qaSaveInvitation" -> {
+                        require(applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE != 0) { "QA_UNAVAILABLE" }
+                        val file = java.io.File(cacheDir,"cine-p2p-qa-invitation")
+                        file.writeText(call.arguments as String)
+                        file.setReadable(false,false); file.setReadable(true,true)
+                        file.setWritable(false,false); file.setWritable(true,true)
+                        reply.success(null)
+                    }
+                    "qaResources" -> {
+                        require(applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE != 0) { "QA_UNAVAILABLE" }
+                        reply.success(mapOf("cpu_ms" to android.os.Process.getElapsedCpuTime(),
+                            "fds" to (java.io.File("/proc/self/fd").list()?.size ?: 0),
+                            "threads" to (java.io.File("/proc/self/task").list()?.size ?: 0)))
+                    }
+                    "transferDestination" -> {
+                        val root = java.io.File(filesDir,"cine-transfers")
+                        require(root.isDirectory || root.mkdirs()) { "TRANSFER_STORAGE" }
+                        reply.success(mapOf("path" to root.canonicalPath,"available_bytes" to android.os.StatFs(root.path).availableBytes))
+                    }
+                    "loadReceived" -> {
+                        val root = java.io.File(filesDir,"cine-transfers").canonicalFile
+                        val file = java.io.File(call.arguments as String).canonicalFile
+                        require(file.isFile && file.parentFile?.parentFile == root && file.parentFile?.name?.matches(Regex("cine-[0-9a-f-]{36}")) == true && file.name == "media.mp4") { "TRANSFER_STORAGE" }
+                        selected = Uri.fromFile(file)
+                        reply.success(null)
+                    }
                     "select" -> {
                         if (picker != null) reply.error("PICKER_BUSY", "PICKER_BUSY", null)
                         else {
@@ -352,7 +378,7 @@ class MainActivity : FlutterActivity() {
                     "resources" -> reply.success(resources())
                     "load" -> {
                         val uri = selected ?: throw IllegalStateException("INVALID_URI")
-                        require(uri.scheme == "content") { "INVALID_URI" }
+                        require(uri.scheme == "content" || (uri.scheme == "file" && java.io.File(uri.path!!).canonicalPath.startsWith(java.io.File(filesDir,"cine-transfers").canonicalPath + "/"))) { "INVALID_URI" }
                         failure = null; firstFrame = false; seekLoss = null; seekOperation = null; seekAdvanceReported = true; stableReported = true; lifecycle("IDLE"); loadMs = 0; loadStart = SystemClock.elapsedRealtime()
                         sdk.trackSelectionParameters = sdk.trackSelectionParameters.buildUpon()
                             .setTrackTypeDisabled(C.TRACK_TYPE_AUDIO, call.argument<Boolean>("disable_audio") == true).build()

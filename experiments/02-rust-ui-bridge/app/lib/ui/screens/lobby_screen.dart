@@ -4,6 +4,7 @@ import '../../presentation/application_controller.dart';
 import '../../presentation/view_state.dart';
 import '../components/product_components.dart';
 import '../components/social_panel.dart';
+import '../components/transfer_card.dart';
 import '../theme/product_theme.dart';
 
 class LobbyScreen extends StatelessWidget {
@@ -175,6 +176,7 @@ class LobbyScreen extends StatelessWidget {
               ? controller.cancelHash
               : null,
         ),
+        TransferCard(controller: controller),
         const SizedBox(height: CineTokens.lg),
         Wrap(
           spacing: CineTokens.sm,
@@ -187,7 +189,9 @@ class LobbyScreen extends StatelessWidget {
               icon: const Icon(Icons.folder_open),
               label: Text(
                 view.filename.isEmpty
-                    ? 'Seleccionar archivo'
+                    ? (view.isHost
+                          ? 'Seleccionar archivo'
+                          : 'Seleccionar mi propia copia')
                     : 'Cambiar archivo',
               ),
             ),

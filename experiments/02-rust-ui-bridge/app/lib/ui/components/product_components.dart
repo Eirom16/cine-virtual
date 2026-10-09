@@ -340,6 +340,7 @@ class ReadinessStatus extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     LinearProgressIndicator(
+                      backgroundColor: CineTokens.border,
                       value: value,
                       semanticsLabel: 'Verificación del archivo',
                     ),

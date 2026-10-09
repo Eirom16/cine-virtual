@@ -86,7 +86,7 @@ class HomeScreen extends StatelessWidget {
                       SizedBox(width: CineTokens.xs),
                       Expanded(
                         child: Text(
-                          'Cada persona elige su copia local. No se sube ni se transfiere el vídeo.',
+                          'Usa tu copia local o recibe el archivo del anfitrión en una LAN compatible.',
                           style: TextStyle(
                             color: CineTokens.muted,
                             fontSize: 12,

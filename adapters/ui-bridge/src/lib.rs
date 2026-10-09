@@ -133,6 +133,7 @@ pub struct Application {
     sync: SyncEngine,
     deadline: Option<u64>,
     job: Option<HashJob>,
+    transfer_source: Option<std::fs::File>,
     network: Option<network::Network>,
     desktop: Option<desktop::Desktop>,
     started: Instant,
@@ -152,6 +153,7 @@ impl Default for Application {
             sync: SyncEngine::new(SyncConfig::default()).unwrap(),
             deadline: None,
             job: None,
+            transfer_source: None,
             network: None,
             desktop: None,
             started: Instant::now(),
@@ -327,11 +329,26 @@ impl Application {
                 } else {
                     None
                 };
+                let source = if matches!(intent, network::Intent::Share { .. }) {
+                    if self.attached_generation != Some(self.generation)
+                        || self
+                            .job
+                            .as_ref()
+                            .is_none_or(|j| j.status.lock().unwrap().state != "complete")
+                    {
+                        return self.reply(now, vec![], Some("MEDIA_NOT_READY"));
+                    }
+                    self.transfer_source
+                        .as_ref()
+                        .and_then(|f| f.try_clone().ok())
+                } else {
+                    None
+                };
                 error = self
                     .network
                     .as_ref()
                     .unwrap()
-                    .enqueue(intent, self.generation, descriptor)
+                    .enqueue_source(intent, self.generation, descriptor, source)
                     .err();
             }
             Command::Configure(caps) => self.caps = caps,
@@ -533,6 +550,7 @@ impl Application {
         }
         use std::io::Seek;
         file.rewind().map_err(|_| "UNSUPPORTED_SOURCE")?;
+        self.transfer_source = Some(file.try_clone().map_err(|_| "READ_FAILED")?);
         let cancel = Arc::new(AtomicBool::new(false));
         let status = Arc::new(Mutex::new(HashStatus {
             state: "running",

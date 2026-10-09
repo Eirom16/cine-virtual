@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -43,7 +45,62 @@ class _ProductShellState extends State<ProductShell> {
     super.initState();
     controller = widget.controller ?? ApplicationController();
     controller.addListener(observe);
-    if (widget.controller == null) unawaited(controller.initialize());
+    if (widget.controller == null) unawaited(initialize());
+  }
+
+  Timer? qaTimer;
+  Future<void> initialize() async {
+    await controller.initialize();
+    if (!const bool.fromEnvironment('P2P_QA') || !mounted) return;
+    if (Platform.isAndroid) {
+      final config =
+          await NativeSessionGateway.native.invokeMapMethod<String, dynamic>(
+            'roomConfig',
+          ) ??
+          {};
+      if ((config['host'] == true || '${config['invite'] ?? ''}'.isNotEmpty) &&
+          await controller.enter(
+            create: config['host'] == true,
+            name: 'Android QA',
+            server: '${config['server']}',
+            invite: '${config['invite']}',
+          )) {
+        if (mounted) setState(() => page = ProductPage.lobby);
+        if (config['host'] == true) {
+          await NativeSessionGateway.native.invokeMethod(
+            'qaSaveInvitation',
+            controller.invitation,
+          );
+        }
+      }
+    } else if (Platform.isLinux &&
+        Platform.environment.containsKey('CINE_P2P_QA_SERVER')) {
+      if (await controller.enter(
+        create: true,
+        name: 'Linux QA',
+        server: Platform.environment['CINE_P2P_QA_SERVER']!,
+      )) {
+        if (mounted) setState(() => page = ProductPage.lobby);
+        final output = Platform.environment['CINE_P2P_QA_INVITATION_FILE'];
+        if (output != null) {
+          // Harness supplies an existing mode-0600 file in a private directory.
+          await File(output).writeAsString(controller.invitation!);
+        }
+      }
+    }
+    final elapsed = Stopwatch()..start();
+    qaTimer = Timer.periodic(const Duration(milliseconds: 500), (_) async {
+      if (!mounted) return;
+      final resources = Platform.isAndroid
+          ? await NativeSessionGateway.native.invokeMapMethod<String, dynamic>(
+              'qaResources',
+            )
+          : null;
+      final v = controller.view;
+      debugPrint(
+        'CINE_P2P_SAMPLE ${jsonEncode({'elapsed_ms': elapsed.elapsedMilliseconds, 'resources': resources, 'connected': v.connected, 'trusted': v.trusted, 'host': v.isHost, 'room_ready': v.roomReady, 'player_ready': v.sync['ready'], 'playing': v.sync['playing'], 'position_ms': v.sync['position_ms'], 'drift_ms': v.sync['drift_ms'], 'snapshot_required': v.sync['snapshot_required'], 'identity_match': v.media['identity_match'], 'hash_state': v.hashState, 'error': controller.error, 'busy': controller.busy, 'action': controller.action, 'page': page.name, 'social_count': controller.social.value.entries.length, 'reaction_count': controller.social.value.reactions.length, 'transfer': controller.transfer.value})}',
+      );
+    });
   }
 
   void observe() {
@@ -144,6 +201,7 @@ class _ProductShellState extends State<ProductShell> {
 
   @override
   void dispose() {
+    qaTimer?.cancel();
     controller.removeListener(observe);
     if (fullscreen) unawaited(controller.gateway.fullscreen(false));
     if (widget.controller == null) controller.dispose();

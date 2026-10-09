@@ -28,6 +28,9 @@ abstract class SessionGateway {
   Map<String, dynamic> call(String type, [Map<String, dynamic>? fields]);
   Future<Map<String, dynamic>?> pick();
   Future<void> prepareAndroid();
+  Future<Map<String, dynamic>?> transferDestination() async => null;
+  Future<void> loadReceived(String path) async {}
+
   Future<void> dispose();
 }
 
@@ -84,8 +87,21 @@ class NativeSessionGateway implements SessionGateway {
   Map<String, dynamic> call(String type, [Map<String, dynamic>? fields]) =>
       bridge!.call(type, fields);
   @override
-  Future<Map<String, dynamic>?> pick() =>
-      (android ? native : desktop).invokeMapMethod<String, dynamic>('select');
+  Future<Map<String, dynamic>?> pick() {
+    if (const bool.fromEnvironment('P2P_QA') && Platform.isLinux) {
+      final fixture = Platform.environment['CINE_P2P_QA_SOURCE'];
+      if (fixture != null) {
+        return Future.value({
+          'path': fixture,
+          'title': 'Clip de prueba autorizado',
+        });
+      }
+    }
+    return (android ? native : desktop).invokeMapMethod<String, dynamic>(
+      'select',
+    );
+  }
+
   @override
   Future<void> prepareAndroid() async {
     final fd = await native.invokeMethod<int>('openHashFd');
@@ -97,6 +113,14 @@ class NativeSessionGateway implements SessionGateway {
     await native.invokeMethod('load', {'disable_audio': false});
   }
 
+  @override
+  Future<Map<String, dynamic>?> transferDestination() =>
+      (android ? native : desktop).invokeMapMethod<String, dynamic>(
+        'transferDestination',
+      );
+  @override
+  Future<void> loadReceived(String path) =>
+      native.invokeMethod('loadReceived', path);
   @override
   Future<void> prepareDesktop() async {
     if (!Platform.isLinux) return;
@@ -223,6 +247,9 @@ class ApplicationController extends ChangeNotifier with WidgetsBindingObserver {
   int _socialVisible = 0, _lastSocialSequence = 0, _unread = 0;
   bool _socialPublishScheduled = false;
   bool _publishScheduled = false;
+  final transfer = ValueNotifier<Map<String, dynamic>>({});
+  String _transferKey = "", _loadedTransfer = "";
+  bool _loadingTransfer = false;
   final playback = ValueNotifier(const PlaybackView());
   final hashProgress = ValueNotifier<double?>(null);
   final diagnostics = ValueNotifier<Map<String, dynamic>>({});
@@ -306,6 +333,39 @@ class ApplicationController extends ChangeNotifier with WidgetsBindingObserver {
     view = next;
     playback.value = PlaybackView.from(next);
     _publishSocial();
+    final data = object(next.network['transfer']);
+    final key = jsonEncode(data);
+    if (key != _transferKey) {
+      _transferKey = key;
+      transfer.value = data;
+    }
+    final transferId = '${object(data['offer'])['transfer_id'] ?? ''}';
+    if (session &&
+        !busy &&
+        !socialPending &&
+        !_loadingTransfer &&
+        next.connected &&
+        object(data['progress'])['state'] == 'completed' &&
+        transferId.isNotEmpty &&
+        transferId != _loadedTransfer) {
+      _loadingTransfer = true;
+      Future<void>(() async {
+        final loaded = await _run('load_transfer', () async {
+          final result = await _intent('load_transfer');
+          filename = 'Película recibida y verificada';
+          if (gateway.android) {
+            await gateway.loadReceived('${result['path']}');
+            await _hashAndAttach(++_mediaOperation);
+          } else {
+            await gateway.finishVideoChange();
+          }
+        });
+        _loadedTransfer = transferId;
+        if (!loaded) error = 'TRANSFER_LOAD_FAILED';
+        _loadingTransfer = false;
+      });
+    }
+
     hashProgress.value = next.hashProgress;
     // Explicit allowlist: never invitation/resume token, local path, URI or full room descriptor.
     diagnostics.value = {
@@ -653,6 +713,28 @@ class ApplicationController extends ChangeNotifier with WidgetsBindingObserver {
       picking = false;
     }
   });
+  Future<String> transferAddress() async =>
+      '${(await _intent('transfer_address'))['address']}';
+  Future<bool> shareMedia(String address) => _run('share', () async {
+    await _intent('share', {'address': address});
+  });
+  Future<bool> receiveMedia() => _run('receive', () async {
+    final destination = await gateway.transferDestination();
+    if (destination == null) return;
+    final total = number(object(transfer.value['offer'])['size_bytes']);
+    if (destination['available_bytes'] is num &&
+        number(destination['available_bytes']) < total + 64 * 1024 * 1024) {
+      throw BridgeFailure('TRANSFER_SPACE');
+    }
+    await _intent('receive', {'root': destination['path']});
+  });
+  Future<bool> transferAction(String operation, [String? receiver]) =>
+      _run('transfer_control', () async {
+        await _intent('transfer_control', {
+          'operation': operation,
+          'receiver_id': receiver,
+        });
+      });
   Future<bool> ready() => _run('ready', () async {
     await _intent('ready');
   });
@@ -758,6 +840,7 @@ class ApplicationController extends ChangeNotifier with WidgetsBindingObserver {
     WidgetsBinding.instance.removeObserver(this);
     unawaited(gateway.dispose());
     gifCache.dispose();
+    transfer.dispose();
     social.dispose();
     playback.dispose();
     hashProgress.dispose();

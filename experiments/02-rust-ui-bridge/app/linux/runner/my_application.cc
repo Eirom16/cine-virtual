@@ -34,12 +34,14 @@ static void file_response(GtkNativeDialog* dialog, gint response, gpointer data)
   g_object_unref(dialog);
 }
 static void file_method(FlMethodChannel*, FlMethodCall* call, gpointer data) {
-  if (g_strcmp0(fl_method_call_get_name(call), "select") != 0) {
+  const gboolean destination = g_strcmp0(fl_method_call_get_name(call), "transferDestination") == 0;
+  if (!destination && g_strcmp0(fl_method_call_get_name(call), "select") != 0) {
     fl_method_call_respond_not_implemented(call, nullptr);
     return;
   }
   GtkFileChooserNative* chooser = gtk_file_chooser_native_new(
-      "Seleccionar película", GTK_WINDOW(data), GTK_FILE_CHOOSER_ACTION_OPEN,
+      destination ? "Destino de la película" : "Seleccionar película", GTK_WINDOW(data),
+      destination ? GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER : GTK_FILE_CHOOSER_ACTION_OPEN,
       "Seleccionar", "Cancelar");
   g_signal_connect(chooser, "response", G_CALLBACK(file_response), g_object_ref(call));
   gtk_native_dialog_show(GTK_NATIVE_DIALOG(chooser));
