@@ -5,3 +5,5 @@ pub use runtime::{Client, ClientError, require_ack};
 pub mod player_backend;
 
 pub mod social;
+
+pub mod transfer;

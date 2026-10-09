@@ -22,10 +22,7 @@ use tokio::{
     sync::{Notify, mpsc, oneshot},
     time,
 };
-use tokio_tungstenite::{
-    connect_async_with_config,
-    tungstenite::{Message, protocol::WebSocketConfig},
-};
+use tokio_tungstenite::tungstenite::{Message, protocol::WebSocketConfig};
 use uuid::Uuid;
 
 pub type ClientError = Box<dyn std::error::Error + Send + Sync>;
@@ -45,6 +42,8 @@ struct Session<P: ApplicationPlayer> {
     last_correction: &'static str,
 }
 pub struct Client<P: ApplicationPlayer = BackendPlayer> {
+    transfer: Arc<Mutex<crate::transfer::Transfers>>,
+    data_address: Option<std::net::SocketAddr>,
     url: String,
     name: String,
     boot: Instant,
@@ -94,6 +93,8 @@ impl<P: ApplicationPlayer + Send + 'static> Client<P> {
         allow_lan: bool,
     ) -> Result<Self, ClientError> {
         let mut client = Self {
+            transfer: Arc::new(Mutex::new(crate::transfer::Transfers::default())),
+            data_address: None,
             url: url.into(),
             name: name.into(),
             boot,
@@ -124,23 +125,51 @@ impl<P: ApplicationPlayer + Send + 'static> Client<P> {
             && !self.url.starts_with("ws://127.0.0.1:")
             && !self.url.starts_with("ws://localhost:")
             && !self.url.starts_with("ws://[::1]:")
+            && !self.url.starts_with("wss://")
         {
             return Err("This spike uses ws:// loopback endpoints only".into());
         }
-        if !self.url.starts_with("ws://") || self.url.len() > 512 {
+        if !(self.url.starts_with("ws://") || self.url.starts_with("wss://"))
+            || self.url.len() > 4096
+        {
             return Err("INVALID_ENDPOINT".into());
         }
         let config = WebSocketConfig::default()
             .max_message_size(Some(MAX_MESSAGE_BYTES))
             .max_frame_size(Some(MAX_MESSAGE_BYTES));
+        let (endpoint, connector) = if self.url.starts_with("wss://") {
+            let (endpoint, pin) = self.url.split_once("#tls=").ok_or("TLS_PIN_REQUIRED")?;
+            let cert = cine_transfer_model::unhex(pin)?;
+            (
+                endpoint,
+                Some(tokio_tungstenite::Connector::Rustls(
+                    cine_transfer::tls::client(&cert)?,
+                )),
+            )
+        } else {
+            (self.url.as_str(), None)
+        };
         let (mut ws, _) = time::timeout(
             Duration::from_secs(8),
-            connect_async_with_config(&self.url, Some(config), true),
+            tokio_tungstenite::connect_async_tls_with_config(
+                endpoint,
+                Some(config),
+                true,
+                connector,
+            ),
         )
         .await??;
+        let mut address = match ws.get_ref() {
+            tokio_tungstenite::MaybeTlsStream::Plain(s) => s.local_addr()?,
+            tokio_tungstenite::MaybeTlsStream::Rustls(s) => s.get_ref().0.local_addr()?,
+            _ => return Err("INVALID_ENDPOINT".into()),
+        };
+        address.set_port(1730);
+        self.data_address = Some(address);
         let (tx, mut rx) = mpsc::channel::<Request>(32);
         self.sender = Some(tx);
         let (ready_tx, ready_rx) = oneshot::channel();
+        let transfers = self.transfer.clone();
         let shared = self.session.clone();
         let notify = self.notify.clone();
         let boot = self.boot;
@@ -160,7 +189,7 @@ impl<P: ApplicationPlayer + Send + 'static> Client<P> {
                 sender_id: None,
                 sequence: None,
                 sent_at_ms: now(),
-                payload: json!({"supported_versions":[1],"client_name":name,"capabilities":["social_v1", "rich_social_v1"]}),
+                payload: json!({"supported_versions":[1],"client_name":name,"capabilities":["social_v1", "rich_social_v1", "p2p_transfer_v1"]}),
             };
             if ws
                 .send(Message::Text(encode(&hello).unwrap().into()))
@@ -179,6 +208,8 @@ impl<P: ApplicationPlayer + Send + 'static> Client<P> {
             let mut negotiated = false;
             let mut gap_requested = false;
             let mut last_ping = 0u64;
+            let mut last_transfer_status = 0u64;
+            let mut transfer_status = None;
             loop {
                 let deadline = {
                     let s = shared.lock().unwrap();
@@ -197,6 +228,15 @@ impl<P: ApplicationPlayer + Send + 'static> Client<P> {
                         if !shared.lock().unwrap().replica.suspended() {shared.lock().unwrap().replica.prepare_pending(now());}
                     },
                     _=sync_tick.tick()=>{
+                        if now().saturating_sub(last_transfer_status)>=1000 {
+                            let maybe={let s=shared.lock().unwrap();let t=transfers.lock().unwrap();let p=t.progress();
+                                if s.replica.connected && t.supported && ["transferring","paused","reconnecting","verifying","completed","failed"].contains(&p.state.as_str()) && transfer_status.as_ref()!=Some(&(p.state.clone(),p.verified_bytes)) {
+                                    t.snapshot.offer.as_ref().zip(s.replica.state.as_ref()).filter(|(_,st)|Some(st.host_id)!=s.replica.member_id).map(|(o,st)| (WireMessage{protocol_version:1,event_id:Uuid::new_v4(),kind:"P2P_TRANSFER_REQUEST".into(),room_id:Some(st.room_id),room_epoch:Some(st.room_epoch),sender_id:s.replica.member_id.map(|i|i.to_string()),sequence:None,sent_at_ms:now(),payload:json!({"signal":{"action":"status","transfer_id":o.manifest.transfer_id,"state":p.state,"verified_bytes":p.verified_bytes}})},(p.state,p.verified_bytes)))
+                                }else{None}
+                            };
+                            if let Some((message,status))=maybe {if ws.send(Message::Text(encode(&message).unwrap().into())).await.is_err(){break;}last_transfer_status=now();transfer_status=Some(status);}
+                        }
+
                         let correction={let mut s=shared.lock().unwrap();let c=s.replica.correct_drift(now());
                             s.last_correction=match c {cine_core::sync::Correction::None=>"none",cine_core::sync::Correction::SetRate(1.0)=>{s.corrections[1]+=1;"restore"},cine_core::sync::Correction::SetRate(_)=>{s.corrections[0]+=1;"rate"},cine_core::sync::Correction::Seek(_)=>{s.corrections[2]+=1;"seek"}};c};
                         match correction {
@@ -257,6 +297,7 @@ impl<P: ApplicationPlayer + Send + 'static> Client<P> {
                                 if s.replica.clock_epoch.is_some_and(|old|old!=epoch){s.credentials=None;}
                                 s.social.rich_supported=message.payload["capabilities"].as_array().is_some_and(|a|a.iter().any(|v|v.as_str()==Some("rich_social_v1")));
                                 s.social.supported=message.payload["capabilities"].as_array().is_some_and(|a|a.iter().any(|v|v.as_str()==Some("social_v1")));
+                                transfers.lock().unwrap().supported=message.payload["capabilities"].as_array().is_some_and(|a|a.iter().any(|v|v.as_str()==Some("p2p_transfer_v1")));
                                 s.replica.set_clock_epoch(epoch);negotiated=true;
                             },
                             "TIME_PONG"=>{
@@ -284,6 +325,13 @@ impl<P: ApplicationPlayer + Send + 'static> Client<P> {
                                     let (_,tx)=sync_reply.take().unwrap();let _=tx.send(message);
                                 } else if let Some(tx)=pending.remove(&id){let _=tx.send(message);}
                             },
+                            "P2P_TRANSFER_STATE"=>{
+                                let s=shared.lock().unwrap();let Some(room)=s.replica.state.as_ref()else{continue};
+                                if message.room_id!=Some(room.room_id) || message.room_epoch!=Some(room.room_epoch){break}
+                                let Ok(snapshot)=serde_json::from_value(message.payload["snapshot"].clone())else{break};
+                                let grant=if message.payload["grant"].is_null(){None}else{let Ok(g)=serde_json::from_value(message.payload["grant"].clone())else{break};Some(g)};
+                                if let Some(member)=s.replica.member_id && transfers.lock().unwrap().install(snapshot,grant,room,member,s.replica.server_now(t4).unwrap_or(0)).is_err(){break;}
+                            },
                             "SOCIAL_STATE"|"CHAT_MESSAGE"|"REACTION"=>{
                                 let need_snapshot={let mut s=shared.lock().unwrap();
                                     if !s.social.supported || !s.replica.state.as_ref().is_some_and(|st|message.room_id==Some(st.room_id)&&message.room_epoch==Some(st.room_epoch)){break;}
@@ -306,6 +354,7 @@ impl<P: ApplicationPlayer + Send + 'static> Client<P> {
                                     gap_requested=false;
                                 }
                                 let result=shared.lock().unwrap().replica.install(state,snapshot,now());
+                                {let s=shared.lock().unwrap();if let (Some(room),Some(member))=(&s.replica.state,s.replica.member_id) && transfers.lock().unwrap().snapshot.offer.is_some(){transfers.lock().unwrap().reconcile(room,member);}}
                                 if message.kind=="ROOM_STATE" && let Some((_,tx))=sync_reply.take() { let _=tx.send(message.clone()); }
                                 if result==Delivery::WrongEpoch {break;}
                                 if result==Delivery::NeedSnapshot && !gap_requested {
@@ -321,11 +370,139 @@ impl<P: ApplicationPlayer + Send + 'static> Client<P> {
                     }
                 }
             }
+            transfers.lock().unwrap().disconnected();
             shared.lock().unwrap().social.disconnected();
             shared.lock().unwrap().replica.disconnect(now());
             notify.notify_waiters();
         }));
         time::timeout(Duration::from_secs(5), ready_rx).await??;
+        Ok(())
+    }
+    pub fn transfer_address(&self) -> Option<std::net::SocketAddr> {
+        self.data_address
+    }
+    pub fn transfer_summary(&self) -> Value {
+        self.transfer.lock().unwrap().summary()
+    }
+    pub fn transfer_completed(&self) -> Option<std::path::PathBuf> {
+        self.transfer.lock().unwrap().completed()
+    }
+    pub async fn transfer_signal(
+        &self,
+        signal: cine_transfer_model::TransferIntent,
+    ) -> Result<(), ClientError> {
+        if !self.transfer.lock().unwrap().supported {
+            return Err("FEATURE_NOT_SUPPORTED".into());
+        }
+        require_ack(
+            &self
+                .request("P2P_TRANSFER_REQUEST", json!({"signal":signal}))
+                .await?,
+        )
+    }
+    pub async fn share_file(
+        &self,
+        address: std::net::SocketAddr,
+        file: std::fs::File,
+    ) -> Result<(), ClientError> {
+        let room = self.state().ok_or("NO_MEDIA")?;
+        if room.host_id
+            != self
+                .session
+                .lock()
+                .unwrap()
+                .replica
+                .member_id
+                .ok_or("NOT_AUTHORIZED")?
+        {
+            return Err("NOT_AUTHORIZED".into());
+        }
+        let manifest = crate::transfer::manifest(&room)?;
+        let offer = self
+            .transfer
+            .lock()
+            .unwrap()
+            .host(address, manifest, file)?;
+        let result = self
+            .transfer_signal(cine_transfer_model::TransferIntent::Offer {
+                manifest: Box::new(offer.manifest),
+                address: offer.address,
+                certificate: offer.certificate,
+            })
+            .await;
+        if result.is_err() {
+            self.transfer.lock().unwrap().abort_host();
+        }
+        result
+    }
+    pub async fn share(&self, address: std::net::SocketAddr) -> Result<(), ClientError> {
+        let file = {
+            let s = self.session.lock().unwrap();
+            s.local
+                .as_ref()
+                .ok_or("MEDIA_NOT_READY")?
+                .handle
+                .transfer_file()?
+        };
+        self.share_file(address, file).await
+    }
+    pub async fn receive_file(&self, root: &Path) -> Result<(), ClientError> {
+        let id = self.transfer.lock().unwrap().download(root)?;
+        self.transfer_signal(cine_transfer_model::TransferIntent::Request { transfer_id: id })
+            .await
+    }
+    pub async fn transfer_action(
+        &self,
+        action: &str,
+        receiver: Option<Uuid>,
+    ) -> Result<(), ClientError> {
+        use cine_transfer_model::TransferIntent as I;
+        let (id, progress) = {
+            let t = self.transfer.lock().unwrap();
+            (
+                t.snapshot
+                    .offer
+                    .as_ref()
+                    .ok_or("NO_MEDIA")?
+                    .manifest
+                    .transfer_id,
+                t.progress(),
+            )
+        };
+        let signal = match action {
+            "accept" => I::Accept {
+                transfer_id: id,
+                receiver_id: receiver.ok_or("INVALID_EVENT")?,
+            },
+            "reject" => I::Reject {
+                transfer_id: id,
+                receiver_id: receiver.ok_or("INVALID_EVENT")?,
+            },
+            "pause" => {
+                self.transfer.lock().unwrap().pause();
+                I::Status {
+                    transfer_id: id,
+                    state: "paused".into(),
+                    verified_bytes: progress.verified_bytes,
+                }
+            }
+            "resume" => I::Request { transfer_id: id },
+            "cancel" => {
+                self.transfer.lock().unwrap().cancel();
+                I::Cancel { transfer_id: id }
+            }
+            "withdraw" => I::Withdraw { transfer_id: id },
+            "status" => I::Status {
+                transfer_id: id,
+                state: progress.state,
+                verified_bytes: progress.verified_bytes,
+            },
+            _ => return Err("INVALID_EVENT".into()),
+        };
+        self.transfer_signal(signal).await?;
+        if action == "resume" {
+            self.transfer.lock().unwrap().waiting();
+        }
         Ok(())
     }
     pub fn state(&self) -> Option<RoomState> {
@@ -507,6 +684,7 @@ impl<P: ApplicationPlayer + Send + 'static> Client<P> {
         Ok(())
     }
     pub async fn suspend(&self) -> Result<(), ClientError> {
+        self.transfer.lock().unwrap().disconnected();
         {
             let mut s = self.session.lock().unwrap();
             s.replica.suspend(self.now());
@@ -632,6 +810,7 @@ impl<P: ApplicationPlayer + Send + 'static> Client<P> {
         self.request(kind, payload).await
     }
     pub async fn disconnect(&mut self) {
+        self.transfer.lock().unwrap().disconnected();
         self.session.lock().unwrap().replica.disconnect(self.now());
         self.sender.take();
         if let Some(mut task) = self.task.take()

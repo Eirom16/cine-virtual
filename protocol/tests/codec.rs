@@ -342,3 +342,25 @@ fn rich_snapshot_budget_covers_encoded_json_with_maximum_reaction_metadata() {
         snapshot.validate().unwrap();
     }
 }
+
+#[test]
+fn transfer_control_is_strict_and_server_state_cannot_be_spoofed() {
+    let mut v = hello();
+    v["type"] = json!("P2P_TRANSFER_REQUEST");
+    v["room_id"] = json!(Uuid::new_v4());
+    v["room_epoch"] = json!(Uuid::new_v4());
+    v["sender_id"] = json!(Uuid::new_v4());
+    v["payload"] = json!({"signal":{"action":"request","transfer_id":Uuid::new_v4()}});
+    assert!(incoming(&decode(&v.to_string()).unwrap()).is_ok());
+    let mut bad = v.clone();
+    bad["payload"]["signal"]["secret"] = json!("spoof");
+    assert_eq!(rejected(bad), ErrorCode::InvalidEvent);
+    let mut bad = v.clone();
+    bad["payload"]["file_bytes"] = json!([1, 2, 3]);
+    assert_eq!(rejected(bad), ErrorCode::InvalidEvent);
+    let mut bad = v.clone();
+    bad["payload"]["signal"]["action"] = json!("unknown");
+    assert_eq!(rejected(bad), ErrorCode::InvalidEvent);
+    v["type"] = json!("P2P_TRANSFER_STATE");
+    assert_eq!(rejected(v), ErrorCode::NotAuthorized);
+}

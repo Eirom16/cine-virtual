@@ -5,6 +5,39 @@ use tokio::io::{AsyncBufReadExt, BufReader};
 
 async fn command(client: &mut Client, parts: &[&str]) -> Result<Value, ClientError> {
     match parts {
+        ["social-state"] => Ok(client.social_summary()),
+        ["chat", text @ ..] => {
+            client.send_chat(&text.join(" ")).await?;
+            Ok(json!({"event":"chat_sent"}))
+        }
+        ["reaction", emoji] => {
+            client.send_reaction(emoji).await?;
+            Ok(json!({"event":"reaction_sent"}))
+        }
+        ["transfer-state"] => Ok(client.transfer_summary()),
+        ["share", address] => {
+            client.share(address.parse()?).await?;
+            Ok(json!({"event":"offered"}))
+        }
+        ["receive", root] => {
+            client.receive_file(std::path::Path::new(root)).await?;
+            Ok(json!({"event":"requested"}))
+        }
+        ["transfer", action] => {
+            client.transfer_action(action, None).await?;
+            Ok(json!({"event":"transfer_action"}))
+        }
+        ["transfer", action, receiver] => {
+            client
+                .transfer_action(action, Some(receiver.parse()?))
+                .await?;
+            Ok(json!({"event":"transfer_action"}))
+        }
+        ["load-transfer"] => {
+            let path = client.transfer_completed().ok_or("TRANSFER_INCOMPLETE")?;
+            client.select(&path).await?;
+            Ok(json!({"event":"transfer_loaded"}))
+        }
         ["create"] => {
             let c = client.create().await?;
             // This explicit private terminal output is the invitation, never a tracing field.

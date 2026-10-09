@@ -195,6 +195,10 @@ impl From<ControlDto> for ControlContext {
 #[derive(Deserialize)]
 #[serde(tag = "type", content = "payload")]
 enum RequestDto {
+    #[serde(rename = "P2P_TRANSFER_REQUEST")]
+    P2p {
+        signal: cine_transfer_model::TransferIntent,
+    },
     #[serde(rename = "SESSION_HELLO")]
     Hello {
         supported_versions: Vec<u32>,
@@ -326,6 +330,7 @@ pub fn incoming(message: &WireMessage) -> Result<Incoming, ErrorCode> {
         "SESSION_ACCEPT",
         "TIME_PONG",
         "ROOM_CLOSED",
+        "P2P_TRANSFER_STATE",
         "SOCIAL_STATE",
         "CHAT_MESSAGE",
         "REACTION",
@@ -364,10 +369,22 @@ pub fn incoming(message: &WireMessage) -> Result<Incoming, ErrorCode> {
             return Err(ErrorCode::InvalidEvent);
         }
     }
+    if message.kind == "P2P_TRANSFER_REQUEST"
+        && message
+            .payload
+            .as_object()
+            .is_none_or(|p| p.len() != 1 || !p.contains_key("signal"))
+    {
+        return Err(ErrorCode::InvalidEvent);
+    }
     let dto: RequestDto =
         serde_json::from_value(json!({"type":message.kind,"payload":message.payload}))
             .map_err(|_| ErrorCode::InvalidEvent)?;
     let command = match dto {
+        RequestDto::P2p { signal } => {
+            signal.validate().map_err(|_| ErrorCode::InvalidEvent)?;
+            Command::P2p(signal)
+        }
         RequestDto::Hello {
             supported_versions,
             client_name,
@@ -561,6 +578,21 @@ pub fn error_message(id: Option<Uuid>, code: ErrorCode, now: u64) -> WireMessage
 }
 pub fn effect_message(effect: &Effect, clock_epoch: Uuid, now: u64) -> Option<WireMessage> {
     let mut message = match effect {
+        Effect::P2p {
+            room_id,
+            room_epoch,
+            snapshot,
+            grant,
+        } => {
+            let mut m = WireMessage::server(
+                "P2P_TRANSFER_STATE",
+                json!({"snapshot":snapshot,"grant":grant}),
+                now,
+            );
+            m.room_id = Some(*room_id);
+            m.room_epoch = Some(*room_epoch);
+            return Some(m);
+        }
         Effect::Social {
             room_id,
             room_epoch,

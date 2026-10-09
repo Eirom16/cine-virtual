@@ -22,6 +22,7 @@ impl Default for ServiceConfig {
     }
 }
 struct Room {
+    p2p: crate::p2p::Transfers,
     social: SocialState,
     state: RoomState,
     invite: [u8; 32],
@@ -134,6 +135,17 @@ impl RoomService {
     }
     pub fn state(&self, room: Uuid) -> Option<&RoomState> {
         self.store.rooms.get(&room).map(|r| &r.state)
+    }
+    pub fn transfer_snapshot(&mut self, connection: Uuid, now: u64) -> Option<Effect> {
+        let (id, _) = self.binding(connection)?;
+        let room = self.store.rooms.get_mut(&id)?;
+        room.p2p.reconcile(&room.state, now);
+        Some(Effect::P2p {
+            room_id: id,
+            room_epoch: room.state.room_epoch,
+            snapshot: room.p2p.snapshot(),
+            grant: None,
+        })
     }
     pub fn binding(&self, connection: Uuid) -> Option<(Uuid, Uuid)> {
         self.bindings.get(&connection).copied()
@@ -268,6 +280,7 @@ impl RoomService {
             self.store.rooms.insert(
                 id,
                 Room {
+                    p2p: crate::p2p::Transfers::default(),
                     social: SocialState::default(),
                     state: state.clone(),
                     invite,
@@ -423,6 +436,45 @@ impl RoomService {
             .ok_or(NotAuthorized)?;
         if bound_id != id || room.connections.get(&mid) != Some(&connection) {
             return Err(NotAuthorized);
+        }
+        if let Command::P2p(intent) = &req.command {
+            let grant = room.p2p.apply(&room.state, mid, intent, now)?;
+            let snapshot = room.p2p.snapshot();
+            let mut deliveries = vec![
+                private(
+                    connection,
+                    Effect::Ack {
+                        request_event_id: req.event_id,
+                        sequence: None,
+                        result: AckResult::Empty,
+                    },
+                ),
+                Delivery {
+                    recipients: room.recipients(),
+                    effect: Effect::P2p {
+                        room_id: id,
+                        room_epoch: room.state.room_epoch,
+                        snapshot: snapshot.clone(),
+                        grant: None,
+                    },
+                },
+            ];
+            if let Some(grant) = grant {
+                let recipients = [room.state.host_id, grant.credential.receiver_id]
+                    .iter()
+                    .filter_map(|m| room.connections.get(m).copied())
+                    .collect();
+                deliveries.push(Delivery {
+                    recipients,
+                    effect: Effect::P2p {
+                        room_id: id,
+                        room_epoch: room.state.room_epoch,
+                        snapshot,
+                        grant: Some(grant),
+                    },
+                });
+            }
+            return Ok(deliveries);
         }
         let host_command = matches!(
             req.command,

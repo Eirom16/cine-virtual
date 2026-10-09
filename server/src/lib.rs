@@ -33,10 +33,12 @@ const QUEUE_CAPACITY: usize = 32;
 pub struct Server {
     hub: Arc<Mutex<Hub>>,
     slots: Arc<Semaphore>,
+    secure: bool,
 }
 struct Hub {
     service: RoomService,
     social: HashSet<Uuid>,
+    p2p: HashSet<Uuid>,
     senders: HashMap<Uuid, mpsc::Sender<Effect>>,
     boot: Instant,
     clock_epoch: Uuid,
@@ -62,12 +64,16 @@ impl Hub {
                 tracing::info!(event,room_id=%e.state.room_id,sequence=e.state.sequence,event_type=e.kind.as_str());
             }
             for id in delivery.recipients {
+                if matches!(delivery.effect, Effect::P2p { .. }) && !self.p2p.contains(&id) {
+                    continue;
+                }
                 if matches!(delivery.effect, Effect::Social { .. }) && !self.social.contains(&id) {
                     continue;
                 }
                 if matches!(delivery.effect, Effect::Close) {
                     self.senders.remove(&id);
                     self.social.remove(&id);
+                    self.p2p.remove(&id);
                     continue;
                 }
                 let failed = self
@@ -85,6 +91,7 @@ impl Hub {
     }
     fn remove(&mut self, id: Uuid) {
         self.social.remove(&id);
+        self.p2p.remove(&id);
         self.senders.remove(&id);
         let deliveries = self.service.disconnect(id, self.now());
         self.dispatch(deliveries);
@@ -101,11 +108,13 @@ impl Server {
             hub: Arc::new(Mutex::new(Hub {
                 service: RoomService::new(config),
                 social: HashSet::new(),
+                p2p: HashSet::new(),
                 senders: HashMap::new(),
                 boot: Instant::now(),
                 clock_epoch: Uuid::new_v4(),
             })),
             slots: Arc::new(Semaphore::new(256)),
+            secure: false,
         }
     }
     pub async fn serve(
@@ -113,6 +122,32 @@ impl Server {
         listener: TcpListener,
         stop: impl std::future::Future<Output = ()> + Send + 'static,
     ) -> std::io::Result<()> {
+        self.serve_listener(listener, stop).await
+    }
+    pub async fn serve_tls(
+        mut self,
+        listener: TcpListener,
+        config: Arc<tokio_rustls::rustls::ServerConfig>,
+        stop: impl std::future::Future<Output = ()> + Send + 'static,
+    ) -> std::io::Result<()> {
+        self.secure = true;
+        self.serve_listener(
+            TlsListener {
+                listener,
+                acceptor: tokio_rustls::TlsAcceptor::from(config),
+            },
+            stop,
+        )
+        .await
+    }
+    async fn serve_listener<L: axum::serve::Listener>(
+        self,
+        listener: L,
+        stop: impl std::future::Future<Output = ()> + Send + 'static,
+    ) -> std::io::Result<()>
+    where
+        L::Addr: Send + std::fmt::Debug,
+    {
         let ticker = self.clone();
         let task = tokio::spawn(async move {
             let mut ticks = time::interval(Duration::from_millis(250));
@@ -124,6 +159,15 @@ impl Server {
                 let now = h.now();
                 let effects = h.service.tick(now);
                 h.dispatch(effects);
+                let peers: Vec<_> = h.p2p.iter().copied().collect();
+                for peer in peers {
+                    if let Some(effect) = h.service.transfer_snapshot(peer, now) {
+                        h.dispatch(vec![Delivery {
+                            recipients: vec![peer],
+                            effect,
+                        }]);
+                    }
+                }
                 if count % 20 == 0 {
                     let effects = h.service.sync_states(now);
                     h.dispatch(effects);
@@ -231,8 +275,13 @@ async fn connection(mut socket: WebSocket, server: Server) {
                         let social=message.payload.get("capabilities").and_then(|v|v.as_array()).is_some_and(|a|a.iter().any(|v|v.as_str()==Some("social_v1")));
                         rich_social=social && message.payload.get("capabilities").and_then(|v|v.as_array()).is_some_and(|a|a.iter().any(|v|v.as_str()==Some("rich_social_v1")));
                         if social {server.hub.lock().unwrap().social.insert(id);}
-                        negotiated=true;hello_payload=Some(message.payload);
-                        let response={let h=server.hub.lock().unwrap();WireMessage::server("SESSION_ACCEPT",json!({"capabilities":if rich_social {vec!["social_v1", "rich_social_v1"]} else if social {vec!["social_v1"]} else {vec![]},"selected_version":1,"connection_id":id,"clock_epoch":h.clock_epoch,
+                        negotiated=true;hello_payload=Some(message.payload.clone());
+                        let p2p=server.secure && message.payload.get("capabilities").and_then(|v|v.as_array()).is_some_and(|a|a.iter().any(|v|v.as_str()==Some("p2p_transfer_v1")));
+                        if p2p {server.hub.lock().unwrap().p2p.insert(id);}
+                        let mut capabilities=vec![];if social{capabilities.push("social_v1")}
+                        if rich_social{capabilities.push("rich_social_v1")}
+                        if p2p{capabilities.push("p2p_transfer_v1")}
+                        let response={let h=server.hub.lock().unwrap();WireMessage::server("SESSION_ACCEPT",json!({"capabilities":capabilities,"selected_version":1,"connection_id":id,"clock_epoch":h.clock_epoch,
                             "limits":{"max_message_bytes":MAX_MESSAGE_BYTES,"max_members":16,"queue_capacity":QUEUE_CAPACITY,"lease_ms":30_000}}),h.now())};
                         if !send(&mut socket,&response).await {break;}
                     },
@@ -250,15 +299,46 @@ async fn connection(mut socket: WebSocket, server: Server) {
                         if matches!(request.command,cine_rooms::model::Command::RichMessage{..}|cine_rooms::model::Command::MessageReact{..}) && !rich_social {
                             if !send(&mut socket,&error_message(Some(message.event_id),ErrorCode::FeatureNotSupported,t2)).await {break;}continue;
                         }
+                        if matches!(request.command,cine_rooms::model::Command::P2p(_)) && !server.hub.lock().unwrap().p2p.contains(&id) {
+                            if !send(&mut socket,&error_message(Some(message.event_id),ErrorCode::FeatureNotSupported,t2)).await{break;}continue;
+                        }
                         let created=matches!(request.command,cine_rooms::model::Command::Create{..});
                         let mut h=server.hub.lock().unwrap();let now=h.now();let effects=h.service.execute(id,*request,now);
                         if created && effects.iter().any(|d|matches!(d.effect,Effect::Ack{..})) {tracing::info!(event="room_created",connection_id=%id);}
                         for d in &effects {if let Effect::Error{code,..}=d.effect {tracing::warn!(event="protocol_error",code=code.as_str(),connection_id=%id);}}
                         h.dispatch(effects);
+                        let recipients:Vec<_>=h.p2p.iter().copied().collect();let now=h.now();
+                        for peer in recipients {if let Some(effect)=h.service.transfer_snapshot(peer,now){h.dispatch(vec![Delivery{recipients:vec![peer],effect}]);}}
                     }
                 }
             }
         }
     }
     server.hub.lock().unwrap().remove(id);
+}
+
+struct TlsListener {
+    listener: TcpListener,
+    acceptor: tokio_rustls::TlsAcceptor,
+}
+impl axum::serve::Listener for TlsListener {
+    type Io = tokio_rustls::server::TlsStream<tokio::net::TcpStream>;
+    type Addr = std::net::SocketAddr;
+    async fn accept(&mut self) -> (Self::Io, Self::Addr) {
+        loop {
+            match self.listener.accept().await {
+                Ok((stream, address)) => {
+                    if let Ok(Ok(tls)) =
+                        time::timeout(Duration::from_secs(2), self.acceptor.accept(stream)).await
+                    {
+                        return (tls, address);
+                    }
+                }
+                Err(_) => time::sleep(Duration::from_millis(100)).await,
+            }
+        }
+    }
+    fn local_addr(&self) -> std::io::Result<Self::Addr> {
+        self.listener.local_addr()
+    }
 }

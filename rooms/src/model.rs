@@ -165,6 +165,7 @@ pub enum Command {
     React {
         emoji: String,
     },
+    P2p(cine_transfer_model::TransferIntent),
     Sync,
 }
 #[derive(Clone, PartialEq)]
@@ -309,6 +310,12 @@ pub enum Effect {
     Error {
         request_event_id: Uuid,
         code: ErrorCode,
+    },
+    P2p {
+        room_id: Uuid,
+        room_epoch: Uuid,
+        snapshot: cine_transfer_model::TransferSnapshot,
+        grant: Option<cine_transfer_model::Grant>,
     },
     Snapshot(RoomState),
     Event(RoomEvent),
