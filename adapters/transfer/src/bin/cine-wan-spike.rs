@@ -276,7 +276,7 @@ fn run() -> Result<(), Error> {
         };
         observations.push(metrics);
     }
-    let fresh = grant_ids.len() == 1 || grant_ids[0] != grant_ids[1];
+    let fresh = grant_ids.get(1).map(|second| grant_ids[0] != *second);
     println!(
         "{}",
         json!({"schema_version":1,"resources":process_resources(),"status":"LOCAL_SPIKE_PASS","real_wan":"NOT TESTED","product_wan":"NOT IMPLEMENTED","network":if sender_ns.is_some(){"isolated namespaces, two NATs"}else{"loopback"},"carrier":"TCP outer TLS1.3 / inner peer TLS1.3","bytes":size,"sha_final_match":partial.completed(),"new_grant_after_pause":fresh,"direct_probe":direct_probe,"runs":observations,"gathering_ms":null,"ice_checks_ms":null,"retries":attempts-1,"resume_policy":"explicit lab reauthorization; not automatic product fallback"})

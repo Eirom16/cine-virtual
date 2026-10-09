@@ -8,7 +8,7 @@
     "abi": "armeabi-v7a"
   },
   "build": "release Rust",
-  "binary_bytes": 1960964,
+  "binary_bytes": 1961088,
   "runs": [
     {
       "bytes": 8192,
@@ -23,9 +23,9 @@
       "product_wan": "NOT IMPLEMENTED",
       "real_wan": "NOT TESTED",
       "resources": {
-        "cpu_seconds": 0.18,
+        "cpu_seconds": 0.22,
         "fds_after_workers": 5,
-        "peak_rss_kib": 3656,
+        "peak_rss_kib": 3668,
         "scope": "entire lab process, fixture creation + sender + receiver + relay; not marginal carrier cost",
         "threads_after_workers": 1
       },
@@ -34,16 +34,16 @@
       "runs": [
         {
           "attempt": 1,
-          "effective_mib_s_including_admission_auth_sha": 0.06212227717263988,
-          "elapsed_seconds": 0.125760039,
-          "first_chunk_ms": 118.763615,
+          "effective_mib_s_including_admission_auth_sha": 0.04410213597440727,
+          "elapsed_seconds": 0.177145615,
+          "first_chunk_ms": 149.937346,
           "initial_verified_bytes": 0,
-          "inner_tls_grant_auth_ms": 37.352462,
+          "inner_tls_grant_auth_ms": 49.305077000000004,
           "new_useful_bytes": 8192,
-          "outer_tls_admission_pair_ms": 59.905616,
+          "outer_tls_admission_pair_ms": 79.017653,
           "relay": {
-            "elapsed_seconds": 0.059951693,
-            "forwarded_ciphertext_bytes": 10069,
+            "elapsed_seconds": 0.072102346,
+            "forwarded_ciphertext_bytes": 10061,
             "termination": "peer_closed"
           },
           "route": "RELAYED",
@@ -68,9 +68,9 @@
       "product_wan": "NOT IMPLEMENTED",
       "real_wan": "NOT TESTED",
       "resources": {
-        "cpu_seconds": 5.09,
+        "cpu_seconds": 4.81,
         "fds_after_workers": 5,
-        "peak_rss_kib": 10896,
+        "peak_rss_kib": 10860,
         "scope": "entire lab process, fixture creation + sender + receiver + relay; not marginal carrier cost",
         "threads_after_workers": 1
       },
@@ -79,16 +79,16 @@
       "runs": [
         {
           "attempt": 1,
-          "effective_mib_s_including_admission_auth_sha": 0.6939611559198553,
-          "elapsed_seconds": 1.4410028449999999,
-          "first_chunk_ms": 1440.684306,
+          "effective_mib_s_including_admission_auth_sha": 0.6921365650559064,
+          "elapsed_seconds": 1.444801576,
+          "first_chunk_ms": 1444.3331150000001,
           "initial_verified_bytes": 0,
-          "inner_tls_grant_auth_ms": 37.126116,
+          "inner_tls_grant_auth_ms": 34.647384,
           "new_useful_bytes": 1048576,
-          "outer_tls_admission_pair_ms": 35.912076,
+          "outer_tls_admission_pair_ms": 35.542885000000005,
           "relay": {
-            "elapsed_seconds": 1.406322345,
-            "forwarded_ciphertext_bytes": 1051753,
+            "elapsed_seconds": 1.409742038,
+            "forwarded_ciphertext_bytes": 1051750,
             "termination": "peer_disconnected"
           },
           "route": "RELAYED",
@@ -97,17 +97,17 @@
         },
         {
           "attempt": 2,
-          "effective_mib_s_including_admission_auth_sha": 0.6994854697501678,
-          "elapsed_seconds": 10.007355839,
-          "first_chunk_ms": 1455.064691,
+          "effective_mib_s_including_admission_auth_sha": 0.7117809219229442,
+          "elapsed_seconds": 9.834486686,
+          "first_chunk_ms": 1482.263653,
           "initial_verified_bytes": 1048576,
-          "inner_tls_grant_auth_ms": 28.642616,
+          "inner_tls_grant_auth_ms": 28.687731,
           "new_useful_bytes": 7340032,
-          "outer_tls_admission_pair_ms": 35.828115000000004,
-          "recovery_to_complete_ms": 10016.682532,
+          "outer_tls_admission_pair_ms": 62.462962,
+          "recovery_to_complete_ms": 9850.220993,
           "relay": {
-            "elapsed_seconds": 9.765692185,
-            "forwarded_ciphertext_bytes": 7352698,
+            "elapsed_seconds": 9.581942455,
+            "forwarded_ciphertext_bytes": 7352708,
             "termination": "peer_closed"
           },
           "route": "RELAYED",

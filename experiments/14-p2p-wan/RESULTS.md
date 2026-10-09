@@ -56,7 +56,8 @@ Netem: intento directo5.007s termina como fallo esperado; admisión exterior
 206.4ms, auth interior254.3ms y primer chunk3053.9ms en resume. Recovery hasta
 completar13,921.4ms, conserva12.5% (1/8MiB), un reintento explícito autorizado.
 Corte crudo: directo5.004s; recovery7,890.7ms hasta SHA completo, mismo12.5%.
-No gathering/ICE: campos nulos. Ningún éxito directo WAN medido.
+No gathering/ICE: campos nulos. Corpus de un intento usa new_grant_after_pause
+null (no aplica); evidencia anterior usaba true por comprobación vacua sin retry. Ningún éxito directo WAN medido.
 
 Netem: CPU2.732s, peak RSS getrusage17,016KiB; son **todo el proceso laboratorio**
 (fixtures/hash + sender + receiver + relay), no coste marginal de un peer.
