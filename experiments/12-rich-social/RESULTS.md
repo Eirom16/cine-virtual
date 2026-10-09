@@ -5,6 +5,11 @@ Fecha: 2026-10-08. Base: master `a771497`. Informe completo:
 [proveedores](provider-evaluation.md). Decisión: ADR-013 en
 [DECISIONS](../../docs/DECISIONS.md).
 
+Verificación final TESTED: commit `9d3b289e98e8389f604740ba55160e392963fb86`,
+run [37860816319](https://github.com/Eirom16/cine-virtual/actions/runs/37860816319),
+COMPLETED / SUCCESS y 11/11 jobs comprobados individualmente. Git limpio y
+sincronizado tras fetch. Detalle y límites: [FINAL_VERIFICATION](FINAL_VERIFICATION.md).
+
 ## Resultado
 
 IMPLEMENTED / TESTED: mensajes GIF con descriptor neutral, eco autoritativo,

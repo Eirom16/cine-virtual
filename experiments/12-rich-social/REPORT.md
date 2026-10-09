@@ -412,8 +412,8 @@ requiere repetir con varios assets y build profile antes de afirmar fluidez.
 
 Compilación por matrix Actions; evidencia de runtime rich prioritariamente
 Linux/Android. No se afirma runtime multimedia Windows/macOS/iOS por compilar.
-iOS Player sigue **NOT IMPLEMENTED**. Ver ejecución de HEAD en Actions para
-conclusión final de builds; no equiparar job en curso a PASS.
+iOS Player sigue **NOT IMPLEMENTED**. TESTED: las nueve variantes de build
+completaron SUCCESS en el checkpoint final; ver [verificación](FINAL_VERIFICATION.md).
 
 ## 62. Regresiones multimedia
 
@@ -424,13 +424,15 @@ repetido, ni afirmación nueva de precisión temporal/jank.
 
 ## 63. GitHub Actions
 
-Validación final exige ejecución de HEAD completada y SUCCESS, no solo gate local.
-[Actions de master](https://github.com/Eirom16/cine-virtual/actions) permite consultar
-commit y matriz exactos; URL/cierre final se adjuntan en la entrega de esta sesión.
-TESTED: ejecución intermedia [37857600609](https://github.com/Eirom16/cine-virtual/actions/runs/37857600609)
-completada SUCCESS: gate Rust/Flutter/docs y todos los builds Linux, Windows,
-Android3ABI, macOSIntel/arm64 e iOSdevice/simulator. El cierre verificará además
-la ejecución del último commit de documentación y correcciones.
+TESTED: HEAD auditado `9d3b289e98e8389f604740ba55160e392963fb86` coincide con
+`headSha` del run [37860816319](https://github.com/Eirom16/cine-virtual/actions/runs/37860816319),
+COMPLETED / SUCCESS, finalizado el 2026-10-08 a las 23:55:43 UTC.
+Se comprobaron individualmente 11/11 jobs: gate Rust/Flutter/docs, Linux,
+Windows, macOS Intel/arm64, Android armeabi-v7a/arm64-v8a/x86_64,
+iOS device/simulator y summary. Ninguno skipped, cancelled o failure.
+Nombres, enlaces y límites en [FINAL_VERIFICATION](FINAL_VERIFICATION.md).
+El commit que incorpora esta evidencia solo modifica documentación y se verifica
+también tras push; su SHA/run exactos se identifican en la entrega final.
 
 ## 64. ADR/documentación
 
@@ -443,13 +445,16 @@ resultados/JSON/capturas; no sobrescribe experimento11.
 
 `18524ce` protocolo/rich state/bridge/tests; `44ad08d` provider/cache/picker/rich UI;
 `42452fd` visibilidad/autoscroll, grid landscape y cursor. Documentación y evidencia
-en `16c1673`; muestra de frames en commit posterior. Historial pequeño, sin force push/rebase destructivo.
+en `16c1673`; muestra de frames en `9d3b289`. El cierre añade únicamente evidencia
+de Git/Actions. Historial pequeño, sin force push/rebase destructivo.
 
 ## 66. Estado Git final
 
-Cierre exige working tree limpio, diff --check, log15 y HEAD...origin/master=0/0,
-con push autorizado. Comprobación exacta posterior al último commit/push se comunica
-en entrega final; no se atribuye limpieza a un checkout durante edición.
+TESTED en el checkpoint `9d3b289`: `git fetch origin`, working tree limpio,
+`git diff --check` sin errores, últimos 15 commits inspeccionados y
+`HEAD...origin/master=0/0`. No se detectó regresión que requiriese modificar código.
+La comprobación se repite tras incorporar y publicar esta evidencia documental;
+el estado del nuevo HEAD y su ejecución exacta se comunican en la entrega final.
 
 ## 67. ¿Está Rich Chat terminado para este MVP?
 
