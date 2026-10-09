@@ -228,11 +228,20 @@ pub fn serve_pair(
     let [Some(mut a), Some(mut b)] = sides else {
         return Err(Error::Unauthorized);
     };
+    // Configure both sockets BEFORE admitting either peer to the byte pipe.
+    // Darwin can reject setsockopt with EINVAL after remote termination; do not
+    // mutate options on every poll, including sockets whose TLS EOF is queued.
+    for side in [&mut a, &mut b] {
+        side.sock.until = None;
+        side.sock.configure(Duration::from_secs(3))?;
+        side.sock
+            .socket
+            .set_read_timeout(Some(Duration::from_millis(1)))
+            .map_err(|e| io_error("poll_config", e))?;
+    }
     for side in [&mut a, &mut b] {
         side.write_all(b"CVR1")?;
         side.flush()?;
-        side.sock.until = None;
-        side.sock.configure(Duration::from_secs(3))?;
     }
     let start = Instant::now();
     let mut last = start;
@@ -251,11 +260,6 @@ pub fn serve_pair(
             } else {
                 (&mut b, &mut a)
             };
-            source
-                .sock
-                .socket
-                .set_read_timeout(Some(Duration::from_millis(1)))
-                .map_err(|e| io_error("poll_config", e))?;
             match source.read(&mut buffer) {
                 Ok(0) => {
                     return Ok(Stats {

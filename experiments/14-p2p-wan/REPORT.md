@@ -272,11 +272,11 @@ NOT TESTED nueva UI WAN. Baseline real libmpv/load/Ready es evidencia funcional 
 
 ### 67. Bugs encontrados
 
-TESTED reproducibles: grantrevocado race bloqueaba resume, configJSON parcialmente escrito, nft reservednames y Uri badport. Primer ARMv7 pequeñoIo y LAN variable no causaaislada; resultados iniciales FAIL conservados.
+TESTED reproducibles: grantrevocado race bloqueaba resume, configJSON parcialmente escrito, nft reservednames y Uri badport. CI macOS ARM64 además mostró EINVAL en poll_config; [diagnóstico](results-ci-macos-diagnosis.json). Primer ARMv7 pequeñoIo y LAN variable no causaaislada; resultados iniciales FAIL conservados.
 
 ### 68. Bugs corregidos
 
-IMPLEMENTED espera authavailable con consume obligado, bounded configparse, nft cadenas seguras y namespaceguard, advertise valida puerto, TLS close_notify explicit inner/outer. Revisión final restaura revalidación antes del connect TCP para parciales grandes. Unit/integration/product finales PASS; no atribuir Io Android solo al cierre.
+IMPLEMENTED espera authavailable con consume obligado, bounded configparse, nft cadenas seguras y namespaceguard, advertise valida puerto, TLS close_notify explicit inner/outer. Relay fija timeout UNA VEZ antes de aceptación, eliminando reconfiguración tras cierre observada en macOS ARM64. Revisión final restaura revalidación antes del connect TCP para parciales grandes. Unit/integration/product finales PASS; no atribuir Io Android solo al cierre.
 
 ### 69. Limitaciones
 

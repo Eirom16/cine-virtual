@@ -103,6 +103,9 @@ checks8KiB relay termination on IPv4 and IPv6. No idle/deadline relaxation. CI e
 reset/unclean EOF now reports explicit transport termination stats; invalid TLS,
 auth, policy and quotas still error. New Unix socket test forces actual TCP RST
 with zero bytes, demonstrating session end cannot mean media completion.
+Mac ARM64 diagnostic found EINVAL in repeated set_read_timeout after peer end;
+configure both sockets once before CVR1, keeping1ms reads/3s writes. Debug error
+categories contain static stage/kind/errno/TLSbool only, never secrets or error text.
 
 ## Android opt-in local reproduction
 

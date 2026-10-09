@@ -76,6 +76,10 @@ contenido en claro: su buffer contiene registros de TLS interior.
 - Resume de producto fallaba: sender escogía autorización revocada antes de que
   WSS entregara nueva. Corrige espera por autorización disponible; consumo TLS
   sigue validando secreto/scope. Test socket real + baseline producto PASS.
+- Diagnóstico macOS ARM64: stage=poll_config, InvalidInput/errno22 (EINVAL),
+  no Rustls error. Reconfiguraba timeout cada poll, también tras finalizar peers.
+  Ahora configura ambos sockets UNA VEZ antes de CVR1; mismos1ms/3s y crypto.
+  [Diagnóstico machine-readable](results-ci-macos-diagnosis.json).
 - CI Windows/macOS ARM64 detectó Error::Io al join del relay DESPUÉS de SHA
   correcto. Relay ahora distingue peer_closed/peer_disconnected como fin de
   sesión, no éxito del archivo; auth/TLS inválido/cuotas siguen fallando. Test

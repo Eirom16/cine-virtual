@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "run_id": 38000210346,
+  "head_sha": "9bbbfb98809a34de578b733906a91166f6600d55",
+  "job_id": 114057008486,
+  "platform": "macOS ARM64",
+  "status": "OBSERVED_FAILURE",
+  "observed_diagnostic": {
+    "stage": "poll_config",
+    "error_kind": "InvalidInput",
+    "os_error": 22,
+    "rustls_error": false
+  },
+  "observation": "read-timeout setsockopt in forwarding loop failed after receive/SHA tests completed",
+  "fix": "set read timeout once for both peers before CVR1 admission ACK; keep 1ms read polling and 3s write bound; no repeated option mutation after peer shutdown",
+  "final_validation": "Full matrix on merged master HEAD required"
+}
