@@ -77,7 +77,7 @@ TLS real para pause/new-grant/resume, pin erróneo, credential errónea, header/
 malicioso y trickle absoluto; pure tests cubren scopes, expiry, dedupe, corruption,
 checkpoints y SHA. Capabilities/WSS/legacy WS ejercitados con sockets reales.
 La verificación GitHub Actions del último HEAD se informa al cerrar la sesión;
-ningún PASS se hereda del run inicial para el código nuevo.
+ningún PASS se hereda del run inicial para el código nuevo. El primer run nuevo detectó el modo no bloqueante heredado en Windows/macOS; reproducción y corrección documentadas en [CI-DIAGNOSIS](CI-DIAGNOSIS.md).
 
 Screenshots reales y evaluación en VISUAL-QA.md. Los fallos iniciales de harness
 (pattern lock, selector/pause después de overlay timeout) no se reclasifican como
@@ -95,7 +95,7 @@ prueba de retomar bloques faltantes: la de256MiB sí lo hace.
 | WAN directo / NAT traversal / STUN/TURN/relay | NOT IMPLEMENTED / NOT TESTED |
 | Process-death resume / background prolongado | NOT IMPLEMENTED |
 | Android export SAF / providers no seek | Export NOT IMPLEMENTED; rechazo implementado, providers diversos NOT TESTED |
-| Windows/macOS/iOS runtime P2P | NOT TESTED; iOS Player NOT IMPLEMENTED |
+| Windows/macOS/iOS producto P2P | NOT TESTED; iOS Player NOT IMPLEMENTED |
 | Multiusuario throughput / batería / RTT aislado carrier | NOT MEASURED |
 | Falta real de espacio / disco defectuoso / symlink atacante | Tests de límites; física destructiva NOT TESTED |
 

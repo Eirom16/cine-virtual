@@ -13,7 +13,7 @@ Android SM-J701M/API28/armv7, Linux y Wi-Fi doméstico compartido.
 - [Comparación de transporte y fuentes primarias](TRANSPORT-EVALUATION.md).
 - [Seguridad](SECURITY.md), [WAN roadmap](WAN-ROADMAP.md).
 - [Contrato e instrucciones de producto](../../docs/P2P.md), [ADR-014](../../docs/DECISIONS.md).
-- [Capturas y revisión visual](VISUAL-QA.md).
+- [Capturas y revisión visual](VISUAL-QA.md), [diagnóstico CI](CI-DIAGNOSIS.md).
 
 ## Reproducibilidad y privacidad
 

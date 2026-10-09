@@ -58,6 +58,9 @@ impl Write for DeadlineSocket<'_> {
     }
 }
 fn socket(stream: &TcpStream) -> Result<(), Error> {
+    // The listener polls nonblocking. Accepted sockets can inherit that mode
+    // on Windows/BSD; this worker requires blocking I/O with bounded timeouts.
+    stream.set_nonblocking(false)?;
     stream.set_read_timeout(Some(Duration::from_secs(3)))?;
     stream.set_write_timeout(Some(Duration::from_secs(3)))?;
     stream.set_nodelay(true)?;

@@ -188,6 +188,8 @@ fn real_tls_stream_pause_resume_new_credential_and_constant_memory_window() {
         let manifest = m.clone();
         let sender = std::thread::spawn(move || {
             let (stream, _) = listener.accept().unwrap();
+            // Reproduce inherited nonblocking mode on every test platform.
+            stream.set_nonblocking(true).unwrap();
             transport::send(
                 stream,
                 config,

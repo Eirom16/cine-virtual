@@ -307,7 +307,7 @@ VISUALLY VERIFIED: capturas reales y responsive en widgets de 360/1280. Se corri
 
 ## 49. Problemas encontrados
 
-Android rechazó hardlink; se detectaron races entre grants/ROOM_STATE y listener, handshake lento sin plazo absoluto, cleanup incompleto al cancelar offline y timeout de hash de 20 s. El harness encontró bloqueo por patrón, timeout de overlay/idle, EOF sin PTY y Seek antes de Player usable. Fallos preservados o descritos, sin reclasificación retroactiva.
+Android rechazó hardlink; se detectaron races entre grants/ROOM_STATE y listener, handshake lento sin plazo absoluto, cleanup incompleto al cancelar offline y timeout de hash de 20 s. El harness encontró bloqueo por patrón, timeout de overlay/idle, EOF sin PTY y Seek antes de Player usable. Fallos preservados o descritos, sin reclasificación retroactiva. CI detectó además herencia de sockets no bloqueantes en Windows/macOS, reproducida y corregida con test TLS real; ver [diagnóstico](CI-DIAGNOSIS.md).
 
 ## 50. Correcciones implementadas
 
@@ -339,7 +339,7 @@ Pins WSS compartidos por canal confiable, credenciales efímeras privadas y revo
 
 ## 57. Windows/macOS/iOS
 
-La matriz de build se conserva; runtime P2P NOT TESTED. iOS Player NOT IMPLEMENTED. Compilar no demuestra funcionamiento físico; no se reemplazaron Players ni plataformas.
+La matriz de build se conserva; runtime de producto P2P NOT TESTED. iOS Player NOT IMPLEMENTED. Los tests TLS/WSS de CI no validan UI/Player físico; no se reemplazaron Players ni plataformas.
 
 ## 58. Regresiones
 
