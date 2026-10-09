@@ -438,3 +438,35 @@ NOT IMPLEMENTED deliberadamente. Antes de activar proveedor revisar contrato,
 marcas/attribution y expiración/revalidación. Sin cambios a Player/SyncEngine,
 Kotlin, membership, historial durable o protocolo breaking. Auditoría, fuentes y
 pruebas en [experimento 12](../experiments/12-rich-social/README.md).
+
+## ADR-014 — Transferencia LAN separada con TCP/TLS y grants de sala (Provisional)
+
+**Context:** Cine Virtual ya identifica archivos con LocalMedia/SHA-256 y carga
+libmpv/Media3. Hace falta una alternativa a seleccionar la misma copia, con
+consentimiento, integridad, resume y recursos limitados, sin cambiar SyncEngine.
+LAN directa no valida conectividad entre NAT/CGNAT. Ver
+[matriz y fuentes](../experiments/13-p2p-media-distribution/TRANSPORT-EVALUATION.md).
+
+**Decision:** vertical slice TCP/TLS 1.3 Rustls/ring/rcgen en Rust separado,
+chunks 1 MiB y SHA por chunk/final. WSS con pin explícito habilita capability
+`p2p_transfer_v1` en protocolo v1; room/member/epoch/revisiones autorizan grants
+privados efímeros y de un uso. Un grant por sala. Destino privado Android; Linux
+carpeta escogida, commit atómico sin reemplazo. Tras completar reutilizar pipeline
+multimedia y Ready. Transporte provisional para Phase 1; no elección universal
+WAN ni sustitución del Player. No 0-RTT, TLS resumption ni certificados aceptados
+indiscriminadamente. Download antes de playback, sin progressive streaming.
+
+**Alternatives:** Quinn/QUIC aporta streams y migración pero requiere UDP y
+traversal adicional; no se ha medido aquí. WebRTC DataChannels integra ICE y
+requiere DTLS/SCTP/negociación, mayor superficie para este único archivo LAN;
+voz futura no obliga su elección. TCP plano no cumple confidencialidad; tokens
+por WS plano no cumplen seguridad. HTTP range/swarm/storage central se excluyen.
+
+**Consequences:** Rust compartido cross-compila NDK/ring; hay compilación C mínima
+adicional. TCP tiene head-of-line blocking; suficiente para una conexión por
+archivo, sujeto a mediciones. No NAT traversal ni fallback automático; investigar
+ICE-TCP versus QUIC/WebRTC con redes reales en Phase 2. Certificados WSS efímeros
+requieren distribuir nuevo pin al reiniciar; solución local explícita, sin PKI
+pública. Android evita suponer random access SAF: destino privado; exportación
+SAF y proceso-muerte resume quedan pendientes. SHA final y carga vuelven a leer
+archivo; CPU/disco deben medirse. Evidencia en [experimento 13](../experiments/13-p2p-media-distribution/README.md).

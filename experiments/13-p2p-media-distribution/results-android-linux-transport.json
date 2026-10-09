@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "scenario": "physical-android-host-linux-transport",
+  "status": "PASS",
+  "product_saf_ui_ready": "NOT TESTED",
+  "network": "same Wi-Fi LAN TCP/TLS1.3; no relay or adb reverse",
+  "bytes": 33554432,
+  "android_build": "release",
+  "linux_build": "debug",
+  "device": "SM-J701M API28 armv7",
+  "sha256_final_match": true,
+  "block_hash_verified": true,
+  "receiver_elapsed_seconds": 10.357136796,
+  "effective_mib_s": 3.089656980523674
+}

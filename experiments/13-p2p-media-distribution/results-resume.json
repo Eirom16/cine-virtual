@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "classification": "TESTED",
+  "linux_android": {
+    "status": "PASS",
+    "source_base_commit": "668a75c",
+    "paused_verified_bytes": 10485760,
+    "wifi_loss_before_verified_bytes": 11534336,
+    "wifi_loss_after_verified_bytes": 17825792,
+    "new_authorization_on_resume": true,
+    "sha256_match": true,
+    "cancelled_from_android_ui": true
+  },
+  "android_linux": {
+    "status": "PASS",
+    "paused_verified_bytes": 1048576,
+    "sha256_match": true
+  },
+  "live_socket_room_lifecycle": {
+    "status": "PASS",
+    "steps": [
+      "cancel_waiting_deletes_partial_without_grant",
+      "receiver_disconnect_stops_real_socket_and_preserves_verified_chunks",
+      "offline_cancel_releases_worker_and_deletes_partial",
+      "room_resume_after_offline_cancel",
+      "host_disconnect_revokes_grant_and_preserves_partial",
+      "host_resume_new_grant_final_sha_complete",
+      "verified_download_loaded_into_libmpv_and_ready",
+      "new_media_revision_invalidates_old_manifest_partial_and_ready"
+    ]
+  },
+  "process_death_resume": "NOT IMPLEMENTED / NOT TESTED"
+}

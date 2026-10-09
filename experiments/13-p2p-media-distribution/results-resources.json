@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "classification": "MEASURED",
+  "android_app_build": "Flutter debug Rust release",
+  "device": "SM-J701M API28 armv7",
+  "forward_file_bytes": 268435456,
+  "android_phase_cpu": {
+    "transferring": {
+      "sample_intervals": 132,
+      "observed_wall_ms": 66013,
+      "process_cpu_ms": 43311,
+      "mean_one_core_percent": 65.61
+    },
+    "verifying": {
+      "sample_intervals": 13,
+      "observed_wall_ms": 6245,
+      "process_cpu_ms": 4952,
+      "mean_one_core_percent": 79.3
+    }
+  },
+  "pss_and_linux_rss_samples": [
+    {
+      "phase": "before_download",
+      "linux": {
+        "rss_kib": 78048,
+        "threads": 22,
+        "fds": 17,
+        "cpu_ticks": 1108
+      },
+      "android_pss_kib": 224882
+    },
+    {
+      "phase": "paused",
+      "linux": {
+        "rss_kib": 79260,
+        "threads": 22,
+        "fds": 17,
+        "cpu_ticks": 1378
+      },
+      "android_pss_kib": 233503
+    },
+    {
+      "phase": "after_playback_smoke",
+      "linux": {
+        "rss_kib": 80028,
+        "threads": 22,
+        "fds": 17,
+        "cpu_ticks": 3302
+      },
+      "android_pss_kib": 202012
+    }
+  ],
+  "notes": "Process CPU across threads, 100 percent means one logical CPU; sampled adjacent same-state intervals, not complete run or isolated transfer CPU. PSS measured with dumpsys outside the app main Looper."
+}

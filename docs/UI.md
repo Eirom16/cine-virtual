@@ -39,7 +39,8 @@ polling y lifecycle. `RoomView`/`PlaybackView` son proyecciones; sus predicados
 limitan botones, pero la autoridad final sigue en Rust/servidor.
 
 No se modificaron algoritmos, thresholds, predictor, scheduler ni protocolo.
-No hay cuentas, providers, transferencia de medios ni datos ficticios.
+No hay cuentas, providers remotos ni datos ficticios. La transferencia LAN de medios
+se añade como alternativa explícita en el Lobby: ver [P2P](P2P.md).
 La extensión social se describe al final de este documento.
 
 ## Navegación y flujo
@@ -215,3 +216,15 @@ monotonic ms nunca se muestran. GIF cuenta en unread igual que texto.
 Diagnósticos agregan estado proveedor, error seguro/latencia, bytes/entradas de
 cache, rich capability y conteos GIF/reply/reacciones, sin query/key/URL/contenido.
 El Player mantiene la misma plataforma/textura al abrir picker/menú/reply.
+
+## Transferencia P2P dentro del Lobby
+
+Host ve disponibilidad de película validada, confirma derechos de distribución,
+ofrece LAN y autoriza/rechaza solicitudes. Participant puede escoger su copia
+o consentir recepción con tamaño/espacio/datos explícitos. TransferCard tiene
+progreso de bytes verificados, velocidad, ETA estimada y acciones reales.
+100% en VERIFYING no permite Ready. Completado dispara carga existente y mantiene
+confirmación Ready. Android guarda en privado; no supone seek/write de todo SAF.
+Actualizaciones del card son ValueNotifier separado; Rich Chat conserva su estado.
+Sin rediseño de Player/chat. Pruebas/capturas en
+[experimento 13](../experiments/13-p2p-media-distribution/README.md).

@@ -512,3 +512,18 @@ snapshot de reconnect la vacía. Resume recupera replies/reacciones con el mismo
 historial 100/48 KiB de presupuesto conservador JSON; metadata/reacciones también
 consumen presupuesto. Dedup existente evita segundo toggle/rebroadcast al retry.
 UTC es epoch ms del servidor capturado al crear mensaje, solo presentación.
+
+## Extensión opt-in p2p_transfer_v1 (protocol_version 1)
+
+Solo WSS con certificado anclado acepta capability `p2p_transfer_v1`. WS anterior
+no la anuncia; ausencia preserva selección manual y eventos anteriores.
+`P2P_TRANSFER_REQUEST` contiene exclusivamente `signal` discriminado por `action`:
+offer/request/accept/reject/cancel/withdraw/status. Schema estricta, UUIDs/revisiones
+y manifest se validan antes de RoomService. `P2P_TRANSFER_STATE` es server-only.
+Snapshot público para peers opt-in; grant secreto solo Host y receptor autorizados.
+Sequence de playback permanece sin cambios. Byte stream usa TCP/TLS separado.
+
+Manifest/grant/status, límites, expiración/revocación y reconexión se especifican
+en [P2P](P2P.md). Invitación nunca autoriza un archivo automáticamente. Credencial
+de un uso ligada a room/epoch/member/manifest/media/autoridad; resume requiere
+grant nuevo. Cambiar medio o autoridad invalida transferencias incompatibles.

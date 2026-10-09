@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "scenario": "transport-spike-linux-android",
+  "status": "PASS",
+  "room_integration": "NOT IMPLEMENTED",
+  "build_modes": {
+    "linux": "debug",
+    "android": "release"
+  },
+  "device": "SM-J701M Android 9 API 28 armv7",
+  "network": "same Wi-Fi LAN; direct TCP; no adb reverse or media relay",
+  "addresses": "Linux WLAN RFC1918 /24 to Android WLAN same subnet; private exact addresses omitted",
+  "port": 1729,
+  "receiver_events": [
+    {
+      "state": "transferring",
+      "received_bytes": 8192,
+      "verified_bytes": 8192,
+      "total_bytes": 8192,
+      "bytes_per_second": 1180344.6110611777,
+      "eta_seconds": 0.0,
+      "error": null
+    },
+    {
+      "state": "verifying",
+      "received_bytes": 8192,
+      "verified_bytes": 8192,
+      "total_bytes": 8192,
+      "bytes_per_second": null,
+      "eta_seconds": null,
+      "error": null
+    },
+    {
+      "status": "PASS",
+      "bytes": 8192,
+      "sha256_match": true,
+      "elapsed_seconds": 0.110177269,
+      "tls": "TLS1.3"
+    }
+  ],
+  "receiver_errors": [],
+  "sender_events": [
+    {
+      "state": "listening"
+    },
+    {
+      "status": "PASS",
+      "bytes": 8192,
+      "elapsed_seconds": 0.068451182,
+      "tls": "TLS1.3"
+    }
+  ],
+  "binary_transfer": true,
+  "final_sha_match": true,
+  "tls": "TLS1.3",
+  "bytes": 8192
+}

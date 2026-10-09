@@ -28,8 +28,8 @@ se compone en la Application; los adapters implementan sus puertos. Se mantiene
 un workspace Rust con `cine-core`, `cine-rooms`, `cine-protocol`, `cine-server` y
 `cine-client`, más `cine-player-mpv` experimental y `cine-local-media`:
 corresponden a responsabilidades que ya se ejecutan y prueban.
-No se crean crates por conceptos futuros. `cine-rooms` no depende de serde,
-Axum ni Tokio en su API; `cine-protocol` convierte DTOs a sus comandos. El cliente
+No se crean crates por conceptos futuros. `cine-rooms` no depende de
+Axum ni Tokio en su API; los DTOs de transferencia compartidos tienen serde sin I/O; `cine-protocol` convierte DTOs a sus comandos. El cliente
 compone networking y Application en un runtime experimental, con réplica pura
 separada; no se fija todavía un trait async de Transport para la UI futura.
 
@@ -295,3 +295,15 @@ Bridge añade intents message y message_reaction en ambos owners; sin lógica so
 Kotlin. Proyección rich_supported, content, reply y reactions llega por el mismo
 SocialView/notifier aislado. UTC vive en la entry, nunca en la timeline de control.
 Privacidad y recursos se delimitan en ADR y [resultados](../experiments/12-rich-social/RESULTS.md).
+
+## P2P Media Distribution Phase 1
+
+`cine-transfer-model`: control DTO puro sin I/O; `cine-transfer`: TLS/bloques/SHA/
+Partial storage en workers propietarios. Client conserva sockets, FD y lifecycle;
+RoomService mantiene autorización y señalización sin contenido binario. Flutter
+observa progreso y despacha consentimiento/pause/resume/cancel; Kotlin conserva
+SAF/Media3 y destino privado. Core/SyncEngine/Player no se sustituyen.
+
+Completado atraviesa LocalMedia/Player/identidad/clock/Ready existentes. TCP/TLS
+directo LAN, WSS pin opt-in y límites en [P2P](P2P.md); decisión provisional
+ADR-014. NAT/CGNAT/relay se investigan separadamente.

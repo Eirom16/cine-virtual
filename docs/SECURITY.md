@@ -92,3 +92,15 @@ Logs añadidos: hash_progress (bytes), player_dispatch/player_event (sequence,
 deadline, posición/latencia), sync_sample (timestamp/edad/drift/confianza),
 player_resources (RSS/threads/FDs). La demo exporta solo campos seleccionados,
 sin credenciales/digests/rutas; no exporta envelopes ni stdout de create/join.
+
+## Transferencias LAN autorizadas
+
+[P2P](P2P.md) exige WSS anclado para capability y grants, además de TLS 1.3
+del archivo. La excepción WS LAN no permite compartir archivos. Certificado
+público se distribuye como pin explícito por canal de confianza; no credencial
+en endpoint. WSS local efímero no sustituye PKI/origins/rate por origen para Internet.
+Consentimiento del receptor y aprobación Host independientes de invite/resume.
+Credencial 256 bits, comparación constant-time, expiración/un uso/revocación,
+room/epoch/media/autoridad/member binding. Parcial nunca se carga ni queda Ready.
+Archivos exclusivos/permisos/commit sin reemplazo, SHA por chunk/final y límites
+de I/O reducen corrupción y abuso. No logging de grants/certs/paths/URI/digests.

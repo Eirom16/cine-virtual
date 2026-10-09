@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "scenario": "linux-real-control-and-transfer-lifecycle",
+  "status": "PASS",
+  "network": "loopback WSS and separate direct TCP/TLS1.3",
+  "build": "debug",
+  "steps": [
+    "cancel_waiting_deletes_partial_without_grant",
+    "receiver_disconnect_stops_real_socket_and_preserves_verified_chunks",
+    "offline_cancel_releases_worker_and_deletes_partial",
+    "room_resume_after_offline_cancel",
+    "host_disconnect_revokes_grant_and_preserves_partial",
+    "host_resume_new_grant_final_sha_complete",
+    "verified_download_loaded_into_libmpv_and_ready",
+    "new_media_revision_invalidates_old_manifest_partial_and_ready"
+  ],
+  "source_bytes": 67108864,
+  "disconnect_verified_bytes": 2097152,
+  "host_disconnect_verified_bytes": 2097152
+}

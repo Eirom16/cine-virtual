@@ -324,3 +324,12 @@ owner desktop reutiliza Client/libmpv; no se cambia la matriz ni sus permisos.
 Resultados locales/físicos y run final en
 [Product UI Phase 1](../experiments/09-product-ui/RESULTS.md). Build Windows/macOS
 no valida multimedia; iOS permanece unsigned con Player NOT IMPLEMENTED.
+
+## Dependencias P2P Phase 1
+
+Rustls/ring requiere el compilador C correspondiente al target; Android helper
+configura CC/AR/linker del NDK ya fijado. No AWS-LC, ICE, TURN ni despliegue.
+Matriz conserva once jobs y checks bloqueantes; no continue-on-error.
+Tests deterministas no necesitan Android ni una LAN física. Artifacts no incluyen
+configs privadas, media, rutas/SAF URI o tokens. P2P_QA no está habilitado en builds
+de CI. Build de Windows/macOS/iOS sigue separado de runtime P2P no probado.

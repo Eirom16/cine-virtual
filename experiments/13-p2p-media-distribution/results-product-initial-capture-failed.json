@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "scenario": "physical-linux-host-android-product",
+  "status": "FAIL",
+  "source_base_commit": "1fdd14e",
+  "network": "direct Wi-Fi LAN TCP/TLS1.3 and separate WSS; no adb reverse/relay",
+  "build_modes": {
+    "linux": "debug",
+    "android_rust": "release",
+    "android_flutter": "debug"
+  },
+  "device": "SM-J701M API28 armv7",
+  "steps": [
+    "host_created",
+    "host_media_selected_and_ready",
+    "host_offered"
+  ],
+  "samples": [],
+  "failure": "RuntimeError:SCENARIO_TIMEOUT"
+}

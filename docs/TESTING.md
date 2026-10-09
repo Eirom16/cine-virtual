@@ -267,3 +267,15 @@ blocked/text fallback, reply/cancel/eviction, copy, reacción/toggle, hora/GIF,
 fallo/layout fijo, reduced motion, cinco viewports/teclado y SurfaceView estable.
 Capturas widget se pueden generar con CINE_SOCIAL_CAPTURE y CINE_SOCIAL_FONT_DIR;
 no representan runtime multimedia. Pruebas físicas y medidas están separadas.
+
+## P2P Media Distribution Phase 1
+
+`cargo test -p cine-transfer -p cine-client -p cine-rooms -p cine-protocol -p cine-server --locked`
+cubre manifest, bounds, corrupción, dedup, checkpoint, SHA, pin/peer auth, replay,
+expiry, room/epoch/media/autoridad, lifecycle y compatibilidad WS/WSS. Tests TLS
+reales localhost y WSS validan bytes fuera del canal de sala.
+Flutter transfer_test usa gateway fixture para consentimiento/espacio/progreso/
+acciones/verificación/Ready y layouts 360/1280; no sustituye dispositivos.
+[Experimento 13](../experiments/13-p2p-media-distribution/README.md) conserva
+pruebas físicas, mediciones, QA visual, fallos y límites. P2P_QA opt-in solo facilita
+entrada/observaciones sobre backend real; no acepta descarga automáticamente.

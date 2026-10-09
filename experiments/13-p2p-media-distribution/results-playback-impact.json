@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "classification": "MEASURED",
+  "source": "results-product-android-linux.json playback_transfer_load",
+  "scenario": "two real players with second synthetic TLS transfer",
+  "samples": 18,
+  "carrier_bytes": 33554432,
+  "carrier_elapsed_seconds": 8.821123186,
+  "carrier_mib_s": 3.6276559487103848,
+  "both_players_advance": true,
+  "linux_player_peak_rss_kib": 78624,
+  "linux_carrier_peak_rss_kib": 7280,
+  "android_app_abs_drift_ms_during_load": {
+    "matched_samples": 18,
+    "median": 140.0,
+    "maximum": 198
+  },
+  "limits": "500 ms asynchronous app snapshots; not frame timing or synchronized cross-device sampling; Android carrier CPU/PSS not isolated; no 600 s synchronization claim"
+}

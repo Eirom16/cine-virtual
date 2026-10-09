@@ -1,0 +1,5611 @@
+{
+  "schema_version": 1,
+  "scenario": "physical-linux-host-android-product",
+  "status": "PASS",
+  "source_base_commit": "1fdd14e",
+  "network": "direct Wi-Fi LAN TCP/TLS1.3 and separate WSS; no adb reverse/relay",
+  "build_modes": {
+    "linux": "debug",
+    "android_rust": "release",
+    "android_flutter": "debug"
+  },
+  "device": "SM-J701M API28 armv7",
+  "steps": [
+    "host_created",
+    "host_media_selected_and_ready",
+    "host_offered",
+    "participant_joined_offer_visible",
+    "recipient_consented",
+    "recipient_requested",
+    "host_authorized",
+    "paused_real_transfer",
+    "resumed_new_authorization",
+    "all_chunks_and_final_sha_verified",
+    "existing_media_pipeline_loaded",
+    "participant_ready",
+    "both_real_players_play",
+    "pause_control",
+    "seek_control"
+  ],
+  "samples": [
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 0,
+          "state": "",
+          "total_bytes": 0,
+          "verified_bytes": 0
+        },
+        "receivers": [],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 0,
+          "state": "",
+          "total_bytes": 0,
+          "verified_bytes": 0
+        },
+        "receivers": [],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 0,
+          "state": "",
+          "total_bytes": 0,
+          "verified_bytes": 0
+        },
+        "receivers": [],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 0,
+          "state": "",
+          "total_bytes": 0,
+          "verified_bytes": 0
+        },
+        "receivers": [],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 0,
+          "state": "",
+          "total_bytes": 0,
+          "verified_bytes": 0
+        },
+        "receivers": [],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 0,
+          "state": "",
+          "total_bytes": 0,
+          "verified_bytes": 0
+        },
+        "receivers": [],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 0,
+          "state": "",
+          "total_bytes": 0,
+          "verified_bytes": 0
+        },
+        "receivers": [],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 0,
+          "state": "",
+          "total_bytes": 0,
+          "verified_bytes": 0
+        },
+        "receivers": [],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 0,
+          "state": "",
+          "total_bytes": 0,
+          "verified_bytes": 0
+        },
+        "receivers": [],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 0,
+          "state": "",
+          "total_bytes": 0,
+          "verified_bytes": 0
+        },
+        "receivers": [],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 0,
+          "state": "",
+          "total_bytes": 0,
+          "verified_bytes": 0
+        },
+        "receivers": [],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 0,
+          "state": "",
+          "total_bytes": 0,
+          "verified_bytes": 0
+        },
+        "receivers": [],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 0,
+          "state": "",
+          "total_bytes": 0,
+          "verified_bytes": 0
+        },
+        "receivers": [],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 0,
+          "state": "",
+          "total_bytes": 0,
+          "verified_bytes": 0
+        },
+        "receivers": [],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 0,
+          "state": "",
+          "total_bytes": 0,
+          "verified_bytes": 0
+        },
+        "receivers": [],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 0,
+          "state": "",
+          "total_bytes": 0,
+          "verified_bytes": 0
+        },
+        "receivers": [],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 0,
+          "state": "",
+          "total_bytes": 0,
+          "verified_bytes": 0
+        },
+        "receivers": [],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": true,
+      "action": "receive",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 0,
+          "state": "",
+          "total_bytes": 0,
+          "verified_bytes": 0
+        },
+        "receivers": [],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 0,
+          "state": "connecting",
+          "total_bytes": 134217728,
+          "verified_bytes": 0
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "connecting",
+            "verified_bytes": 0
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3198741.481481882,
+          "error": null,
+          "eta_seconds": 41.631733221,
+          "received_bytes": 1048576,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 1048576
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "connecting",
+            "verified_bytes": 0
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3251487.253022402,
+          "error": null,
+          "eta_seconds": 40.633890191999996,
+          "received_bytes": 2097152,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 2097152
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 1048576
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3015085.8403422064,
+          "error": null,
+          "eta_seconds": 43.124285969000006,
+          "received_bytes": 4194304,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 4194304
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 1048576
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3129228.73531914,
+          "error": null,
+          "eta_seconds": 41.2161778218,
+          "received_bytes": 5242880,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 5242880
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 4194304
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3214970.824991858,
+          "error": null,
+          "eta_seconds": 39.464649263285715,
+          "received_bytes": 7340032,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 7340032
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 4194304
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3329700.4411812224,
+          "error": null,
+          "eta_seconds": 37.47500599655556,
+          "received_bytes": 9437184,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 9437184
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 4194304
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3389053.2450377066,
+          "error": null,
+          "eta_seconds": 36.19990101354546,
+          "received_bytes": 11534336,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 11534336
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 10485760
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3421310.7331463466,
+          "error": null,
+          "eta_seconds": 35.552110137666666,
+          "received_bytes": 12582912,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 12582912
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 10485760
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3461417.5360002685,
+          "error": null,
+          "eta_seconds": 34.53430935642857,
+          "received_bytes": 14680064,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 14680064
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 10485760
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3324349.9812415624,
+          "error": null,
+          "eta_seconds": 35.642783903200005,
+          "received_bytes": 15728640,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 15728640
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 13631488
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3403567.640493943,
+          "error": null,
+          "eta_seconds": 34.19703919358824,
+          "received_bytes": 17825792,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 17825792
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 16777216
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3426750.2175974874,
+          "error": null,
+          "eta_seconds": 33.35369570068421,
+          "received_bytes": 19922944,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 19922944
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 16777216
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3447177.2125655096,
+          "error": null,
+          "eta_seconds": 32.851867199400004,
+          "received_bytes": 20971520,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 20971520
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 20971520
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3450247.6701781237,
+          "error": null,
+          "eta_seconds": 32.21480503,
+          "received_bytes": 23068672,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 23068672
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 20971520
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3513149.8505237536,
+          "error": null,
+          "eta_seconds": 31.041062476666667,
+          "received_bytes": 25165824,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 25165824
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 20971520
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3520481.8064439213,
+          "error": null,
+          "eta_seconds": 30.380714311384615,
+          "received_bytes": 27262976,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 27262976
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 26214400
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3556954.7419472486,
+          "error": null,
+          "eta_seconds": 29.47959915357143,
+          "received_bytes": 29360128,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 29360128
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 26214400
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3585241.8492910755,
+          "error": null,
+          "eta_seconds": 28.662068646866665,
+          "received_bytes": 31457280,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 31457280
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 26214400
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3617547.3055074373,
+          "error": null,
+          "eta_seconds": 27.826393824,
+          "received_bytes": 33554432,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 33554432
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 32505856
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3617547.3055074373,
+          "error": null,
+          "eta_seconds": 27.826393824,
+          "received_bytes": 33554432,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 33554432
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 32505856
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3401368.9071452855,
+          "error": null,
+          "eta_seconds": 29.286655672878787,
+          "received_bytes": 34603008,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 34603008
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 32505856
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3426808.7065599123,
+          "error": null,
+          "eta_seconds": 28.45725465017143,
+          "received_bytes": 36700160,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 36700160
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 35651584
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3447927.744028782,
+          "error": null,
+          "eta_seconds": 27.674714519540544,
+          "received_bytes": 38797312,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 38797312
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 35651584
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3479103.2063036803,
+          "error": null,
+          "eta_seconds": 26.82394239725641,
+          "received_bytes": 40894464,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 40894464
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 39845888
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3498386.853512374,
+          "error": null,
+          "eta_seconds": 26.076622117536587,
+          "received_bytes": 42991616,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 42991616
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 39845888
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3530310.6682710107,
+          "error": null,
+          "eta_seconds": 25.24677524872093,
+          "received_bytes": 45088768,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 45088768
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 44040192
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3547765.480551524,
+          "error": null,
+          "eta_seconds": 24.531443376711113,
+          "received_bytes": 47185920,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 47185920
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 44040192
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3568476.2293137475,
+          "error": null,
+          "eta_seconds": 23.801379228000002,
+          "received_bytes": 49283072,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 49283072
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 44040192
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3575374.89938559,
+          "error": null,
+          "eta_seconds": 23.462177355,
+          "received_bytes": 50331648,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 50331648
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 44040192
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3530585.406942222,
+          "error": null,
+          "eta_seconds": 23.16582622224,
+          "received_bytes": 52428800,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 52428800
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 50331648
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3521295.110216289,
+          "error": null,
+          "eta_seconds": 22.92916369484314,
+          "received_bytes": 53477376,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 53477376
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 52428800
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3517829.3418640997,
+          "error": null,
+          "eta_seconds": 22.355604083490565,
+          "received_bytes": 55574528,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 55574528
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 52428800
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3529366.5225682715,
+          "error": null,
+          "eta_seconds": 21.68832494741818,
+          "received_bytes": 57671680,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 57671680
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 52428800
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3538833.89225664,
+          "error": null,
+          "eta_seconds": 21.03769158617544,
+          "received_bytes": 59768832,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 59768832
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 58720256
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3560857.6187041337,
+          "error": null,
+          "eta_seconds": 20.318628753915252,
+          "received_bytes": 61865984,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 61865984
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 58720256
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3573202.0936343325,
+          "error": null,
+          "eta_seconds": 19.66152211909836,
+          "received_bytes": 63963136,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 63963136
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 61865984
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3580493.5748405843,
+          "error": null,
+          "eta_seconds": 19.328624546709676,
+          "received_bytes": 65011712,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 65011712
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 61865984
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3588421.776089569,
+          "error": null,
+          "eta_seconds": 18.701498371,
+          "received_bytes": 67108864,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 67108864
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 61865984
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3603127.920242716,
+          "error": null,
+          "eta_seconds": 18.043131811878787,
+          "received_bytes": 69206016,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 69206016
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 68157440
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3607946.5463957614,
+          "error": null,
+          "eta_seconds": 17.437774975588233,
+          "received_bytes": 71303168,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 71303168
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 68157440
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3625116.5705972426,
+          "error": null,
+          "eta_seconds": 16.776676505599998,
+          "received_bytes": 73400320,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 73400320
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 68157440
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3637230.079769955,
+          "error": null,
+          "eta_seconds": 16.144223684555556,
+          "received_bytes": 75497472,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 75497472
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 74448896
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3653122.658095805,
+          "error": null,
+          "eta_seconds": 15.499918644810812,
+          "received_bytes": 77594624,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 77594624
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 74448896
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3667600.308804309,
+          "error": null,
+          "eta_seconds": 14.86692862063158,
+          "received_bytes": 79691776,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 79691776
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 78643200
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3670374.777346354,
+          "error": null,
+          "eta_seconds": 14.284317864102565,
+          "received_bytes": 81788928,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 81788928
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 78643200
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3680423.3374498156,
+          "error": null,
+          "eta_seconds": 13.675505067,
+          "received_bytes": 83886080,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 83886080
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 82837504
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3696355.058572503,
+          "error": null,
+          "eta_seconds": 13.049205294317073,
+          "received_bytes": 85983232,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 85983232
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 82837504
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3707841.75827152,
+          "error": null,
+          "eta_seconds": 12.443180428904762,
+          "received_bytes": 88080384,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 88080384
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 87031808
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3719158.173525968,
+          "error": null,
+          "eta_seconds": 11.841440978093022,
+          "received_bytes": 90177536,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 90177536
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 87031808
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3725382.344512524,
+          "error": null,
+          "eta_seconds": 11.25872088318182,
+          "received_bytes": 92274688,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 92274688
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 91226112
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3739659.256721872,
+          "error": null,
+          "eta_seconds": 10.654951498155555,
+          "received_bytes": 94371840,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 94371840
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 91226112
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3749609.787845851,
+          "error": null,
+          "eta_seconds": 10.067377176782609,
+          "received_bytes": 96468992,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 96468992
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 91226112
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3762421.9928493425,
+          "error": null,
+          "eta_seconds": 9.475700510936171,
+          "received_bytes": 98566144,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 98566144
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 97517568
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3777821.955265871,
+          "error": null,
+          "eta_seconds": 8.60439067402062,
+          "received_bytes": 101711872,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 101711872
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 97517568
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3782391.841103589,
+          "error": null,
+          "eta_seconds": 8.31676920887755,
+          "received_bytes": 102760448,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 102760448
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 101711872
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3795612.9254860366,
+          "error": null,
+          "eta_seconds": 7.45901980939604,
+          "received_bytes": 105906176,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 105906176
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 101711872
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3799930.9118695413,
+          "error": null,
+          "eta_seconds": 6.898651740776699,
+          "received_bytes": 108003328,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 108003328
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 105906176
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3800611.37156327,
+          "error": null,
+          "eta_seconds": 6.621519945,
+          "received_bytes": 109051904,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 109051904
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 105906176
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3814701.3494612947,
+          "error": null,
+          "eta_seconds": 5.772429866130841,
+          "received_bytes": 112197632,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 112197632
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 105906176
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3821285.7409041733,
+          "error": null,
+          "eta_seconds": 5.21367554033945,
+          "received_bytes": 114294784,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 114294784
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 112197632
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3829708.308988522,
+          "error": null,
+          "eta_seconds": 4.6546082786936935,
+          "received_bytes": 116391936,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 116391936
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 112197632
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3833869.579316891,
+          "error": null,
+          "eta_seconds": 4.102549571548672,
+          "received_bytes": 118489088,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 118489088
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 112197632
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3840789.9055651836,
+          "error": null,
+          "eta_seconds": 3.5491365930347825,
+          "received_bytes": 120586240,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 120586240
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 118489088
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3848097.952058421,
+          "error": null,
+          "eta_seconds": 2.9974122654102566,
+          "received_bytes": 122683392,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 122683392
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 118489088
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3853979.7442069054,
+          "error": null,
+          "eta_seconds": 2.4486854177647057,
+          "received_bytes": 124780544,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 124780544
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 118489088
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3852916.0004511215,
+          "error": null,
+          "eta_seconds": 2.1772101958666665,
+          "received_bytes": 125829120,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 125829120
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 124780544
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3842278.107067028,
+          "error": null,
+          "eta_seconds": 1.6374285839508198,
+          "received_bytes": 127926272,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 127926272
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 124780544
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3825493.6354674096,
+          "error": null,
+          "eta_seconds": 1.3705107104065042,
+          "received_bytes": 128974848,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 128974848
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 127926272
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3817035.568980892,
+          "error": null,
+          "eta_seconds": 0.8241285529439999,
+          "received_bytes": 131072000,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 131072000
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 127926272
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": 3816705.6986049316,
+          "error": null,
+          "eta_seconds": 0.27473326025196854,
+          "received_bytes": 133169152,
+          "state": "transferring",
+          "total_bytes": 134217728,
+          "verified_bytes": 133169152
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 127926272
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 134217728,
+          "state": "verifying",
+          "total_bytes": 134217728,
+          "verified_bytes": 134217728
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 133169152
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 134217728,
+          "state": "verifying",
+          "total_bytes": 134217728,
+          "verified_bytes": 134217728
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 133169152
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 134217728,
+          "state": "verifying",
+          "total_bytes": 134217728,
+          "verified_bytes": 134217728
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "transferring",
+            "verified_bytes": 133169152
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 134217728,
+          "state": "verifying",
+          "total_bytes": 134217728,
+          "verified_bytes": 134217728
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "verifying",
+            "verified_bytes": 134217728
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 134217728,
+          "state": "paused",
+          "total_bytes": 134217728,
+          "verified_bytes": 134217728
+        },
+        "receivers": [
+          {
+            "authorized": false,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "paused",
+            "verified_bytes": 134217728
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 134217728,
+          "state": "paused",
+          "total_bytes": 134217728,
+          "verified_bytes": 134217728
+        },
+        "receivers": [
+          {
+            "authorized": false,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "paused",
+            "verified_bytes": 134217728
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 134217728,
+          "state": "paused",
+          "total_bytes": 134217728,
+          "verified_bytes": 134217728
+        },
+        "receivers": [
+          {
+            "authorized": false,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "paused",
+            "verified_bytes": 134217728
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 134217728,
+          "state": "paused",
+          "total_bytes": 134217728,
+          "verified_bytes": 134217728
+        },
+        "receivers": [
+          {
+            "authorized": false,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "paused",
+            "verified_bytes": 134217728
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 134217728,
+          "state": "paused",
+          "total_bytes": 134217728,
+          "verified_bytes": 134217728
+        },
+        "receivers": [
+          {
+            "authorized": false,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "paused",
+            "verified_bytes": 134217728
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 134217728,
+          "state": "paused",
+          "total_bytes": 134217728,
+          "verified_bytes": 134217728
+        },
+        "receivers": [
+          {
+            "authorized": false,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "paused",
+            "verified_bytes": 134217728
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 134217728,
+          "state": "paused",
+          "total_bytes": 134217728,
+          "verified_bytes": 134217728
+        },
+        "receivers": [
+          {
+            "authorized": false,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "paused",
+            "verified_bytes": 134217728
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 134217728,
+          "state": "paused",
+          "total_bytes": 134217728,
+          "verified_bytes": 134217728
+        },
+        "receivers": [
+          {
+            "authorized": false,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "paused",
+            "verified_bytes": 134217728
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 134217728,
+          "state": "paused",
+          "total_bytes": 134217728,
+          "verified_bytes": 134217728
+        },
+        "receivers": [
+          {
+            "authorized": false,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "paused",
+            "verified_bytes": 134217728
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 134217728,
+          "state": "paused",
+          "total_bytes": 134217728,
+          "verified_bytes": 134217728
+        },
+        "receivers": [
+          {
+            "authorized": false,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "paused",
+            "verified_bytes": 134217728
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 134217728,
+          "state": "connecting",
+          "total_bytes": 134217728,
+          "verified_bytes": 134217728
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "connecting",
+            "verified_bytes": 134217728
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 134217728,
+          "state": "connecting",
+          "total_bytes": 134217728,
+          "verified_bytes": 134217728
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "connecting",
+            "verified_bytes": 134217728
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 134217728,
+          "state": "connecting",
+          "total_bytes": 134217728,
+          "verified_bytes": 134217728
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "connecting",
+            "verified_bytes": 134217728
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 134217728,
+          "state": "connecting",
+          "total_bytes": 134217728,
+          "verified_bytes": 134217728
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "connecting",
+            "verified_bytes": 134217728
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 0,
+          "state": "verifying",
+          "total_bytes": 134217728,
+          "verified_bytes": 134217728
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "connecting",
+            "verified_bytes": 134217728
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 0,
+          "state": "verifying",
+          "total_bytes": 134217728,
+          "verified_bytes": 134217728
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "verifying",
+            "verified_bytes": 134217728
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 0,
+          "state": "verifying",
+          "total_bytes": 134217728,
+          "verified_bytes": 134217728
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "verifying",
+            "verified_bytes": 134217728
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 0,
+          "state": "verifying",
+          "total_bytes": 134217728,
+          "verified_bytes": 134217728
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "verifying",
+            "verified_bytes": 134217728
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "",
+      "error": "",
+      "busy": true,
+      "action": "load_transfer",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 0,
+          "state": "completed",
+          "total_bytes": 134217728,
+          "verified_bytes": 134217728
+        },
+        "receivers": [
+          {
+            "authorized": true,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "verifying",
+            "verified_bytes": 134217728
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "running",
+      "error": "",
+      "busy": true,
+      "action": "load_transfer",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 0,
+          "state": "completed",
+          "total_bytes": 134217728,
+          "verified_bytes": 134217728
+        },
+        "receivers": [
+          {
+            "authorized": false,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "completed",
+            "verified_bytes": 134217728
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "running",
+      "error": "",
+      "busy": true,
+      "action": "load_transfer",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 0,
+          "state": "completed",
+          "total_bytes": 134217728,
+          "verified_bytes": 134217728
+        },
+        "receivers": [
+          {
+            "authorized": false,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "completed",
+            "verified_bytes": 134217728
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "running",
+      "error": "",
+      "busy": true,
+      "action": "load_transfer",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 0,
+          "state": "completed",
+          "total_bytes": 134217728,
+          "verified_bytes": 134217728
+        },
+        "receivers": [
+          {
+            "authorized": false,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "completed",
+            "verified_bytes": 134217728
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": true,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": null,
+      "hash_state": "running",
+      "error": "",
+      "busy": true,
+      "action": "load_transfer",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 0,
+          "state": "completed",
+          "total_bytes": 134217728,
+          "verified_bytes": 134217728
+        },
+        "receivers": [
+          {
+            "authorized": false,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "completed",
+            "verified_bytes": 134217728
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": true,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": true,
+      "hash_state": "complete",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 0,
+          "state": "completed",
+          "total_bytes": 134217728,
+          "verified_bytes": 134217728
+        },
+        "receivers": [
+          {
+            "authorized": false,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "completed",
+            "verified_bytes": 134217728
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": true,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": true,
+      "hash_state": "complete",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 0,
+          "state": "completed",
+          "total_bytes": 134217728,
+          "verified_bytes": 134217728
+        },
+        "receivers": [
+          {
+            "authorized": false,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "completed",
+            "verified_bytes": 134217728
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": true,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": true,
+      "hash_state": "complete",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 0,
+          "state": "completed",
+          "total_bytes": 134217728,
+          "verified_bytes": 134217728
+        },
+        "receivers": [
+          {
+            "authorized": false,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "completed",
+            "verified_bytes": 134217728
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": true,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": true,
+      "hash_state": "complete",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 0,
+          "state": "completed",
+          "total_bytes": 134217728,
+          "verified_bytes": 134217728
+        },
+        "receivers": [
+          {
+            "authorized": false,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "completed",
+            "verified_bytes": 134217728
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": true,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": true,
+      "hash_state": "complete",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 0,
+          "state": "completed",
+          "total_bytes": 134217728,
+          "verified_bytes": 134217728
+        },
+        "receivers": [
+          {
+            "authorized": false,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "completed",
+            "verified_bytes": 134217728
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": true,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": true,
+      "hash_state": "complete",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 0,
+          "state": "completed",
+          "total_bytes": 134217728,
+          "verified_bytes": 134217728
+        },
+        "receivers": [
+          {
+            "authorized": false,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "completed",
+            "verified_bytes": 134217728
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": true,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": true,
+      "hash_state": "complete",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 0,
+          "state": "completed",
+          "total_bytes": 134217728,
+          "verified_bytes": 134217728
+        },
+        "receivers": [
+          {
+            "authorized": false,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "completed",
+            "verified_bytes": 134217728
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": false,
+      "player_ready": true,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": true,
+      "hash_state": "complete",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 0,
+          "state": "completed",
+          "total_bytes": 134217728,
+          "verified_bytes": 134217728
+        },
+        "receivers": [
+          {
+            "authorized": false,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "completed",
+            "verified_bytes": 134217728
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": true,
+      "player_ready": true,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": true,
+      "hash_state": "complete",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 0,
+          "state": "completed",
+          "total_bytes": 134217728,
+          "verified_bytes": 134217728
+        },
+        "receivers": [
+          {
+            "authorized": false,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "completed",
+            "verified_bytes": 134217728
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": true,
+      "player_ready": true,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": true,
+      "hash_state": "complete",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 0,
+          "state": "completed",
+          "total_bytes": 134217728,
+          "verified_bytes": 134217728
+        },
+        "receivers": [
+          {
+            "authorized": false,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "completed",
+            "verified_bytes": 134217728
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": true,
+      "player_ready": true,
+      "playing": false,
+      "position_ms": 0,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": true,
+      "hash_state": "complete",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 0,
+          "state": "completed",
+          "total_bytes": 134217728,
+          "verified_bytes": 134217728
+        },
+        "receivers": [
+          {
+            "authorized": false,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "completed",
+            "verified_bytes": 134217728
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": true,
+      "player_ready": true,
+      "playing": true,
+      "position_ms": 0,
+      "drift_ms": -60,
+      "snapshot_required": false,
+      "identity_match": true,
+      "hash_state": "complete",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 0,
+          "state": "completed",
+          "total_bytes": 134217728,
+          "verified_bytes": 134217728
+        },
+        "receivers": [
+          {
+            "authorized": false,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "completed",
+            "verified_bytes": 134217728
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": true,
+      "player_ready": true,
+      "playing": true,
+      "position_ms": 806,
+      "drift_ms": -254,
+      "snapshot_required": false,
+      "identity_match": true,
+      "hash_state": "complete",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 0,
+          "state": "completed",
+          "total_bytes": 134217728,
+          "verified_bytes": 134217728
+        },
+        "receivers": [
+          {
+            "authorized": false,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "completed",
+            "verified_bytes": 134217728
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": true,
+      "player_ready": true,
+      "playing": true,
+      "position_ms": 1251,
+      "drift_ms": -304,
+      "snapshot_required": false,
+      "identity_match": true,
+      "hash_state": "complete",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 0,
+          "state": "completed",
+          "total_bytes": 134217728,
+          "verified_bytes": 134217728
+        },
+        "receivers": [
+          {
+            "authorized": false,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "completed",
+            "verified_bytes": 134217728
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": true,
+      "player_ready": true,
+      "playing": true,
+      "position_ms": 1755,
+      "drift_ms": -307,
+      "snapshot_required": false,
+      "identity_match": true,
+      "hash_state": "complete",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 0,
+          "state": "completed",
+          "total_bytes": 134217728,
+          "verified_bytes": 134217728
+        },
+        "receivers": [
+          {
+            "authorized": false,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "completed",
+            "verified_bytes": 134217728
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": true,
+      "player_ready": true,
+      "playing": true,
+      "position_ms": 2265,
+      "drift_ms": -297,
+      "snapshot_required": false,
+      "identity_match": true,
+      "hash_state": "complete",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 0,
+          "state": "completed",
+          "total_bytes": 134217728,
+          "verified_bytes": 134217728
+        },
+        "receivers": [
+          {
+            "authorized": false,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "completed",
+            "verified_bytes": 134217728
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": true,
+      "player_ready": true,
+      "playing": true,
+      "position_ms": 2794,
+      "drift_ms": -268,
+      "snapshot_required": false,
+      "identity_match": true,
+      "hash_state": "complete",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 0,
+          "state": "completed",
+          "total_bytes": 134217728,
+          "verified_bytes": 134217728
+        },
+        "receivers": [
+          {
+            "authorized": false,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "completed",
+            "verified_bytes": 134217728
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": true,
+      "player_ready": true,
+      "playing": true,
+      "position_ms": 3179,
+      "drift_ms": -370,
+      "snapshot_required": false,
+      "identity_match": true,
+      "hash_state": "complete",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 0,
+          "state": "completed",
+          "total_bytes": 134217728,
+          "verified_bytes": 134217728
+        },
+        "receivers": [
+          {
+            "authorized": false,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "completed",
+            "verified_bytes": 134217728
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": true,
+      "player_ready": true,
+      "playing": true,
+      "position_ms": 3658,
+      "drift_ms": -407,
+      "snapshot_required": false,
+      "identity_match": true,
+      "hash_state": "complete",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 0,
+          "state": "completed",
+          "total_bytes": 134217728,
+          "verified_bytes": 134217728
+        },
+        "receivers": [
+          {
+            "authorized": false,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "completed",
+            "verified_bytes": 134217728
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": true,
+      "player_ready": true,
+      "playing": true,
+      "position_ms": 4155,
+      "drift_ms": -409,
+      "snapshot_required": false,
+      "identity_match": true,
+      "hash_state": "complete",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 0,
+          "state": "completed",
+          "total_bytes": 134217728,
+          "verified_bytes": 134217728
+        },
+        "receivers": [
+          {
+            "authorized": false,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "completed",
+            "verified_bytes": 134217728
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": true,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 5053,
+      "drift_ms": -2,
+      "snapshot_required": false,
+      "identity_match": true,
+      "hash_state": "complete",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 0,
+          "state": "completed",
+          "total_bytes": 134217728,
+          "verified_bytes": 134217728
+        },
+        "receivers": [
+          {
+            "authorized": false,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "completed",
+            "verified_bytes": 134217728
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": true,
+      "player_ready": true,
+      "playing": false,
+      "position_ms": 5097,
+      "drift_ms": 23,
+      "snapshot_required": false,
+      "identity_match": true,
+      "hash_state": "complete",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 0,
+          "state": "completed",
+          "total_bytes": 134217728,
+          "verified_bytes": 134217728
+        },
+        "receivers": [
+          {
+            "authorized": false,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "completed",
+            "verified_bytes": 134217728
+          }
+        ],
+        "supported": true
+      }
+    },
+    {
+      "connected": true,
+      "trusted": true,
+      "room_ready": true,
+      "player_ready": false,
+      "playing": false,
+      "position_ms": 15000,
+      "drift_ms": 0,
+      "snapshot_required": false,
+      "identity_match": true,
+      "hash_state": "complete",
+      "error": "",
+      "busy": false,
+      "action": "",
+      "transfer": {
+        "offer": {
+          "display_name": "Pel\u00edcula del anfitri\u00f3n",
+          "duration_ms": 620000,
+          "size_bytes": 134217728,
+          "transfer_id": "2ce60516-2e2c-4399-8836-a2ac8e4ca6fe"
+        },
+        "progress": {
+          "bytes_per_second": null,
+          "error": null,
+          "eta_seconds": null,
+          "received_bytes": 0,
+          "state": "completed",
+          "total_bytes": 134217728,
+          "verified_bytes": 134217728
+        },
+        "receivers": [
+          {
+            "authorized": false,
+            "receiver_id": "a43c21f6-7b22-4bc9-992a-2796d0c79698",
+            "state": "completed",
+            "verified_bytes": 134217728
+          }
+        ],
+        "supported": true
+      }
+    }
+  ],
+  "paused_verified_bytes": 134217728,
+  "download_elapsed_with_pause_seconds": 46.793361678999645,
+  "bytes": 134217728,
+  "final_sha_verified": true,
+  "identity_match": true,
+  "participant_ready": true
+}

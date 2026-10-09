@@ -4,7 +4,7 @@ Base de un proyecto con vocación open source para ver contenido juntos desde
 Windows, Linux, macOS, Android e iOS. Cada dispositivo conserva su archivo y el
 servidor coordina la sala; el control de reproducción no transporta el vídeo.
 
-**Estado: Social Experience Phase 2 — Rich Chat con fixtures; proveedor GIF remoto bloqueado sobre el vertical slice real Linux ↔ Android, previo al MVP v0.1.** Servidor WebSocket
+**Estado: P2P Media Distribution Phase 1 — transferencia directa LAN cifrada, con validación Linux/Android y límites previos al MVP v0.1.** Servidor WebSocket
 y dos clientes CLI integran libmpv in-process, archivo local, metadata, SHA-256
 completo, Ready, controles programados, correcciones y resume con snapshot.
 FakePlayer y los instrumentos anteriores se conservan. La licencia está
@@ -22,12 +22,14 @@ El objetivo de v0.1 es demostrar dos clientes con el mismo vídeo local,
 Play/Pause/Seek programados y recuperación tras una desconexión temporal.
 Chat, replies, GIF descriptors y reacciones comparten la sesión de sala, con historial
 reciente y límites en memoria. GIPHY permanece bloqueado por términos/cache; la
-búsqueda remota real no fue probada. Distribución P2P, voz/cámara y providers son
-etapas posteriores, no capacidades disponibles. El soporte de las cinco plataformas es un objetivo;
+búsqueda remota real no fue probada. P2P directo LAN se implementa con TCP/TLS, consentimiento y grants de sala WSS;
+[P2P](docs/P2P.md) detalla seguridad y límites. P2P Internet, voz/cámara y providers
+remotos siguen como etapas posteriores. El soporte de las cinco plataformas es un objetivo;
 la evidencia de cada plataforma se detalla en [Spike C](experiments/02-rust-ui-bridge/RESULTS.md); no existe soporte universal demostrado.
 
 Social base se documenta en [experimento 11](experiments/11-social-chat-reactions/README.md).
 Rich Chat, proveedor y evidencia: [experimento 12](experiments/12-rich-social/README.md).
+Distribución LAN, mediciones y plan WAN: [experimento 13](experiments/13-p2p-media-distribution/README.md).
 La UI y sus límites actuales se describen en [UI](docs/UI.md) y
 [Product UI Phase 1](experiments/09-product-ui/RESULTS.md). [Player integration Phase 2](experiments/10-player-integration/RESULTS.md). Linux
 integra vídeo libmpv en Flutter mediante Render API/EGL; Android conserva Media3.
