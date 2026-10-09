@@ -280,13 +280,15 @@ IMPLEMENTED espera authavailable con consume obligado, bounded configparse, nft 
 
 ### 69. Limitaciones
 
-BLOCKED infraestructura WAN. Allocation/privatesignaling/candidatos/route UX/networkchange/automaticfallback no implementados; relay finite lab no público. Grants actuales10min limitan ficheros largos sobre WAN lenta; revisar renovación sin reutilización. LAN física intermitente requiere diagnóstico.
+BLOCKED infraestructura WAN. Allocation/privatesignaling/candidatos/route UX/networkchange/automaticfallback no implementados; relay finite lab no público. Grants actuales10min limitan ficheros largos sobre WAN lenta; revisar renovación sin reutilización. LAN física intermitente requiere diagnóstico. [Timeout CI social puntual](results-ci-social-timeout.json) no reproducido localmente; causa pendiente, no afirmamos corregirlo por una reejecución verde.
 
 ### 70. Regresiones
 
 150 Rust/68 Flutter PASS y baseline producto funcional; Core/SyncEngine/Player/RichChat intactos. LAN física completó antes pero cortes viejos+nuevos posteriores; no declarar estabilidad universal ni mismos3MiB/s.
 
 ### 71. GitHub Actions
+
+TESTED: commit de código bb6ec172eab523b6107cef5f27e6495a84a8f7c0, [run38001263654](https://github.com/Eirom16/cine-virtual/actions/runs/38001263654), **11/11 success** después de reejecutar Linux. [Recibo machine-readable](results-ci-code-final.json). Timeout puntual del test WebSocket social existente: cinco repeticiones locales sin cambios PASS, reejecución CI PASS; causa NOT DETERMINED. Una descarga Ubuntu lenta se interrumpió y relanzó, no error de código. No SyncEngine/test/timeouts modificados por ese episodio. El commit posterior solo añade este cierre documental; su CI exacto se entrega en respuesta final.
 
 Inicial37966817288 11/11 PASS solo b41. Run37997804755 detectó fallos al join del relay tras SHA completo en Windows/macOS ARM64; [diagnóstico preservado](results-ci-first-failure.json). Corrige clasificación del fin de sesión/reset, sin omitir tests. Cambios se commit/push y matriz final se espera/diagnostica; run exacto del HEAD y estado final se entregan en respuesta de cierre. No continue-on-error, secrets, releases o deployment modificados.
 
@@ -296,11 +298,11 @@ IMPLEMENTED ADR015 provisional y docs architecture/P2P/security/protocol/UI/test
 
 ### 73. Commits
 
-Base b41f3c0; cambios de código/evidencia/documentación publicados mediante commit normal master. Hash final se entrega en cierre y git log; no forcepush/rebase/borradohistoria. Docs no inventan su propio hash autoreferente.
+TESTED: base b41f3c0; commits170f9fa (investigación/carrier/spike), fb5002a (prevalidación/grants/Ready ensayo), 8e9dceb (teardown), 9bbbfb9 (diagnóstico seguro), 6994121 (polling previo a ACK), bb6ec17 (evidencia final de código). Todos incorporados en master por commits normales/fast-forward. El cierre posterior solo actualiza documentación/recibos. Hash final se entrega en cierre y git log; no forcepush/rebase/borradohistoria. Docs no inventan su propio hash autoreferente.
 
 ### 74. Estado Git final
 
-Se verifica git status y HEAD/remoto después de commit/push/CI. Estado final exacto se comunica en cierre; modificaciones externas no sobrescritas. No certificados/grants/media privada tracked.
+TESTED antes de este cierre documental: master limpio y sincronizado con origin/master en bb6ec17, ahead/behind0/0; CI11/11. El HEAD posterior de documentación se verifica nuevamente y comunica en cierre. Estado final exacto se comunica en cierre; modificaciones externas no sobrescritas. No certificados/grants/media privada tracked.
 
 ### 75. ¿Funciona P2P entre casas diferentes?
 

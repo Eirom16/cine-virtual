@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "head_sha": "bb6ec172eab523b6107cef5f27e6495a84a8f7c0",
+  "test": "social_two_clients_chat_reactions_resume_and_player_regression",
+  "observed_ci_status": "FAIL (Elapsed timeout, first attempt)",
+  "test_source_sha256": "3a7fba8388b48692e9a4ab67b5f43a55740f871cb5e34a9a4aa5cc7ac0f97e29",
+  "code_changes_for_this_timeout": false,
+  "sync_engine_changes": false,
+  "root_cause": "NOT DETERMINED; not reproduced locally",
+  "local_repetitions": [
+    {
+      "trial": 1,
+      "status": "PASS",
+      "seconds": 4.49
+    },
+    {
+      "trial": 2,
+      "status": "PASS",
+      "seconds": 4.6
+    },
+    {
+      "trial": 3,
+      "status": "PASS",
+      "seconds": 4.52
+    },
+    {
+      "trial": 4,
+      "status": "PASS",
+      "seconds": 4.81
+    },
+    {
+      "trial": 5,
+      "status": "PASS",
+      "seconds": 4.49
+    }
+  ],
+  "same_head_ci_rerun": "PASS"
+}

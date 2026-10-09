@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "scope": "final code HEAD before documentation-only validation receipt commit",
+  "head_sha": "bb6ec172eab523b6107cef5f27e6495a84a8f7c0",
+  "run_id": 38001263654,
+  "url": "https://github.com/Eirom16/cine-virtual/actions/runs/38001263654",
+  "status": "PASS",
+  "passed": 11,
+  "total": 11,
+  "jobs": [
+    {
+      "name": "linux / build",
+      "status": "success"
+    },
+    {
+      "name": "Rust, Flutter and documentation gate",
+      "status": "success"
+    },
+    {
+      "name": "ios / build (device)",
+      "status": "success"
+    },
+    {
+      "name": "windows / build",
+      "status": "success"
+    },
+    {
+      "name": "ios / build (simulator)",
+      "status": "success"
+    },
+    {
+      "name": "android / build (arm64-v8a)",
+      "status": "success"
+    },
+    {
+      "name": "android / build (armeabi-v7a)",
+      "status": "success"
+    },
+    {
+      "name": "macos / build (macos-15, arm64)",
+      "status": "success"
+    },
+    {
+      "name": "android / build (x86_64)",
+      "status": "success"
+    },
+    {
+      "name": "macos / build (macos-15-intel, x64)",
+      "status": "success"
+    },
+    {
+      "name": "summary",
+      "status": "success"
+    }
+  ],
+  "notes": [
+    "First Linux attempt timed out in existing social websocket test; five unchanged local repetitions passed.",
+    "Second Linux attempt cancelled during slow active Ubuntu package downloads; third attempt passed.",
+    "No CI error suppression, tests/timeouts unchanged. Final documentation HEAD CI is checked separately in closing response."
+  ]
+}

@@ -115,3 +115,16 @@ entre los tests workspace. No Internet obligatorio en CI; no sleeps largos ni
 continue-on-error añadidos. Checks docs/CI y matriz final: ver run del HEAD
 publicado, no reutilizar run inicial37966817288 como resultado de estos cambios.
 No nueva QA visual ni capturas: [alcance](screenshots/README.md).
+
+## Published code validation
+
+**TESTED CI11/11 PASS** para código bb6ec17,
+[run38001263654](https://github.com/Eirom16/cine-virtual/actions/runs/38001263654),
+[recibo](results-ci-code-final.json). Este cierre solo añade documentación;
+su HEAD y run final se verifican aparte en respuesta de cierre.
+
+[Timeout WebSocket social](results-ci-social-timeout.json): primer Linux Elapsed,
+cinco repeticiones locales del test intacto PASS, reejecución mismo HEAD PASS.
+Causa NOT DETERMINED, no cambio de SyncEngine ni timeouts/test para ocultarlo.
+Una reejecución interrumpió descarga Ubuntu que avanzaba lentamente; nuevo
+runner completó SDK y suite. Los logs Actions mantienen todos los intentos.

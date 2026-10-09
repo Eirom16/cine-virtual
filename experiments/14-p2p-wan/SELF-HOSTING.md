@@ -48,8 +48,11 @@ Input certificate ≤2048bytes, PKCS8 key ≤8192bytes. Wrong key fails closed;
 wrong/expired SAN fails at Client. A persisted identity keeps pin stable across
 restart, but rooms/epochs/resume tokens still vanish on restart (in-memory store).
 Renewal replaces the pin; distribute new pin by authenticated channel, never TOFU.
-A public CA certificate can be provisioned, but clients still require the exact
-pin; full WebPKI chain/default roots are not being added by this phase.
+The tested preparation uses an explicitly pinned self-signed identity. A CA-issued
+leaf can be loaded by the server, but client validation of a public CA chain PLUS
+pin has NOT BEEN TESTED; do not assume a leaf placed in RootCertStore supplies
+its issuer chain. Full WebPKI roots/chains plus explicit pin checking require
+separate implementation/review. Never weaken TLS validation to make it connect.
 
 Start native TLS on loopback behind an approved TCP pass-through ingress:
 
