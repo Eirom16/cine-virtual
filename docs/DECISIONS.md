@@ -470,3 +470,36 @@ requieren distribuir nuevo pin al reiniciar; solución local explícita, sin PKI
 pública. Android evita suponer random access SAF: destino privado; exportación
 SAF y proceso-muerte resume quedan pendientes. SHA final y carga vuelven a leer
 archivo; CPU/disco deben medirse. Evidencia en [experimento 13](../experiments/13-p2p-media-distribution/README.md).
+
+## ADR-015 — Fundamento WAN aditivo y relay TCP end-to-end (Provisional)
+
+**Context:** TCP/TLS LAN/manifest/chunks/Partial/Ready ya probados; WAN/NAT/CGNAT
+no demostrado. Usuario confirmó WSS público y relay ausentes, solo autorizó
+investigación/spike local/preparación self-hosted. ARMv7 es target obligatorio.
+
+**Decision:** preservar TCP/TLS, introducir Carrier byte-stream mínimo y probar
+túnel TCP relay de dos sockets salientes con TLS exterior de admisión e interior
+Host↔receiver pinned end-to-end. Grants/scope/hash/revocación originales intactos;
+tickets relay separados, un uso/cuotas/plazos. No hole punching propio/ICE ficticio,
+no QUIC/WebRTC migrado. Local finite relay no daemon público ni almacenamiento.
+
+**Alternatives:** ICE/WebRTC DataChannels integra DTLS/SCTP/traversal pero cambia
+carrier, buffers/runtime y TURN TCP/TLS/ARMv7 necesitan prueba. Quinn necesita
+traversal/relay adicional; iroh cambia identidad/routing/MSRV. TCP público/IPv6
+puede conectar cuando alcanzable, forwarding doméstico no resuelve CGNAT.
+[Investigación/API/licencias](../experiments/14-p2p-wan/TRANSPORT-DECISION.md).
+
+**Consequences:** sin deps/lock nuevos, builds móviles conservados; relay aumenta
+coste de egress y head-of-line, no conecta universalmente. Cifrado interior evita
+que relay lea medio/grant, pero metadata/DoS visibles. Mobile loopback ARMv7
+probado, Internet/ARM64 físico no. Self-hosting WSS nativeTLS con pin/SAN persistente
+y TCPpassthrough preparado, no desplegado; renovación redistribuyepin. Público
+requiere autorización explícita/host/dominio y cuotas globales, servicio allocation
+privado y auditoría. Phase1 LAN sigue disponible.
+
+**Migration plan:** capacidad WAN negociada aditiva, candidatos privados tras
+consentimiento (no snapshot v1), scope/generation/TTL/newgrant antes de reroute;
+relay allocation/policy y daemon endurecido; UIroute/error/mobileconsent y network
+change luego. Dos redes reales/corpus pequeño/SHA antes de WANPASS, producto/Ready
+Player después. Reemplazo carrier requiere consulta. Evidencia y límites en
+[experimento14](../experiments/14-p2p-wan/README.md).

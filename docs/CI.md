@@ -333,3 +333,12 @@ Matriz conserva once jobs y checks bloqueantes; no continue-on-error.
 Tests deterministas no necesitan Android ni una LAN física. Artifacts no incluyen
 configs privadas, media, rutas/SAF URI o tokens. P2P_QA no está habilitado en builds
 de CI. Build de Windows/macOS/iOS sigue separado de runtime P2P no probado.
+
+## Phase 2 — carrier aditivo sin nuevas dependencias
+
+Cargo.lock/toolchain/targets conservados. Bin local relay compila bajo targets
+existentes; setns solo cfg Linux, getrusage cfg Linux/Android. Tests reales locales
+sin requerir Internet, sin continue-on-error ni secretos nuevos. Matriz final
+debe corresponder al HEAD publicado, inicial11/11 no heredado.
+[Checks/evidencia](../experiments/14-p2p-wan/RESULTS.md). Build multiplataforma
+no afirma runtime WAN/multimedia físico.

@@ -1,0 +1,21 @@
+# PROPOSED WSS TLS passthrough only; never automatically deployed.
+# Backend terminates TLS itself, retaining Server.secure and the exact client pin.
+global
+    maxconn 128
+
+defaults
+    mode tcp
+    timeout connect 5s
+    timeout client 1h
+    timeout server 1h
+
+frontend cine_wss
+    bind :443
+    stick-table type ip size 10k expire 60s store conn_cur,conn_rate(60s)
+    tcp-request connection track-sc0 src
+    tcp-request connection reject if { sc0_conn_cur gt 8 }
+    tcp-request connection reject if { sc0_conn_rate gt 20 }
+    default_backend cine_control
+
+backend cine_control
+    server room 127.0.0.1:1729

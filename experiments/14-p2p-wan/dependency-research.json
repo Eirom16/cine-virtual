@@ -1,0 +1,273 @@
+{
+  "schema_version": 1,
+  "consulted_date": "2026-10-09",
+  "method": "crates.io registry API and published source archives; versions pinned for inspection, not added to Cargo.lock",
+  "libraries": [
+    {
+      "crate": "datachannel",
+      "version": "0.16.1",
+      "released": "2026-07-27T21:28:20.291276Z",
+      "license": "MPL-2.0",
+      "rust_version": null,
+      "repository": "https://github.com/lerouxrgd/datachannel-rs",
+      "api_source": "https://crates.io/api/v1/crates/datachannel",
+      "source_commit": "6abf0f8a461f6eba8bef51c011141eada40bb297",
+      "cargo_toml_sha256": "46243d861ad04e0f64596afb42f04d6d8a89ebf8f64e39d94d46ee66602c21fb",
+      "compiled_here": false,
+      "binary_size_bytes": null,
+      "cpu_measured": false,
+      "ram_measured": false
+    },
+    {
+      "crate": "ice",
+      "version": "0.4.0",
+      "released": "2026-08-14T07:08:02.803281Z",
+      "license": "MIT",
+      "rust_version": null,
+      "repository": "https://github.com/tamton-aquib/ice",
+      "api_source": "https://crates.io/api/v1/crates/ice",
+      "source_commit": null,
+      "cargo_toml_sha256": null,
+      "compiled_here": false,
+      "binary_size_bytes": null,
+      "cpu_measured": false,
+      "ram_measured": false
+    },
+    {
+      "crate": "iroh",
+      "version": "1.3.0",
+      "released": "2026-09-28T19:22:11.465120Z",
+      "license": "MIT OR Apache-2.0",
+      "rust_version": "1.91",
+      "repository": "https://github.com/n0-computer/iroh",
+      "api_source": "https://crates.io/api/v1/crates/iroh",
+      "source_commit": "0072d7d84b233f9e7185eb676f049beaf557ac03",
+      "cargo_toml_sha256": "b956e143b49dcfc074031774bb16fab72d396bcbe858d09f15678f0a77ba4a8e",
+      "compiled_here": false,
+      "binary_size_bytes": null,
+      "cpu_measured": false,
+      "ram_measured": false
+    },
+    {
+      "crate": "quinn",
+      "version": "0.11.12",
+      "released": "2026-09-14T10:08:47.662258Z",
+      "license": "MIT OR Apache-2.0",
+      "rust_version": "1.85",
+      "repository": "https://github.com/quinn-rs/quinn",
+      "api_source": "https://crates.io/api/v1/crates/quinn",
+      "source_commit": "eaec0db4bcb698f76df736d89938743c88a2ad5f",
+      "cargo_toml_sha256": "dc852465e70040708a87a31b71b62b80e5d5d9be39ee6eacfc924007bdef9eb9",
+      "compiled_here": false,
+      "binary_size_bytes": null,
+      "cpu_measured": false,
+      "ram_measured": false
+    },
+    {
+      "crate": "rice-proto",
+      "version": "0.4.3",
+      "released": "2026-05-11T01:36:12.141485Z",
+      "license": "MIT OR Apache-2.0",
+      "rust_version": "1.85.0",
+      "repository": "https://github.com/ystreet/librice",
+      "api_source": "https://crates.io/api/v1/crates/rice-proto",
+      "source_commit": "afd70fdd7ca96a39824c55e6b373bac97311f2ba",
+      "cargo_toml_sha256": "e52837ef2ca1a008d86c37ca3af11e3f0a5167d8998fb52ebc047194ebd0914b",
+      "compiled_here": false,
+      "binary_size_bytes": null,
+      "cpu_measured": false,
+      "ram_measured": false
+    },
+    {
+      "crate": "rtc",
+      "version": "0.21.0",
+      "released": "2026-09-19T15:24:28.200503Z",
+      "license": "MIT/Apache-2.0",
+      "rust_version": null,
+      "repository": "https://github.com/webrtc-rs/rtc",
+      "api_source": "https://crates.io/api/v1/crates/rtc",
+      "source_commit": "c8321cab79ae745aad973d62034ec84d301e893c",
+      "cargo_toml_sha256": "9c2eadad4ec4368c4404a03a89c805378639196fe2df29a1b23e61dcbb014482",
+      "compiled_here": false,
+      "binary_size_bytes": null,
+      "cpu_measured": false,
+      "ram_measured": false
+    },
+    {
+      "crate": "rustls",
+      "version": "0.23.45",
+      "released": "2026-09-14T15:11:17.808465Z",
+      "license": "Apache-2.0 OR ISC OR MIT",
+      "rust_version": "1.71",
+      "repository": "https://github.com/rustls/rustls",
+      "api_source": "https://crates.io/api/v1/crates/rustls",
+      "source_commit": null,
+      "cargo_toml_sha256": null,
+      "compiled_here": false,
+      "binary_size_bytes": null,
+      "cpu_measured": false,
+      "ram_measured": false
+    },
+    {
+      "crate": "str0m",
+      "version": "0.24.1",
+      "released": "2026-10-03T21:24:04.952632Z",
+      "license": "MIT OR Apache-2.0",
+      "rust_version": "1.85.0",
+      "repository": "https://github.com/algesten/str0m",
+      "api_source": "https://crates.io/api/v1/crates/str0m",
+      "source_commit": "8c4c5284cb11b1e3c82962639cda5b3e95af73e8",
+      "cargo_toml_sha256": "6e1c505306058295cd5c8850400faa8d1b87be466d57776e3beb6f5efbbb7283",
+      "compiled_here": false,
+      "binary_size_bytes": null,
+      "cpu_measured": false,
+      "ram_measured": false
+    },
+    {
+      "crate": "stun",
+      "version": "0.17.2",
+      "released": "2026-07-20T21:23:22.071118Z",
+      "license": "MIT/Apache-2.0",
+      "rust_version": null,
+      "repository": "https://github.com/webrtc-rs/webrtc/tree/master/stun",
+      "api_source": "https://crates.io/api/v1/crates/stun",
+      "source_commit": "1da3fe8ee84db8d266322cbcfcb357c745959a8e",
+      "cargo_toml_sha256": "4c265dad15a76d8e008fd7b65b8512a7657024cf3aa4f8fdbf43a4ceb0f590ca",
+      "compiled_here": false,
+      "binary_size_bytes": null,
+      "cpu_measured": false,
+      "ram_measured": false
+    },
+    {
+      "crate": "turn",
+      "version": "0.17.2",
+      "released": "2026-07-20T21:23:25.230366Z",
+      "license": "MIT/Apache-2.0",
+      "rust_version": null,
+      "repository": "https://github.com/webrtc-rs/webrtc/tree/master/turn",
+      "api_source": "https://crates.io/api/v1/crates/turn",
+      "source_commit": "1da3fe8ee84db8d266322cbcfcb357c745959a8e",
+      "cargo_toml_sha256": "28c5f1ae68b8fa26a5c99ec812f001d44925dca59f6a6f14a4aacffa96f5ea80",
+      "compiled_here": false,
+      "binary_size_bytes": null,
+      "cpu_measured": false,
+      "ram_measured": false
+    },
+    {
+      "crate": "webrtc-ice",
+      "version": "0.17.2",
+      "released": "2026-07-20T21:23:29.138505Z",
+      "license": "MIT/Apache-2.0",
+      "rust_version": null,
+      "repository": "https://github.com/webrtc-rs/webrtc/tree/master/ice",
+      "api_source": "https://crates.io/api/v1/crates/webrtc-ice",
+      "source_commit": "1da3fe8ee84db8d266322cbcfcb357c745959a8e",
+      "cargo_toml_sha256": "33f508cebcbc42f30f8b9085434ddb5fed86b7046b70fde82ef1d672102c955b",
+      "compiled_here": false,
+      "binary_size_bytes": null,
+      "cpu_measured": false,
+      "ram_measured": false
+    },
+    {
+      "crate": "webrtc",
+      "version": "0.21.0",
+      "released": "2026-09-19T15:34:04.871923Z",
+      "license": "MIT/Apache-2.0",
+      "rust_version": null,
+      "repository": "https://github.com/webrtc-rs/webrtc",
+      "api_source": "https://crates.io/api/v1/crates/webrtc",
+      "source_commit": "4be2e3d6f99787ac438d28f9f704d343b1aa1498",
+      "cargo_toml_sha256": "af297451d3b4266726bf0c2b1cb4c4530322503a76e52c055a73dc0ab3c6dc67",
+      "compiled_here": false,
+      "binary_size_bytes": null,
+      "cpu_measured": false,
+      "ram_measured": false
+    }
+  ],
+  "upstream_activity": [
+    {
+      "repository": "webrtc-rs/webrtc",
+      "archived": false,
+      "last_push": "2026-10-03T19:34:20Z",
+      "default_branch": "master",
+      "license": "Apache-2.0",
+      "source_url": "https://github.com/webrtc-rs/webrtc"
+    },
+    {
+      "repository": "webrtc-rs/rtc",
+      "archived": false,
+      "last_push": "2026-10-08T13:12:54Z",
+      "default_branch": "master",
+      "license": "Apache-2.0",
+      "source_url": "https://github.com/webrtc-rs/rtc"
+    },
+    {
+      "repository": "algesten/str0m",
+      "archived": false,
+      "last_push": "2026-10-09T10:16:04Z",
+      "default_branch": "main",
+      "license": "MIT",
+      "source_url": "https://github.com/algesten/str0m"
+    },
+    {
+      "repository": "quinn-rs/quinn",
+      "archived": false,
+      "last_push": "2026-10-08T04:35:55Z",
+      "default_branch": "main",
+      "license": "Apache-2.0",
+      "source_url": "https://github.com/quinn-rs/quinn"
+    },
+    {
+      "repository": "ystreet/librice",
+      "archived": false,
+      "last_push": "2026-10-01T03:23:27Z",
+      "default_branch": "main",
+      "license": "Apache-2.0",
+      "source_url": "https://github.com/ystreet/librice"
+    },
+    {
+      "repository": "lerouxrgd/datachannel-rs",
+      "archived": false,
+      "last_push": "2026-07-27T21:29:28Z",
+      "default_branch": "master",
+      "license": "MPL-2.0",
+      "source_url": "https://github.com/lerouxrgd/datachannel-rs"
+    },
+    {
+      "repository": "paullouisageneau/libdatachannel",
+      "archived": false,
+      "last_push": "2026-10-07T09:13:36Z",
+      "default_branch": "master",
+      "license": "MPL-2.0",
+      "source_url": "https://github.com/paullouisageneau/libdatachannel"
+    },
+    {
+      "repository": "n0-computer/iroh",
+      "archived": false,
+      "last_push": "2026-10-09T11:17:36Z",
+      "default_branch": "main",
+      "license": "Apache-2.0",
+      "source_url": "https://github.com/n0-computer/iroh"
+    },
+    {
+      "repository": "coturn/coturn",
+      "archived": false,
+      "last_push": "2026-10-06T05:24:02Z",
+      "default_branch": "master",
+      "license": "NOASSERTION",
+      "source_url": "https://github.com/coturn/coturn"
+    },
+    {
+      "repository": "rustls/rustls",
+      "archived": false,
+      "last_push": "2026-10-09T12:43:56Z",
+      "default_branch": "main",
+      "license": "NOASSERTION",
+      "source_url": "https://github.com/rustls/rustls"
+    }
+  ],
+  "excluded_name_collision": {
+    "crate": "ice",
+    "reason": "registry description A simple CTF tool store; not ICE NAT traversal"
+  }
+}

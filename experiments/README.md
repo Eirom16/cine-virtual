@@ -33,3 +33,9 @@ red Rust compartida con Flutter/Media3 Android y CLI/libmpv Linux. Gate físico
 por Wi-Fi/LAN, identidad/Ready, controles, background y resume. Resultados
 aprobados/fallidos se distinguen en su evidencia; no convierte los candidatos
 provisionales en stack definitivo ni declara v0.1 completa.
+
+## 14 — P2P WAN foundation
+
+[Experimento 14](14-p2p-wan/README.md): investigación TCP/TLS vs ICE/WebRTC/QUIC,
+spike relay TLS interior sobre sockets salientes, simulación NAT/netem y ARMv7.
+Infraestructura WAN ausente: BLOCKED/NOT TESTED, sin deployment público.

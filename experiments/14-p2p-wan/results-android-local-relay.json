@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "scenario": "Android ARMv7 on-device loopback relay carrier",
+  "network": "on-device loopback; no mobile data; not WAN",
+  "device": "SM-J701M Android9 API28 ARMv7",
+  "build": "release Rust",
+  "binary_bytes": 1959108,
+  "runs": [
+    {
+      "bytes": 8192,
+      "carrier": "TCP outer TLS1.3 / inner peer TLS1.3",
+      "direct_probe": {
+        "status": "NOT TESTED"
+      },
+      "gathering_ms": null,
+      "ice_checks_ms": null,
+      "network": "loopback",
+      "new_grant_after_pause": true,
+      "product_wan": "NOT IMPLEMENTED",
+      "real_wan": "NOT TESTED",
+      "resources": {
+        "cpu_seconds": 0.16999999999999998,
+        "fds_after_workers": 5,
+        "peak_rss_kib": 3736,
+        "scope": "entire lab process, fixture creation + sender + receiver + relay; not marginal carrier cost",
+        "threads_after_workers": 1
+      },
+      "resume_policy": "explicit lab reauthorization; not automatic product fallback",
+      "retries": 0,
+      "runs": [
+        {
+          "attempt": 1,
+          "effective_mib_s_including_admission_auth_sha": 0.05330718455298693,
+          "elapsed_seconds": 0.14655623,
+          "first_chunk_ms": 116.674653,
+          "initial_verified_bytes": 0,
+          "inner_tls_grant_auth_ms": 36.528616,
+          "new_useful_bytes": 8192,
+          "outer_tls_admission_pair_ms": 58.962923,
+          "relay": {
+            "elapsed_seconds": 0.058812808,
+            "forwarded_ciphertext_bytes": 10073
+          },
+          "route": "RELAYED",
+          "status": "COMPLETE_SHA_VERIFIED",
+          "verified_bytes": 8192
+        }
+      ],
+      "schema_version": 1,
+      "sha_final_match": true,
+      "status": "LOCAL_SPIKE_PASS"
+    },
+    {
+      "bytes": 8388608,
+      "carrier": "TCP outer TLS1.3 / inner peer TLS1.3",
+      "direct_probe": {
+        "status": "NOT TESTED"
+      },
+      "gathering_ms": null,
+      "ice_checks_ms": null,
+      "network": "loopback",
+      "new_grant_after_pause": true,
+      "product_wan": "NOT IMPLEMENTED",
+      "real_wan": "NOT TESTED",
+      "resources": {
+        "cpu_seconds": 4.77,
+        "fds_after_workers": 5,
+        "peak_rss_kib": 10964,
+        "scope": "entire lab process, fixture creation + sender + receiver + relay; not marginal carrier cost",
+        "threads_after_workers": 1
+      },
+      "resume_policy": "explicit lab reauthorization; not automatic product fallback",
+      "retries": 1,
+      "runs": [
+        {
+          "attempt": 1,
+          "effective_mib_s_including_admission_auth_sha": 0.699868651520944,
+          "elapsed_seconds": 1.428839537,
+          "first_chunk_ms": 1428.330422,
+          "initial_verified_bytes": 0,
+          "inner_tls_grant_auth_ms": 38.35273,
+          "new_useful_bytes": 1048576,
+          "outer_tls_admission_pair_ms": 35.533423,
+          "relay": {
+            "elapsed_seconds": 1.393738229,
+            "forwarded_ciphertext_bytes": 1051758
+          },
+          "route": "RELAYED",
+          "status": "PAUSED",
+          "verified_bytes": 1048576
+        },
+        {
+          "attempt": 2,
+          "effective_mib_s_including_admission_auth_sha": 0.7113153728490769,
+          "elapsed_seconds": 9.840923263,
+          "first_chunk_ms": 1449.036846,
+          "initial_verified_bytes": 1048576,
+          "inner_tls_grant_auth_ms": 31.957038999999998,
+          "new_useful_bytes": 7340032,
+          "outer_tls_admission_pair_ms": 54.99727,
+          "recovery_to_complete_ms": 9856.7093,
+          "relay": {
+            "elapsed_seconds": 9.588414185,
+            "forwarded_ciphertext_bytes": 7352710
+          },
+          "route": "RELAYED",
+          "status": "COMPLETE_SHA_VERIFIED",
+          "verified_bytes": 8388608
+        }
+      ],
+      "schema_version": 1,
+      "sha_final_match": true,
+      "status": "LOCAL_SPIKE_PASS"
+    }
+  ]
+}

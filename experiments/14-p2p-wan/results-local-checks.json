@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "base_commit": "b41f3c03854767fed1456ac3c917c90977c9a45b",
+  "scope": "Phase 2 working tree before documentation-only finalization",
+  "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+  "rust_tests": {
+    "status": "PASS",
+    "passed": 149,
+    "ignored": 8
+  },
+  "checks": {
+    "cargo fmt --all -- --check": "PASS",
+    "cargo clippy --workspace --all-targets --locked -- -D warnings": "PASS",
+    "cargo test --workspace --locked": "PASS",
+    "cargo build --workspace --locked": "PASS",
+    "flutter analyze": "PASS",
+    "flutter test (68 tests)": "PASS",
+    "python3 scripts/check_docs.py": "PASS (74 Markdown)",
+    "python3 scripts/check_ci.py": "PASS (validator venv PyYAML)",
+    "python3 -m unittest discover -s scripts/tests -v": "PASS (10 tests)",
+    "python3 -m py_compile experiments/14-p2p-wan/*.py": "PASS"
+  },
+  "public_wan": "NOT TESTED",
+  "ci_last_head": "See final GitHub Actions run for published HEAD; initial 11/11 is not inherited",
+  "source_sha256": {
+    "adapters/transfer/src/bin/cine-transfer-spike.rs": "cfe3cdba11e01a9182e413a1171f3d2d939210af43c2fdf63bf57514b6906bda",
+    "adapters/transfer/src/bin/cine-wan-spike.rs": "38e4d69f4faf79809ee9addaed74d274ef9568b576d5e8c8ef93544147e501ca",
+    "adapters/transfer/src/carrier.rs": "58682800e6a3eae26847b03afdadc3d51377b68ea651e217aff50c950949ea3d",
+    "adapters/transfer/src/lib.rs": "2bf2dee125f8eeef413669a960aa1e1bd08f18ed7722f9eb3e5a659cc4fd727f",
+    "adapters/transfer/src/relay.rs": "328f0f91f77216d8838bafad8be34eebcf14b9d71b25f7ed97b8e5cb32d08c7a",
+    "adapters/transfer/src/storage.rs": "4cda3c2554775f41a16eb16948e157bdece694c5f12e759b20d8a7672ca7b43c",
+    "adapters/transfer/src/tls.rs": "7d0f1fb86e2c8a923bb7a688a7c069763ea096bef71a8775b5a6760d0170989e",
+    "adapters/transfer/src/transport.rs": "31445e325069a43b7437b3a6ac053118c33dd4e96469fa4678450aee8d385b0b",
+    "client/src/fake_player.rs": "dee404e102157327188aeab5d3dfce89a3957a0774f51a5c9667e2bf0fe6a3ec",
+    "client/src/lib.rs": "8506882f930d0be6a475f6f4b809a095b8822171c02f54b9b6ccf47e86131587",
+    "client/src/main.rs": "093696a5cfad90c0ff5729af9b6a5bfb057d2f6f07624679bc126f0e839ab9de",
+    "client/src/player_backend.rs": "4584542749d0e89cadf1805478f6eee351effcb1ac151f575cc470260270517d",
+    "client/src/replica.rs": "93955ec08e8ebaaece9023692d3d3d3ea5227e9d08065c6f97914dea2224526e",
+    "client/src/runtime.rs": "7567a0efe63f43b790681349cf3d481cdcbcfba86c5be6af1e6959589bf978a1",
+    "client/src/social.rs": "ed4c56ed0613f6eb210a5ab16206a554aafde34c31283dd123271cb6de3cc046",
+    "client/src/transfer.rs": "10147a008114ce0ccb548ee0a271aa1ade4394b68ccd731521834a71c697d755",
+    "server/src/config.rs": "b61d96ad96e1165bb99c8a8cba982aabb65fbf731859ef5d32ecb32cde380c6b",
+    "server/src/lib.rs": "e44cdc9882ff53c43a37e4f7387567ab9eeb76a7a5521c7706c2d5ce7030c1f1",
+    "server/src/main.rs": "aa46e0c013f96fa7e1a4eb8944f215d628e29b93e03f4c77b3ff4a19a72bf013"
+  }
+}

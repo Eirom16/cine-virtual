@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "scenario": "physical independent networks direct",
+  "status": "NOT TESTED",
+  "phase_classification": "BLOCKED",
+  "reason": "No public Cine Virtual WSS endpoint or authorized public relay. Confirmed by user.",
+  "public_infrastructure_deployed": false,
+  "bytes": null,
+  "sha_final_match": null,
+  "route": null,
+  "physical_cgnat": "NOT TESTED",
+  "ipv6_internet": "NOT TESTED",
+  "gathering_ms": null,
+  "connectivity_check_ms": null
+}

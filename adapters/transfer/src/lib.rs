@@ -1,4 +1,6 @@
 //! Bounded blocking transfer workers. Never run these functions on UI/control threads.
+pub mod carrier;
+pub mod relay;
 pub mod storage;
 pub mod tls;
 pub mod transport;
@@ -36,6 +38,11 @@ impl Authorization {
             return Err(Error::Expired);
         }
         Ok(())
+    }
+    /// A revoked/expired/consumed grant cannot authorize a newly accepted socket.
+    /// This does not consume it; the TLS credential still must pass `consume`.
+    pub fn available(&self) -> bool {
+        self.check().is_ok() && !self.consumed.load(Ordering::Acquire)
     }
     pub fn consume(&self, candidate: &Credential) -> Result<(), Error> {
         self.check()?;

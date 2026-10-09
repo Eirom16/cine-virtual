@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "status": "FAIL",
+  "scenario": "physical-LAN-v1-compatibility-baseline",
+  "real_wan": "NOT TESTED",
+  "network": "same Wi-Fi; direct TCP/TLS1.3; private ADB config; no reverse/forward",
+  "linux_build": "b41f3c0 debug",
+  "android_build": "existing Phase 1 release ARMv7 carrier",
+  "product_ready_player": "separate loopback product baseline",
+  "runs": [
+    {
+      "bytes": 8192,
+      "status": "PASS",
+      "route": "DIRECT_LAN",
+      "elapsed_seconds": 0.439619731,
+      "effective_mib_s": 0.017771040399458322,
+      "sha_final_match": true,
+      "chunks_verified": true
+    }
+  ],
+  "device": {
+    "model": "SM-J701M",
+    "api": "28",
+    "abi": "armeabi-v7a"
+  },
+  "source_label": "b41f3c0",
+  "safe_failure": {
+    "receiver_exit": 1,
+    "sender_exit": 1,
+    "receiver_verified_sha": false,
+    "sender_codes": [
+      "TRANSFER_Io"
+    ],
+    "receiver_codes": []
+  },
+  "error": "RuntimeError"
+}

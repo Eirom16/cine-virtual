@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "status": "FAIL",
+  "scenario": "physical-LAN-v1-compatibility-baseline",
+  "real_wan": "NOT TESTED",
+  "network": "same Wi-Fi; direct TCP/TLS1.3; private ADB config; no reverse/forward",
+  "linux_build": "current debug",
+  "android_build": "existing Phase 1 release ARMv7 carrier",
+  "product_ready_player": "separate loopback product baseline",
+  "runs": [
+    {
+      "bytes": 8192,
+      "status": "PASS",
+      "route": "DIRECT_LAN",
+      "elapsed_seconds": 0.347468769,
+      "effective_mib_s": 0.022484035104749226,
+      "sha_final_match": true,
+      "chunks_verified": true
+    }
+  ],
+  "device": {
+    "model": "SM-J701M",
+    "api": "28",
+    "abi": "armeabi-v7a"
+  },
+  "error": "JSONDecodeError"
+}

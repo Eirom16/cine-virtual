@@ -228,3 +228,12 @@ confirmación Ready. Android guarda en privado; no supone seek/write de todo SAF
 Actualizaciones del card son ValueNotifier separado; Rich Chat conserva su estado.
 Sin rediseño de Player/chat. Pruebas/capturas en
 [experimento 13](../experiments/13-p2p-media-distribution/README.md).
+
+## Phase 2 — conectividad WAN pendiente
+
+Panel transferencia existente conservado; no nuevas vistas relay/mobileconsent
+ni fake estados ICE. Spike solo Rust/laboratorio. UX prevista con conexión
+directa/relay, consentimiento coste/exposición y errores útiles requiere
+state real y negociación privada antes de implementarse. Diagnósticos seguros
+JSON en [experimento14](../experiments/14-p2p-wan/README.md); QA visual WAN
+NOT TESTED. Rich Chat/Player no editados.

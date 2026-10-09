@@ -279,3 +279,15 @@ acciones/verificación/Ready y layouts 360/1280; no sustituye dispositivos.
 [Experimento 13](../experiments/13-p2p-media-distribution/README.md) conserva
 pruebas físicas, mediciones, QA visual, fallos y límites. P2P_QA opt-in solo facilita
 entrada/observaciones sobre backend real; no acepta descarga automáticamente.
+
+## Phase 2 — evidencia local separada de WAN
+
+[Spike reproducible](../experiments/14-p2p-wan/WAN-SPIKE.md): TLS interior/exterior
+real, pause/newgrant/resume/SHA, negativospin/ticket/quota/replay/cancel. Netns
+rootless/nft/netem aislados, sin cambios firewallhost; no Internet en CI. Android9
+ARMv7 loopback y Linux→Android LAN pequeños; WSS/libmpv/Ready lifecycle en loopback.
+Cortes físicos posteriores/rates bajos quedan documentados, no ocultos.
+
+[Resultados](../experiments/14-p2p-wan/RESULTS.md):149 Rust PASS/8opt-in ignored,
+68 Flutter PASS. Redes físicas independientes/CGNAT/IPv6 público/relay público
+NOT TESTED; no WAN PASS por localhost/LAN/VPN/simulación.

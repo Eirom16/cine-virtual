@@ -147,3 +147,18 @@ relay fallback y WAN directo siguen NOT IMPLEMENTED.
 El [plan WAN](../experiments/13-p2p-media-distribution/WAN-ROADMAP.md) trata NAT,
 CGNAT, firewalls, UDP bloqueado, ICE/STUN/TURN y self-hosting como fase independiente.
 No hay servidor central de películas, infraestructura pública nueva ni voz.
+
+## Phase 2 — fundamento WAN local
+
+TCP LAN permanece; Carrier pequeño permite TLS peer-to-peer dentro de túnel
+relay con dos conexiones salientes y tickets exteriores independientes. Es
+un laboratorio finite de una pareja, no daemon público ni fallback de producto.
+No ICE/STUN/QUIC añadidos ni protocolo v1 cambiado. Resume aguarda grant vigente
+en Client, rechaza autorizaciones revocadas/consumidas antes de nueva conexión.
+
+[Decisión](../experiments/14-p2p-wan/TRANSPORT-DECISION.md),
+[resultados](../experiments/14-p2p-wan/RESULTS.md) y
+[self-hosting](../experiments/14-p2p-wan/SELF-HOSTING.md).
+WAN real BLOCKED por WSS/relay ausentes; simulaciones no demuestran dos hogares.
+LAN física SHA PASS en muestra pero cortes/velocidad variable posteriores
+requieren seguimiento, también observados con fuente Phase1.

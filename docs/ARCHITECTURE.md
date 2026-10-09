@@ -307,3 +307,13 @@ SAF/Media3 y destino privado. Core/SyncEngine/Player no se sustituyen.
 Completado atraviesa LocalMedia/Player/identidad/clock/Ready existentes. TCP/TLS
 directo LAN, WSS pin opt-in y límites en [P2P](P2P.md); decisión provisional
 ADR-014. NAT/CGNAT/relay se investigan separadamente.
+
+## P2P WAN foundation — Phase 2 provisional
+
+[ADR-015](DECISIONS.md#adr-015--fundamento-wan-aditivo-y-relay-tcp-end-to-end-provisional)
+añade Carrier Read+Write/configure/close en Transfer Layer. TCP y stream TLS
+exterior reutilizan TLS peer, chunks y Partial. Relay experimental finite empareja
+dos conexiones salientes, no almacena ni recibe archivos en claro. Core,
+RoomService, Ready, SyncEngine, Player, Flutter y Kotlin conservan autoridad y
+responsabilidades. Producto WAN/private signaling/allocation no implementados;
+[experimento 14](../experiments/14-p2p-wan/README.md) separa evidencia simulada.

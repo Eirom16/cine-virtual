@@ -1,0 +1,20 @@
+# TEMPLATE ONLY. Operator must provision user, binaries, identity and approval.
+[Unit]
+Description=Cine Virtual experimental pinned WSS room coordination
+After=network.target
+
+[Service]
+User=cine
+Group=cine
+ExecStart=/opt/cine/cine-server --bind 127.0.0.1:1729 --tls --advertise wss://rooms.example.invalid:443/ --tls-cert /etc/cine/room-cert.der --tls-key /etc/cine/room-key.pkcs8.der
+Restart=on-failure
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+LimitNOFILE=1024
+MemoryMax=256M
+TasksMax=64
+
+[Install]
+WantedBy=multi-user.target

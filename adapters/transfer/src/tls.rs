@@ -15,7 +15,15 @@ impl Identity {
     pub fn generate_names(names: Vec<String>) -> Result<Self, Error> {
         let cert = rcgen::generate_simple_self_signed(names).map_err(|_| Error::Tls)?;
         let certificate = cert.cert.der().to_vec();
-        let key = PrivatePkcs8KeyDer::from(cert.signing_key.serialize_der());
+        Self::from_der(certificate, cert.signing_key.serialize_der())
+    }
+    /// Explicit operator-provisioned identity, with the same TLS/pin model.
+    /// The caller reads private keys locally; never serialize them into signaling.
+    pub fn from_der(certificate: Vec<u8>, pkcs8: Vec<u8>) -> Result<Self, Error> {
+        if certificate.is_empty() || certificate.len() > 2048 || pkcs8.len() > 8192 {
+            return Err(Error::Tls);
+        }
+        let key = PrivatePkcs8KeyDer::from(pkcs8);
         let mut config =
             ServerConfig::builder_with_provider(Arc::new(rustls::crypto::ring::default_provider()))
                 .with_protocol_versions(&[&rustls::version::TLS13])

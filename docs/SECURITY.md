@@ -104,3 +104,17 @@ Credencial 256 bits, comparación constant-time, expiración/un uso/revocación,
 room/epoch/media/autoridad/member binding. Parcial nunca se carga ni queda Ready.
 Archivos exclusivos/permisos/commit sin reemplazo, SHA por chunk/final y límites
 de I/O reducen corrupción y abuso. No logging de grants/certs/paths/URI/digests.
+
+## Phase 2 — relay end-to-end y self-hosting provisional
+
+Relay local posee solo clave TLS exterior; interior Host↔receptor conserva pin,
+SAN, credential scoped y SHA. Tickets relay separados, single-use, finite cuotas
+y cancelación; no proxy con TLS por hop sin interior. Endpoint/cert público no
+se acepta automáticamente: native WSS conserva pin exacto y SAN. Startup permite
+cert DER/keyPKCS8 persistentes y --advertise separado de bind; rechazo de pares
+inválidos. Templates no se desplegaron.
+
+V1 distribuye oferta a opt-in de sala; NO reutilizarla para candidatos WAN
+sensibles. Private allocation/exchange, generation y cuotasglobal antes de
+público pendientes. [Amenazas/evidencia](../experiments/14-p2p-wan/SECURITY.md)
+y [modelo WSS](../experiments/14-p2p-wan/SELF-HOSTING.md).

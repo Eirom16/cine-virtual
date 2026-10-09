@@ -115,3 +115,10 @@ El diagnóstico de precisión Android y su evidencia antes/después están en
 [experimento 08](experiments/08-android-sync-precision/README.md).
 Consulta [CONTRIBUTING](docs/CONTRIBUTING.md) antes de proponer cambios; la licencia
 sigue pendiente y no se solicitan aportes públicos ni se publica una release.
+
+## P2P WAN foundation — Phase 2
+
+Investigación y spike TCP/TLS relay end-to-end local, sin migración del carrier.
+WAN real **BLOCKED**: no WSS público ni relay autorizado. La evidencia NAT/netem
+y ARMv7 loopback no se presenta como Internet PASS.
+[Decisión, informe y self-hosting](experiments/14-p2p-wan/README.md).

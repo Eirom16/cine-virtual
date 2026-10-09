@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "scenario": "linux-real-control-and-transfer-lifecycle",
+  "status": "FAIL",
+  "network": "loopback WSS and separate direct TCP/TLS1.3",
+  "build": "debug",
+  "steps": [
+    "cancel_waiting_deletes_partial_without_grant",
+    "receiver_disconnect_stops_real_socket_and_preserves_verified_chunks",
+    "offline_cancel_releases_worker_and_deletes_partial",
+    "room_resume_after_offline_cancel",
+    "host_disconnect_revokes_grant_and_preserves_partial"
+  ],
+  "failure": "RuntimeError:SCENARIO_TIMEOUT"
+}

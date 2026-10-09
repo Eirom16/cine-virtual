@@ -145,7 +145,12 @@ impl Transfers {
                             // Keep only this one socket for a bounded rendezvous.
                             let waiting = Instant::now();
                             let auth = loop {
-                                if let Some(auth) = pending.lock().unwrap().clone() {
+                                if let Some(auth) = pending
+                                    .lock()
+                                    .unwrap()
+                                    .clone()
+                                    .filter(|auth| auth.available())
+                                {
                                     break Some(auth);
                                 }
                                 if stopping.load(Ordering::Acquire)
@@ -495,6 +500,83 @@ mod tests {
     use super::*;
     use cine_core::media::{ContentIdentity, MediaDescriptor, SourceType};
     use cine_rooms::model::{MediaSelection, Member, MemberStatus, Role};
+    #[test]
+    fn accepted_socket_waits_for_fresh_grant_when_previous_grant_is_revoked() {
+        let root = std::env::temp_dir().join(format!("cine-fresh-grant-{}", Uuid::new_v4()));
+        std::fs::create_dir(&root).unwrap();
+        let source = root.join("source");
+        std::fs::write(&source, b"abc").unwrap();
+        let mut file = File::open(&source).unwrap();
+        let identity = cine_local_media::hash_reader(&mut file, None, |_| true).unwrap();
+        let manifest = Manifest {
+            version: 1,
+            transfer_id: Uuid::new_v4(),
+            room_id: Uuid::new_v4(),
+            room_epoch: Uuid::new_v4(),
+            host_id: Uuid::new_v4(),
+            authority_revision: 1,
+            media_revision: 1,
+            media_id: Uuid::new_v4(),
+            display_name: "fixture".into(),
+            size_bytes: 3,
+            chunk_size: CHUNK_SIZE,
+            chunk_count: 1,
+            sha256: identity.sha256,
+            duration_ms: 1000,
+            block_hash: "sha256".into(),
+        };
+        let mut t = Transfers {
+            supported: true,
+            ..Default::default()
+        };
+        let offer = t
+            .host("127.0.0.1:0".parse().unwrap(), manifest.clone(), file)
+            .unwrap();
+        let old = Arc::new(Authorization::new(
+            cine_transfer::Credential::new(&manifest, Uuid::new_v4()).unwrap(),
+            Duration::from_secs(10),
+        ));
+        old.revoked.store(true, Ordering::Release);
+        let grants = t.host.as_ref().unwrap().grant.clone();
+        *grants.lock().unwrap() = Some(old);
+        let fresh = cine_transfer::Credential::new(&manifest, Uuid::new_v4()).unwrap();
+        let receiver_credential = fresh.clone();
+        let destination = root.clone();
+        let (connected_tx, connected_rx) = mpsc::channel();
+        let (done_tx, done_rx) = mpsc::channel();
+        let receiver = thread::spawn(move || {
+            let mut partial = Partial::create(&destination, manifest).unwrap();
+            let result = transport::receive_observed(
+                offer.address,
+                &offer.certificate,
+                &receiver_credential,
+                &mut partial,
+                &Control::default(),
+                |_| {
+                    connected_tx.send(()).unwrap();
+                },
+                |_| {},
+            );
+            done_tx.send(result).unwrap();
+        });
+        connected_rx.recv_timeout(Duration::from_secs(5)).unwrap();
+        // No sleeps: the receiver must remain pending while its WSS grant has
+        // not yet arrived at the Host. Old code returns Io in this window.
+        assert!(matches!(
+            done_rx.recv_timeout(Duration::from_millis(200)),
+            Err(mpsc::RecvTimeoutError::Timeout)
+        ));
+        *grants.lock().unwrap() =
+            Some(Arc::new(Authorization::new(fresh, Duration::from_secs(10))));
+        let path = done_rx
+            .recv_timeout(Duration::from_secs(5))
+            .unwrap()
+            .unwrap();
+        assert_eq!(std::fs::read(path).unwrap(), b"abc");
+        receiver.join().unwrap();
+        drop(t);
+        std::fs::remove_dir_all(root).unwrap();
+    }
     #[test]
     fn pending_offer_survives_room_snapshot_but_media_change_and_withdraw_close_listener() {
         let host = Uuid::new_v4();

@@ -527,3 +527,12 @@ Manifest/grant/status, límites, expiración/revocación y reconexión se especi
 en [P2P](P2P.md). Invitación nunca autoriza un archivo automáticamente. Credencial
 de un uso ligada a room/epoch/member/manifest/media/autoridad; resume requiere
 grant nuevo. Cambiar medio o autoridad invalida transferencias incompatibles.
+
+## Phase 2 — ningún cambio wire WAN todavía
+
+protocol_version1 y p2p_transfer_v1 LAN intactos. Relay spike recibe Credential
+scoped por TLS exterior, CVR1 privado de laboratorio, y transporta registros
+TLS peer, no nuevos eventos WSS. No negotiation/candidates/ICE producto
+implementados. Evolución WAN exige capability explícita y entrega privada
+Host↔receptor tras aceptación, límites de count/size, scope/generation/epoch/TTL,
+revocación y grant nuevo. [Plan](../experiments/14-p2p-wan/WAN-ROADMAP.md).

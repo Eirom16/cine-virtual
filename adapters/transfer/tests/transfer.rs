@@ -128,6 +128,7 @@ fn authorization_room_epoch_receiver_revision_secret_expiry_replay_and_revocatio
     let m = manifest(b"test");
     let c = Credential::new(&m, Uuid::new_v4()).unwrap();
     let auth = Authorization::new(c.clone(), Duration::from_secs(30));
+    assert!(auth.available());
     for field in 0..6 {
         let mut bad = c.clone();
         match field {
@@ -141,10 +142,13 @@ fn authorization_room_epoch_receiver_revision_secret_expiry_replay_and_revocatio
         assert_eq!(auth.consume(&bad), Err(Error::Unauthorized));
     }
     auth.consume(&c).unwrap();
+    assert!(!auth.available());
     assert_eq!(auth.consume(&c), Err(Error::Replay));
     auth.revoked.store(true, Ordering::Release);
+    assert!(!auth.available());
     assert_eq!(auth.check(), Err(Error::Unauthorized));
     let expired = Authorization::new(c.clone(), Duration::ZERO);
+    assert!(!expired.available());
     assert_eq!(expired.consume(&c), Err(Error::Expired));
 }
 #[test]
@@ -377,5 +381,53 @@ fn unauthenticated_tls_trickle_has_an_absolute_handshake_deadline() {
     assert!(result.is_err());
     assert!(elapsed < Duration::from_secs(7));
     drop(attack);
+    std::fs::remove_dir_all(path).unwrap();
+}
+
+#[test]
+fn provisioned_tls_identity_survives_restart_and_rejects_mismatched_keys() {
+    let cert = rcgen::generate_simple_self_signed(vec!["cine-transfer.local".into()]).unwrap();
+    let der = cert.cert.der().to_vec();
+    let key = cert.signing_key.serialize_der();
+    let first = Identity::from_der(der.clone(), key.clone()).unwrap();
+    let second = Identity::from_der(der.clone(), key).unwrap();
+    assert_eq!(first.certificate, second.certificate);
+    let other = rcgen::generate_simple_self_signed(vec!["cine-transfer.local".into()]).unwrap();
+    assert!(Identity::from_der(der.clone(), other.signing_key.serialize_der()).is_err());
+    assert!(Identity::from_der(vec![0; 2049], vec![]).is_err());
+    assert!(Identity::from_der(der, vec![0; 8193]).is_err());
+    let path = root();
+    let data = b"provisioned identity";
+    let manifest = manifest(data);
+    let credential = Credential::new(&manifest, Uuid::new_v4()).unwrap();
+    let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+    let address = listener.local_addr().unwrap();
+    let source = path.join("source");
+    std::fs::write(&source, data).unwrap();
+    let m = manifest.clone();
+    let c = credential.clone();
+    let sender = std::thread::spawn(move || {
+        transport::send(
+            listener.accept().unwrap().0,
+            second.server,
+            &m,
+            &mut File::open(source).unwrap(),
+            &Authorization::new(c, Duration::from_secs(10)),
+            &Control::default(),
+            |_| {},
+        )
+    });
+    let mut partial = Partial::create(&path, manifest).unwrap();
+    let finished = transport::receive(
+        address,
+        &first.certificate,
+        &credential,
+        &mut partial,
+        &Control::default(),
+        |_| {},
+    )
+    .unwrap();
+    assert_eq!(std::fs::read(finished).unwrap(), data);
+    sender.join().unwrap().unwrap();
     std::fs::remove_dir_all(path).unwrap();
 }

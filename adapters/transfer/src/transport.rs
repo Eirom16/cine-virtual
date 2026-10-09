@@ -1,3 +1,4 @@
+use crate::carrier::Carrier;
 use crate::{
     Authorization, Control, Credential, Error, MAX_CONTROL, Manifest, Progress, storage::Partial,
 };
@@ -10,14 +11,14 @@ use std::{
     sync::Arc,
     time::{Duration, Instant},
 };
-struct DeadlineSocket<'a> {
-    stream: TcpStream,
+struct DeadlineSocket<'a, C> {
+    stream: C,
     handshake_until: Option<Instant>,
     control: &'a Control,
     auth: Option<&'a Authorization>,
 }
-impl DeadlineSocket<'_> {
-    fn check(&self, writing: bool) -> std::io::Result<()> {
+impl<C: Carrier> DeadlineSocket<'_, C> {
+    fn check(&self) -> std::io::Result<()> {
         self.control
             .check()
             .map_err(|_| std::io::ErrorKind::ConnectionAborted)?;
@@ -34,39 +35,32 @@ impl DeadlineSocket<'_> {
         } else {
             return Ok(());
         };
-        if writing {
-            self.stream.set_write_timeout(Some(timeout))
-        } else {
-            self.stream.set_read_timeout(Some(timeout))
-        }
+        self.stream.configure(timeout)
     }
 }
-impl Read for DeadlineSocket<'_> {
+impl<C: Carrier> Read for DeadlineSocket<'_, C> {
     fn read(&mut self, buf: &mut [u8]) -> std::io::Result<usize> {
-        self.check(false)?;
+        self.check()?;
         self.stream.read(buf)
     }
 }
-impl Write for DeadlineSocket<'_> {
+impl<C: Carrier> Write for DeadlineSocket<'_, C> {
     fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
-        self.check(true)?;
+        self.check()?;
         self.stream.write(buf)
     }
     fn flush(&mut self) -> std::io::Result<()> {
-        self.check(true)?;
+        self.check()?;
         self.stream.flush()
     }
 }
-fn socket(stream: &TcpStream) -> Result<(), Error> {
+fn socket(stream: &impl Carrier) -> Result<(), Error> {
     // The listener polls nonblocking. Accepted sockets can inherit that mode
     // on Windows/BSD; this worker requires blocking I/O with bounded timeouts.
-    stream.set_nonblocking(false)?;
-    stream.set_read_timeout(Some(Duration::from_secs(3)))?;
-    stream.set_write_timeout(Some(Duration::from_secs(3)))?;
-    stream.set_nodelay(true)?;
+    stream.configure(Duration::from_secs(3))?;
     Ok(())
 }
-fn send_control(s: &mut impl Write, c: &Credential) -> Result<(), Error> {
+pub(crate) fn send_control(s: &mut impl Write, c: &Credential) -> Result<(), Error> {
     let data = serde_json::to_vec(c).map_err(|_| Error::Unauthorized)?;
     if data.len() > MAX_CONTROL {
         return Err(Error::Unauthorized);
@@ -76,7 +70,7 @@ fn send_control(s: &mut impl Write, c: &Credential) -> Result<(), Error> {
     s.flush()?;
     Ok(())
 }
-fn read_control(s: &mut impl Read) -> Result<Credential, Error> {
+pub(crate) fn read_control(s: &mut impl Read) -> Result<Credential, Error> {
     let mut len = [0; 4];
     s.read_exact(&mut len)?;
     let len = u32::from_be_bytes(len) as usize;
@@ -87,8 +81,8 @@ fn read_control(s: &mut impl Read) -> Result<Credential, Error> {
     s.read_exact(&mut data)?;
     serde_json::from_slice(&data).map_err(|_| Error::Unauthorized)
 }
-pub fn send(
-    stream: TcpStream,
+pub fn send<C: Carrier>(
+    stream: C,
     config: Arc<rustls::ServerConfig>,
     manifest: &Manifest,
     file: &mut File,
@@ -174,6 +168,7 @@ pub fn send(
     }
     tls.conn.send_close_notify();
     let _ = tls.flush();
+    let _ = tls.sock.stream.close();
     Ok(())
 }
 pub fn receive_observed(
@@ -183,16 +178,57 @@ pub fn receive_observed(
     partial: &mut Partial,
     control: &Control,
     mut connected: impl FnMut(&TcpStream),
+    progress: impl FnMut(Progress),
+) -> Result<std::path::PathBuf, Error> {
+    control.check()?;
+    if credential.manifest_hash != partial.manifest.fingerprint() {
+        return Err(Error::Unauthorized);
+    }
+    let stream = TcpStream::connect_timeout(&address, Duration::from_secs(5))?;
+    socket(&stream)?;
+    connected(&stream);
+    receive_on(stream, certificate, credential, partial, control, progress)
+}
+
+/// Reuse the exact peer TLS, authentication, chunks and checkpoint over a pipe.
+/// Route selection and fresh grants remain the caller's responsibility.
+pub fn receive_on<C: Carrier>(
+    stream: C,
+    certificate: &[u8],
+    credential: &Credential,
+    partial: &mut Partial,
+    control: &Control,
+    progress: impl FnMut(Progress),
+) -> Result<std::path::PathBuf, Error> {
+    receive_on_observed(
+        stream,
+        certificate,
+        credential,
+        partial,
+        control,
+        |_| {},
+        progress,
+    )
+}
+
+/// Reports peer TLS plus grant/ACK time, excluding checkpoint revalidation.
+pub fn receive_on_observed<C: Carrier>(
+    stream: C,
+    certificate: &[u8],
+    credential: &Credential,
+    partial: &mut Partial,
+    control: &Control,
+    authenticated: impl FnOnce(Duration),
     mut progress: impl FnMut(Progress),
 ) -> Result<std::path::PathBuf, Error> {
     control.check()?;
     if credential.manifest_hash != partial.manifest.fingerprint() {
         return Err(Error::Unauthorized);
     }
+    // Even a separately established route must revalidate retained blocks.
     partial.revalidate(|| control.check())?;
-    let stream = TcpStream::connect_timeout(&address, Duration::from_secs(5))?;
     socket(&stream)?;
-    connected(&stream);
+    let handshake_start = Instant::now();
     let mut conn = ClientConnection::new(
         crate::tls::client(certificate)?,
         "cine-transfer.local".try_into().map_err(|_| Error::Tls)?,
@@ -214,6 +250,7 @@ pub fn receive_observed(
     if &accept != b"CVP1" {
         return Err(Error::Unauthorized);
     }
+    authenticated(handshake_start.elapsed());
     tls.sock.handshake_until = None;
     socket(&tls.sock.stream)?;
     let mut data = vec![0; partial.manifest.chunk_size as usize];
@@ -253,6 +290,9 @@ pub fn receive_observed(
     }
     tls.write_all(&u32::MAX.to_be_bytes())?;
     tls.flush()?;
+    tls.conn.send_close_notify();
+    let _ = tls.flush();
+    let _ = tls.sock.stream.close();
     drop(tls);
     progress(Progress {
         state: "verifying".into(),
