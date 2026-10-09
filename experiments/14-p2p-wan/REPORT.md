@@ -244,7 +244,7 @@ TESTED pipeline libmpv/SHA/Ready por baseline control real; SyncEngine/Player no
 
 ### 60. Tests Rust
 
-TESTED149 PASS/8opt-in ignored;fmt/clippy -Dwarnings/test/build --locked. Transfer11 tests, relay8, config2 y real socket grant race. Sin red pública obligatoria ni cambio de locks.
+TESTED150 PASS/8opt-in ignored;fmt/clippy -Dwarnings/test/build --locked. Transfer11 tests, relay9 (Unix;8 Windows), config2 y real socket grant race. Sin red pública obligatoria ni cambio de locks.
 
 ### 61. Tests Flutter
 
@@ -284,11 +284,11 @@ BLOCKED infraestructura WAN. Allocation/privatesignaling/candidatos/route UX/net
 
 ### 70. Regresiones
 
-149 Rust/68 Flutter PASS y baseline producto funcional; Core/SyncEngine/Player/RichChat intactos. LAN física completó antes pero cortes viejos+nuevos posteriores; no declarar estabilidad universal ni mismos3MiB/s.
+150 Rust/68 Flutter PASS y baseline producto funcional; Core/SyncEngine/Player/RichChat intactos. LAN física completó antes pero cortes viejos+nuevos posteriores; no declarar estabilidad universal ni mismos3MiB/s.
 
 ### 71. GitHub Actions
 
-Inicial37966817288 11/11 PASS solo b41. Cambios se commit/push y matriz final se espera/diagnostica; run exacto del HEAD y estado final se entregan en respuesta de cierre. No continue-on-error, secrets, releases o deployment modificados.
+Inicial37966817288 11/11 PASS solo b41. Run37997804755 detectó fallos al join del relay tras SHA completo en Windows/macOS ARM64; [diagnóstico preservado](results-ci-first-failure.json). Corrige clasificación del fin de sesión/reset, sin omitir tests. Cambios se commit/push y matriz final se espera/diagnostica; run exacto del HEAD y estado final se entregan en respuesta de cierre. No continue-on-error, secrets, releases o deployment modificados.
 
 ### 72. ADR/documentación
 

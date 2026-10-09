@@ -288,6 +288,6 @@ rootless/nft/netem aislados, sin cambios firewallhost; no Internet en CI. Androi
 ARMv7 loopback y Linux→Android LAN pequeños; WSS/libmpv/Ready lifecycle en loopback.
 Cortes físicos posteriores/rates bajos quedan documentados, no ocultos.
 
-[Resultados](../experiments/14-p2p-wan/RESULTS.md):149 Rust PASS/8opt-in ignored,
+[Resultados](../experiments/14-p2p-wan/RESULTS.md):150 Rust PASS/8opt-in ignored,
 68 Flutter PASS. Redes físicas independientes/CGNAT/IPv6 público/relay público
 NOT TESTED; no WAN PASS por localhost/LAN/VPN/simulación.

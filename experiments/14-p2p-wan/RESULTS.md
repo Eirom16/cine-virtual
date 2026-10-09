@@ -37,7 +37,8 @@ Rates son bytes útiles NUEVOS divididos por tiempo de intento incluido admisió
 autenticación, checkpoint y SHA; no equivalen al rate instantáneo de transporte
 Phase1 (~3MiB/s). Comparación de transportes bajo condiciones iguales **NOT
 MEASURED**. Primera muestra NAT precede cierre TLS instrumentado final; netem,
-recovery y Android corresponden al carrier final. Recovery/netem coincidieron
+recovery y Android preceden clasificación final portable de cierre/reset;
+esta última se valida con nuevo test RST y nuevas muestras pequeñas/Android. Recovery/netem coincidieron
 con otras verificaciones/compilación en host; diferencias no prueban regresión.
 
 Wi-Fi físico variable: [primera muestra](results-lan-first-sample.json)8MiB
@@ -75,6 +76,12 @@ contenido en claro: su buffer contiene registros de TLS interior.
 - Resume de producto fallaba: sender escogía autorización revocada antes de que
   WSS entregara nueva. Corrige espera por autorización disponible; consumo TLS
   sigue validando secreto/scope. Test socket real + baseline producto PASS.
+- CI Windows/macOS ARM64 detectó Error::Io al join del relay DESPUÉS de SHA
+  correcto. Relay ahora distingue peer_closed/peer_disconnected como fin de
+  sesión, no éxito del archivo; auth/TLS inválido/cuotas siguen fallando. Test
+  Unix fuerza TCP RST real, comprueba cero bytes y no éxito multimedia.
+  [Fallo CI](results-ci-first-failure.json),
+  [Android tras corrección](results-android-relay-portable-termination.json).
 - Baseline heredado esperaba clock del receiver pero no el Host tras room
   resume: descargó/SHA PASS, ready command falló bajo compilación concurrente.
   Ahora aguarda clock/player prepared de ambos hasta15s antes de Ready; no
@@ -97,8 +104,8 @@ contenido en claro: su buffer contiene registros de TLS interior.
 
 ## Verificaciones
 
-149 tests Rust PASS,8 opt-in ignored,68 Flutter PASS/analyze, fmt/clippy/build PASS.
-8 nuevos tests relay reales TLS,11 transfer,2 config y regresión socket cliente
+150 tests Rust PASS,8 opt-in ignored,68 Flutter PASS/analyze, fmt/clippy/build PASS.
+9 nuevos tests relay (8 on Windows; real Unix RST extra) reales TLS,11 transfer,2 config y regresión socket cliente
 entre los tests workspace. No Internet obligatorio en CI; no sleeps largos ni
 continue-on-error añadidos. Checks docs/CI y matriz final: ver run del HEAD
 publicado, no reutilizar run inicial37966817288 como resultado de estos cambios.

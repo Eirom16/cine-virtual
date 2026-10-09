@@ -421,3 +421,66 @@ fn stale_allocation_ticket_does_not_authorize_a_new_generation() {
     auth.consume(&new).unwrap();
     assert_eq!(auth.consume(&new), Err(Error::Replay));
 }
+
+#[cfg(unix)]
+#[test]
+fn peer_tcp_reset_reports_transport_end_without_claiming_file_completion() {
+    use std::os::fd::AsRawFd;
+    let f = Fixture::new();
+    let tls = Identity::generate_names(vec!["cine-relay.local".into()]).unwrap();
+    let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+    let address = listener.local_addr().unwrap();
+    let a = f.ticket();
+    let b = f.ticket();
+    let auth_a = Authorization::new(a.clone(), Duration::from_secs(10));
+    let auth_b = Authorization::new(b.clone(), Duration::from_secs(10));
+    let pin = tls.certificate.clone();
+    let server = thread::spawn(move || {
+        relay::serve_pair(
+            listener,
+            tls.server,
+            &auth_a,
+            &auth_b,
+            &Control::default(),
+            relay::Limits::default(),
+        )
+    });
+    let (stop_tx, stop_rx) = std::sync::mpsc::channel();
+    let sender_pin = pin.clone();
+    let sender = thread::spawn(move || {
+        let mut raw = None;
+        let pipe = relay::connect(address, &sender_pin, &a, &Control::default(), |s| {
+            raw = Some(s.try_clone().unwrap());
+        })
+        .unwrap();
+        stop_rx.recv_timeout(Duration::from_secs(5)).unwrap();
+        let raw = raw.unwrap();
+        let linger = libc::linger {
+            l_onoff: 1,
+            l_linger: 0,
+        };
+        // Force a real RST on this one disposable laboratory socket.
+        assert_eq!(
+            unsafe {
+                libc::setsockopt(
+                    raw.as_raw_fd(),
+                    libc::SOL_SOCKET,
+                    libc::SO_LINGER,
+                    (&linger as *const libc::linger).cast(),
+                    std::mem::size_of::<libc::linger>() as libc::socklen_t,
+                )
+            },
+            0
+        );
+        drop(pipe);
+        drop(raw);
+    });
+    let receiver = relay::connect(address, &pin, &b, &Control::default(), |_| {}).unwrap();
+    stop_tx.send(()).unwrap();
+    sender.join().unwrap();
+    let stats = server.join().unwrap().unwrap();
+    assert_eq!(stats.termination, "peer_disconnected");
+    assert_eq!(stats.forwarded_ciphertext_bytes, 0);
+    // No file/chunk was transferred. Session stats never report media success.
+    drop(receiver);
+}

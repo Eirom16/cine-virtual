@@ -116,6 +116,18 @@ impl Default for Limits {
 pub struct Stats {
     pub forwarded_ciphertext_bytes: u64,
     pub elapsed_seconds: f64,
+    /// A relay session ending never asserts file completion or integrity.
+    pub termination: &'static str,
+}
+fn disconnected(error: &std::io::Error) -> bool {
+    matches!(
+        error.kind(),
+        std::io::ErrorKind::UnexpectedEof
+            | std::io::ErrorKind::ConnectionReset
+            | std::io::ErrorKind::ConnectionAborted
+            | std::io::ErrorKind::BrokenPipe
+            | std::io::ErrorKind::NotConnected
+    )
 }
 
 type Incoming = StreamOwned<ServerConnection, BoundedSocket>;
@@ -234,6 +246,7 @@ pub fn serve_pair(
                     return Ok(Stats {
                         forwarded_ciphertext_bytes: bytes,
                         elapsed_seconds: start.elapsed().as_secs_f64(),
+                        termination: "peer_closed",
                     });
                 }
                 Ok(n) => {
@@ -241,8 +254,25 @@ pub fn serve_pair(
                     if next > limits.bytes {
                         return Err(Error::Bounds);
                     }
-                    destination.write_all(&buffer[..n])?;
-                    destination.flush()?;
+                    if let Err(error) = destination
+                        .write_all(&buffer[..n])
+                        .and_then(|()| destination.flush())
+                    {
+                        // Some kernels reset a socket when its owner exits with
+                        // unread encrypted termination records. Report lifecycle,
+                        // not successful delivery: receiver SHA remains decisive.
+                        control.check()?;
+                        sender.check()?;
+                        receiver.check()?;
+                        if disconnected(&error) {
+                            return Ok(Stats {
+                                forwarded_ciphertext_bytes: bytes,
+                                elapsed_seconds: start.elapsed().as_secs_f64(),
+                                termination: "peer_disconnected",
+                            });
+                        }
+                        return Err(Error::Io);
+                    }
                     bytes = next;
                     last = Instant::now();
                     let earliest =
@@ -266,11 +296,15 @@ pub fn serve_pair(
                         e.kind(),
                         std::io::ErrorKind::WouldBlock | std::io::ErrorKind::TimedOut
                     ) => {}
-                // Rustls reports EOF without close_notify as UnexpectedEof.
-                Err(e) if e.kind() == std::io::ErrorKind::UnexpectedEof => {
+                // Unclean EOF/reset is a transport end, not file completion.
+                Err(e) if disconnected(&e) => {
+                    control.check()?;
+                    sender.check()?;
+                    receiver.check()?;
                     return Ok(Stats {
                         forwarded_ciphertext_bytes: bytes,
                         elapsed_seconds: start.elapsed().as_secs_f64(),
+                        termination: "peer_disconnected",
                     });
                 }
                 Err(_) => return Err(Error::Io),

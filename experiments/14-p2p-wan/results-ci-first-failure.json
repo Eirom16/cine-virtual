@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "run_id": 37997804755,
+  "head_sha": "fb5002a7810d0cec4780eae68a98061a26bf71be",
+  "status": "FAIL",
+  "failed_jobs": [
+    {
+      "name": "macos / build (macos-15, arm64)",
+      "job_id": 114049303337
+    },
+    {
+      "name": "windows / build",
+      "job_id": 114049303458
+    }
+  ],
+  "failed_tests": [
+    "small_relay_transfer_drains_tls_termination_on_ipv4_and_ipv6",
+    "two_outbound_peers_keep_inner_tls_chunks_sha_and_resume_with_new_grants"
+  ],
+  "failure_stage": "relay worker join after receiver SHA/file success; transport Error::Io",
+  "fix": "separate peer_closed/peer_disconnected transport lifecycle stats from receiver COMPLETE_SHA_VERIFIED; preserve auth/quota/TLS/timeout failures",
+  "final_validation": "new HEAD full matrix required"
+}

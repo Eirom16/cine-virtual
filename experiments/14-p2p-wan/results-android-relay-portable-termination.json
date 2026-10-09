@@ -1,0 +1,123 @@
+{
+  "schema_version": 1,
+  "scenario": "Android on-device loopback relay carrier",
+  "network": "on-device loopback; no mobile data; not WAN",
+  "device": {
+    "model": "SM-J701M",
+    "api": "28",
+    "abi": "armeabi-v7a"
+  },
+  "build": "release Rust",
+  "binary_bytes": 1960964,
+  "runs": [
+    {
+      "bytes": 8192,
+      "carrier": "TCP outer TLS1.3 / inner peer TLS1.3",
+      "direct_probe": {
+        "status": "NOT TESTED"
+      },
+      "gathering_ms": null,
+      "ice_checks_ms": null,
+      "network": "loopback",
+      "new_grant_after_pause": true,
+      "product_wan": "NOT IMPLEMENTED",
+      "real_wan": "NOT TESTED",
+      "resources": {
+        "cpu_seconds": 0.18,
+        "fds_after_workers": 5,
+        "peak_rss_kib": 3656,
+        "scope": "entire lab process, fixture creation + sender + receiver + relay; not marginal carrier cost",
+        "threads_after_workers": 1
+      },
+      "resume_policy": "explicit lab reauthorization; not automatic product fallback",
+      "retries": 0,
+      "runs": [
+        {
+          "attempt": 1,
+          "effective_mib_s_including_admission_auth_sha": 0.06212227717263988,
+          "elapsed_seconds": 0.125760039,
+          "first_chunk_ms": 118.763615,
+          "initial_verified_bytes": 0,
+          "inner_tls_grant_auth_ms": 37.352462,
+          "new_useful_bytes": 8192,
+          "outer_tls_admission_pair_ms": 59.905616,
+          "relay": {
+            "elapsed_seconds": 0.059951693,
+            "forwarded_ciphertext_bytes": 10069,
+            "termination": "peer_closed"
+          },
+          "route": "RELAYED",
+          "status": "COMPLETE_SHA_VERIFIED",
+          "verified_bytes": 8192
+        }
+      ],
+      "schema_version": 1,
+      "sha_final_match": true,
+      "status": "LOCAL_SPIKE_PASS"
+    },
+    {
+      "bytes": 8388608,
+      "carrier": "TCP outer TLS1.3 / inner peer TLS1.3",
+      "direct_probe": {
+        "status": "NOT TESTED"
+      },
+      "gathering_ms": null,
+      "ice_checks_ms": null,
+      "network": "loopback",
+      "new_grant_after_pause": true,
+      "product_wan": "NOT IMPLEMENTED",
+      "real_wan": "NOT TESTED",
+      "resources": {
+        "cpu_seconds": 5.09,
+        "fds_after_workers": 5,
+        "peak_rss_kib": 10896,
+        "scope": "entire lab process, fixture creation + sender + receiver + relay; not marginal carrier cost",
+        "threads_after_workers": 1
+      },
+      "resume_policy": "explicit lab reauthorization; not automatic product fallback",
+      "retries": 1,
+      "runs": [
+        {
+          "attempt": 1,
+          "effective_mib_s_including_admission_auth_sha": 0.6939611559198553,
+          "elapsed_seconds": 1.4410028449999999,
+          "first_chunk_ms": 1440.684306,
+          "initial_verified_bytes": 0,
+          "inner_tls_grant_auth_ms": 37.126116,
+          "new_useful_bytes": 1048576,
+          "outer_tls_admission_pair_ms": 35.912076,
+          "relay": {
+            "elapsed_seconds": 1.406322345,
+            "forwarded_ciphertext_bytes": 1051753,
+            "termination": "peer_disconnected"
+          },
+          "route": "RELAYED",
+          "status": "PAUSED",
+          "verified_bytes": 1048576
+        },
+        {
+          "attempt": 2,
+          "effective_mib_s_including_admission_auth_sha": 0.6994854697501678,
+          "elapsed_seconds": 10.007355839,
+          "first_chunk_ms": 1455.064691,
+          "initial_verified_bytes": 1048576,
+          "inner_tls_grant_auth_ms": 28.642616,
+          "new_useful_bytes": 7340032,
+          "outer_tls_admission_pair_ms": 35.828115000000004,
+          "recovery_to_complete_ms": 10016.682532,
+          "relay": {
+            "elapsed_seconds": 9.765692185,
+            "forwarded_ciphertext_bytes": 7352698,
+            "termination": "peer_closed"
+          },
+          "route": "RELAYED",
+          "status": "COMPLETE_SHA_VERIFIED",
+          "verified_bytes": 8388608
+        }
+      ],
+      "schema_version": 1,
+      "sha_final_match": true,
+      "status": "LOCAL_SPIKE_PASS"
+    }
+  ]
+}

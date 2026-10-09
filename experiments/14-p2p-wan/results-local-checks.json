@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
   "base_commit": "b41f3c03854767fed1456ac3c917c90977c9a45b",
-  "scope": "Phase 2 working tree before documentation-only finalization",
+  "scope": "Phase 2 working tree including portable relay termination fix",
   "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
   "rust_tests": {
     "status": "PASS",
-    "passed": 149,
+    "passed": 150,
     "ignored": 8
   },
   "checks": {
@@ -27,7 +27,7 @@
     "adapters/transfer/src/bin/cine-wan-spike.rs": "38e4d69f4faf79809ee9addaed74d274ef9568b576d5e8c8ef93544147e501ca",
     "adapters/transfer/src/carrier.rs": "58682800e6a3eae26847b03afdadc3d51377b68ea651e217aff50c950949ea3d",
     "adapters/transfer/src/lib.rs": "2bf2dee125f8eeef413669a960aa1e1bd08f18ed7722f9eb3e5a659cc4fd727f",
-    "adapters/transfer/src/relay.rs": "328f0f91f77216d8838bafad8be34eebcf14b9d71b25f7ed97b8e5cb32d08c7a",
+    "adapters/transfer/src/relay.rs": "00b97fc79d15e18037652323b29711cd2fb66563ed7db1cd750411e7931ee986",
     "adapters/transfer/src/storage.rs": "4cda3c2554775f41a16eb16948e157bdece694c5f12e759b20d8a7672ca7b43c",
     "adapters/transfer/src/tls.rs": "7d0f1fb86e2c8a923bb7a688a7c069763ea096bef71a8775b5a6760d0170989e",
     "adapters/transfer/src/transport.rs": "6618f4baef53ed41c76826ecec681b1b4110571771e888b3fdf3b63164c976b3",

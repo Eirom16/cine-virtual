@@ -84,8 +84,8 @@ TLS5s per socket within10s total rendezvous, connect5s, client admission/pair10s
 absolute (individual blocking read≤3s); allocation60s default/300s hard max,
 idle3s, cooperative checks at I/O/pacing/accept. These are provisional bounded
 lab defaults, not WAN tuning results. Cancellation owner can shutdown raw socket;
-CSPRNG grant expiry/revocation checked by existing auth. `Stats` EOF means relay
-session ended, never means file/SHA PASS: only receiver can verify completion.
+CSPRNG grant expiry/revocation checked by existing auth. `Stats.termination` peer_closed/peer_disconnected means relay
+session ended (including kernel reset), never means file/SHA PASS: only receiver can verify completion.
 No attempt/list/buffer growth beyond these limits. No ICE gathering/check times:
 fields null because ICE is not implemented. Errors still transfer Error enum in
 spike; product WAN error mapping/new diagnostics remain pending.
@@ -99,7 +99,10 @@ holds new grant delivery for200ms using notification timeout; existing old code
 rejects early. Physical small-payload lab also exposed an intermittent Io at
 termination; inner/outer close_notify now flush before pipe drop. Exact cause of
 that original Android Io was not isolated, and the FAIL is preserved. New test
-checks8KiB relay termination on IPv4 and IPv6. No idle/deadline relaxation.
+checks8KiB relay termination on IPv4 and IPv6. No idle/deadline relaxation. CI exposed post-SHA relay join Io on Windows/macOS:
+reset/unclean EOF now reports explicit transport termination stats; invalid TLS,
+auth, policy and quotas still error. New Unix socket test forces actual TCP RST
+with zero bytes, demonstrating session end cannot mean media completion.
 
 ## Android opt-in local reproduction
 
