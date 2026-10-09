@@ -6,6 +6,7 @@ rust-version = "1.89"
 publish = false
 
 [dependencies]
+cine-transfer-model = { path = "../adapters/transfer-model" }
 cine-core = { path = "../core" }
 uuid.workspace = true
 sha2 = "0.10"

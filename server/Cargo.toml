@@ -6,6 +6,9 @@ rust-version = "1.89"
 publish = false
 
 [dependencies]
+cine-transfer = { path = "../adapters/transfer" }
+tokio-rustls = { version = "0.26", default-features = false, features = ["ring"] }
+cine-transfer-model = { path = "../adapters/transfer-model" }
 cine-rooms = { path = "../rooms" }
 cine-protocol = { path = "../protocol" }
 axum = { version = "0.8", features = ["ws"] }
@@ -16,6 +19,7 @@ tracing.workspace = true
 tracing-subscriber.workspace = true
 
 [dev-dependencies]
+cine-local-media = {path="../adapters/local-media"}
 futures-util.workspace = true
 tokio-tungstenite = "0.29"
 cine-core = { path = "../core" }

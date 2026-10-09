@@ -1,0 +1,21 @@
+[package]
+name = "cine-transfer"
+version = "0.1.0-dev"
+edition = "2024"
+rust-version = "1.89"
+publish = false
+
+[dependencies]
+cine-transfer-model = { path = "../transfer-model" }
+cine-core = { path = "../../core" }
+cine-local-media = { path = "../local-media" }
+serde.workspace = true
+serde_json.workspace = true
+uuid.workspace = true
+sha2 = "0.10"
+getrandom = "0.3"
+rustls = { version = "0.23", default-features = false, features = ["std", "ring"] }
+rcgen = { version = "0.14", default-features = false, features = ["crypto", "ring"] }
+
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"

@@ -135,6 +135,10 @@ impl LocalHandle {
             file,
         })
     }
+    pub fn transfer_file(&self) -> Result<File, MediaError> {
+        self.unchanged()?;
+        self.file.try_clone().map_err(|_| MediaError::ReadFailed)
+    }
     pub fn path(&self) -> &Path {
         &self.path
     }
