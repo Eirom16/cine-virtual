@@ -452,7 +452,8 @@ class ApplicationController extends ChangeNotifier with WidgetsBindingObserver {
         throw BridgeFailure('OPERATION_CANCELLED');
       }
       // Media hashing has no arbitrary timeout proportional to file size.
-      if (intent != 'select' && elapsed.elapsedMilliseconds > 20000) {
+      if (!['select', 'load_transfer'].contains(intent) &&
+          elapsed.elapsedMilliseconds > 20000) {
         throw BridgeFailure('OPERATION_CANCELLED_OR_TIMEOUT');
       }
       await Future<void>.delayed(const Duration(milliseconds: 50));
@@ -734,8 +735,9 @@ class ApplicationController extends ChangeNotifier with WidgetsBindingObserver {
         _loadingTransfer ||
         !session ||
         id.isEmpty ||
-        object(transfer.value['progress'])['state'] != 'completed')
+        object(transfer.value['progress'])['state'] != 'completed') {
       return false;
+    }
     _loadingTransfer = true;
     return _loadTransferredMedia(id);
   }

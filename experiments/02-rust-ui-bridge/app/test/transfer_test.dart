@@ -49,6 +49,38 @@ Future<(ApplicationController, TransferGateway)> fixture(
 
 void main() {
   testWidgets(
+    'completed transfer preserves an already validated playing copy',
+    (tester) async {
+      final (c, g) = await fixture(tester);
+      g.sync['playing'] = true;
+      object(g.network['transfer'])['progress'] = {'state': 'completed'};
+      c.poll();
+      await tester.pumpAndSettle();
+      expect(g.intents, isNot(contains('load_transfer')));
+      expect(c.view.sync['playing'], true);
+    },
+  );
+  testWidgets(
+    'host offline disables resume but local cancel remains available',
+    (tester) async {
+      final (c, g) = await fixture(tester);
+      object((g.room['members'] as List).first)['connected'] = false;
+      g.network['connected'] = false;
+      object(g.network['transfer'])['progress'] = {'state': 'paused'};
+      c.poll();
+      await tester.pump();
+      final resume = tester.widget<FilledButton>(
+        find.widgetWithText(FilledButton, 'Reanudar transferencia'),
+      );
+      expect(resume.onPressed, isNull);
+      expect(find.text('Reconectar a la sala'), findsOneWidget);
+      await tester.tap(find.text('Cancelar y eliminar parcial'));
+      await tester.pumpAndSettle();
+      expect(g.intents, contains('transfer_control'));
+      expect(tester.takeException(), isNull);
+    },
+  );
+  testWidgets(
     'explicit consent before request and insufficient space rejection',
     (tester) async {
       final (c, g) = await fixture(tester);

@@ -460,6 +460,14 @@ impl<P: ApplicationPlayer + Send + 'static> Client<P> {
         receiver: Option<Uuid>,
     ) -> Result<(), ClientError> {
         use cine_transfer_model::TransferIntent as I;
+        if action == "cancel" {
+            let connected = self.connected();
+            let mut t = self.transfer.lock().unwrap();
+            t.cancel();
+            if t.snapshot.offer.is_none() || !connected {
+                return Ok(()); // Local cancellation never waits for a lost room socket.
+            }
+        }
         let (id, progress) = {
             let t = self.transfer.lock().unwrap();
             (

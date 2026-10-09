@@ -113,6 +113,10 @@ async fn command(client: &mut Client, parts: &[&str]) -> Result<Value, ClientErr
             client.resume().await?;
             Ok(json!({"event":"resumed"}))
         }
+        ["resume-room"] => {
+            client.resume_snapshot().await?;
+            Ok(json!({"event":"resumed"}))
+        }
         ["leave"] => {
             require_ack(&client.request("ROOM_LEAVE", json!({})).await?)?;
             Ok(json!({"event":"left"}))

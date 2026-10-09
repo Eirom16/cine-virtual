@@ -238,7 +238,6 @@ impl Transfers {
                 let mut partial = partial;
                 while !stopping.load(Ordering::Acquire) {
                     if ctl.cancel.load(Ordering::Acquire) {
-                        let _ = partial.discard();
                         break;
                     }
                     let grant = match rx.recv_timeout(Duration::from_millis(100)) {
@@ -247,7 +246,6 @@ impl Transfers {
                         Err(_) => break,
                     };
                     if ctl.cancel.load(Ordering::Acquire) {
-                        let _ = partial.discard();
                         break;
                     }
                     ctl.pause.store(false, Ordering::Release);
@@ -287,10 +285,13 @@ impl Transfers {
                     }
                 }
                 if ctl.cancel.load(Ordering::Acquire) {
-                    let _ = partial.discard();
+                    let cleanup_failed = !partial.completed() && partial.discard().is_err();
                     let mut p = public.lock().unwrap();
+                    p.completed = None;
                     p.progress.state = "cancelled".into();
                     p.progress.verified_bytes = 0;
+                    p.progress.received_bytes = 0;
+                    p.progress.error = cleanup_failed.then_some(Error::Storage.to_string());
                 }
             })
             .map_err(|_| Error::Io)?;
@@ -323,6 +324,7 @@ impl Transfers {
     pub fn cancel(&mut self) {
         if let Some(d) = &self.download {
             d.worker.interrupt(true);
+            self.public.lock().unwrap().progress.state = "cancelled".into();
         }
         self.public.lock().unwrap().completed = None;
     }

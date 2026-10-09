@@ -13,7 +13,7 @@ const transferLabels = {
   'reconnecting': 'Conexión interrumpida · puedes reanudar',
   'verifying': 'Verificando SHA-256 del archivo completo',
   'completed': 'Archivo completo · SHA-256 verificado',
-  'cancelled': 'Transferencia cancelada · datos parciales eliminados',
+  'cancelled': 'Transferencia cancelada',
   'failed': 'La transferencia falló',
 };
 
@@ -112,6 +112,7 @@ class TransferCard extends StatelessWidget {
       final total = number(progress['total_bytes']);
       final verified = number(progress['verified_bytes']);
       final enabled = view.connected && !view.busy;
+      final hostAvailable = view.members.any((m) => m.host && m.connected);
       final supported =
           data['supported'] == true && controller.gateway.supportsPlayer;
       if (!view.hasMedia) return const SizedBox.shrink();
@@ -208,9 +209,13 @@ class TransferCard extends StatelessWidget {
               Text(
                 '${transferSize(number(offer['size_bytes']))} · LAN directa',
               ),
+              if (!hostAvailable)
+                const Text(
+                  'El anfitrión está desconectado. Espera a que regrese.',
+                ),
               if (state.isEmpty || ['cancelled', 'failed'].contains(state))
                 FilledButton.icon(
-                  onPressed: enabled
+                  onPressed: enabled && hostAvailable
                       ? () => _receive(context, number(offer['size_bytes']))
                       : null,
                   icon: const Icon(Icons.download_outlined),
@@ -219,6 +224,11 @@ class TransferCard extends StatelessWidget {
             ],
             if (!view.isHost && state.isNotEmpty) ...[
               const SizedBox(height: CineTokens.sm),
+              if (!view.connected)
+                OutlinedButton(
+                  onPressed: view.busy ? null : controller.reconnect,
+                  child: const Text('Reconectar a la sala'),
+                ),
               Text(transferLabels[state] ?? state),
               if (total > 0) ...[
                 const SizedBox(height: CineTokens.sm),
@@ -237,9 +247,11 @@ class TransferCard extends StatelessWidget {
                   ),
               ],
               if (progress['error'] != null)
-                const Text(
-                  'No se pudo completar la transferencia. Revisa conexión, almacenamiento o solicita de nuevo el archivo.',
-                  style: TextStyle(color: CineTokens.error),
+                Text(
+                  state == 'cancelled'
+                      ? 'No se pudo eliminar el parcial. Revisa el almacenamiento local.'
+                      : 'No se pudo completar la transferencia. Revisa conexión, almacenamiento o solicita de nuevo el archivo.',
+                  style: const TextStyle(color: CineTokens.error),
                 ),
               Wrap(
                 spacing: CineTokens.sm,
@@ -266,14 +278,14 @@ class TransferCard extends StatelessWidget {
                     ),
                   if (['paused', 'reconnecting'].contains(state))
                     FilledButton(
-                      onPressed: enabled
+                      onPressed: enabled && hostAvailable
                           ? () => controller.transferAction('resume')
                           : null,
                       child: const Text('Reanudar transferencia'),
                     ),
                   if (!['completed', 'cancelled'].contains(state))
                     TextButton(
-                      onPressed: enabled
+                      onPressed: !view.busy
                           ? () => controller.transferAction('cancel')
                           : null,
                       child: const Text('Cancelar y eliminar parcial'),

@@ -154,6 +154,9 @@ impl Partial {
         std::fs::remove_dir(&self.directory)?;
         Ok(())
     }
+    pub fn completed(&self) -> bool {
+        self.completed
+    }
 }
 
 fn commit(part: &Path, complete: &Path) -> Result<(), Error> {
