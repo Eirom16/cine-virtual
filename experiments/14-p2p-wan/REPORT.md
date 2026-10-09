@@ -274,9 +274,13 @@ NOT TESTED nueva UI WAN. Baseline real libmpv/load/Ready es evidencia funcional 
 
 TESTED reproducibles: grantrevocado race bloqueaba resume, configJSON parcialmente escrito, nft reservednames y Uri badport. CI macOS ARM64 además mostró EINVAL en poll_config; [diagnóstico](results-ci-macos-diagnosis.json). Primer ARMv7 pequeñoIo y LAN variable no causaaislada; resultados iniciales FAIL conservados.
 
+TESTED el cierre documental 5c49be2 falló en el test social existente con OUT_OF_SEQUENCE en macOS ARM64. Revisado: faltaba esperar el estado del Host tras join antes de seleccionar medio; conexión causal con el fallo concreto INFERRED porque el log no identifica intent. [Recibo](results-ci-social-sequence.json).
+
 ### 68. Bugs corregidos
 
 IMPLEMENTED espera authavailable con consume obligado, bounded configparse, nft cadenas seguras y namespaceguard, advertise valida puerto, TLS close_notify explicit inner/outer. Relay fija timeout UNA VEZ antes de aceptación, eliminando reconfiguración tras cierre observada en macOS ARM64. Revisión final restaura revalidación antes del connect TCP para parciales grandes. Unit/integration/product finales PASS; no atribuir Io Android solo al cierre.
+
+IMPLEMENTED una barrera wait_state únicamente en el test social tras join; no cambios de producto/SyncEngine ni ampliación de plazos. Suite WebSocket y repeticiones locales PASS; no afirmamos corregir el timeout Linux anterior.
 
 ### 69. Limitaciones
 
@@ -288,7 +292,7 @@ BLOCKED infraestructura WAN. Allocation/privatesignaling/candidatos/route UX/net
 
 ### 71. GitHub Actions
 
-TESTED: commit de código bb6ec172eab523b6107cef5f27e6495a84a8f7c0, [run38001263654](https://github.com/Eirom16/cine-virtual/actions/runs/38001263654), **11/11 success** después de reejecutar Linux. [Recibo machine-readable](results-ci-code-final.json). Timeout puntual del test WebSocket social existente: cinco repeticiones locales sin cambios PASS, reejecución CI PASS; causa NOT DETERMINED. Una descarga Ubuntu lenta se interrumpió y relanzó, no error de código. No SyncEngine/test/timeouts modificados por ese episodio. El commit posterior solo añade este cierre documental; su CI exacto se entrega en respuesta final.
+TESTED: commit de código bb6ec172eab523b6107cef5f27e6495a84a8f7c0, [run38001263654](https://github.com/Eirom16/cine-virtual/actions/runs/38001263654), **11/11 success** después de reejecutar Linux. [Recibo machine-readable](results-ci-code-final.json). Timeout puntual del test WebSocket social existente: cinco repeticiones locales sin cambios PASS, reejecución CI PASS; causa NOT DETERMINED. Una descarga Ubuntu lenta se interrumpió y relanzó, no error de código. No SyncEngine/test/timeouts modificados por ese episodio. El cierre documental siguiente detectó OUT_OF_SEQUENCE en macOS ARM64: se sincroniza el estado del Host en el test, con límites explicados en apartados67/68. La matriz del HEAD final se verifica nuevamente y entrega en respuesta final.
 
 Inicial37966817288 11/11 PASS solo b41. Run37997804755 detectó fallos al join del relay tras SHA completo en Windows/macOS ARM64; [diagnóstico preservado](results-ci-first-failure.json). Corrige clasificación del fin de sesión/reset, sin omitir tests. Cambios se commit/push y matriz final se espera/diagnostica; run exacto del HEAD y estado final se entregan en respuesta de cierre. No continue-on-error, secrets, releases o deployment modificados.
 
@@ -298,11 +302,11 @@ IMPLEMENTED ADR015 provisional y docs architecture/P2P/security/protocol/UI/test
 
 ### 73. Commits
 
-TESTED: base b41f3c0; commits170f9fa (investigación/carrier/spike), fb5002a (prevalidación/grants/Ready ensayo), 8e9dceb (teardown), 9bbbfb9 (diagnóstico seguro), 6994121 (polling previo a ACK), bb6ec17 (evidencia final de código). Todos incorporados en master por commits normales/fast-forward. El cierre posterior solo actualiza documentación/recibos. Hash final se entrega en cierre y git log; no forcepush/rebase/borradohistoria. Docs no inventan su propio hash autoreferente.
+TESTED: base b41f3c0; commits170f9fa (investigación/carrier/spike), fb5002a (prevalidación/grants/Ready ensayo), 8e9dceb (teardown), 9bbbfb9 (diagnóstico seguro), 6994121 (polling previo a ACK), bb6ec17 (evidencia final de código), 5c49be2 (informe). Todos incorporados en master por commits normales/fast-forward. El cierre siguiente añade la sincronización del test social y su recibo. Hash final se entrega en cierre y git log; no forcepush/rebase/borradohistoria. Docs no inventan su propio hash autoreferente.
 
 ### 74. Estado Git final
 
-TESTED antes de este cierre documental: master limpio y sincronizado con origin/master en bb6ec17, ahead/behind0/0; CI11/11. El HEAD posterior de documentación se verifica nuevamente y comunica en cierre. Estado final exacto se comunica en cierre; modificaciones externas no sobrescritas. No certificados/grants/media privada tracked.
+TESTED en cierre anterior: master limpio y sincronizado con origin/master en bb6ec17, ahead/behind0/0; CI11/11. El HEAD posterior se verifica nuevamente y comunica en cierre. Estado final exacto se comunica en cierre; modificaciones externas no sobrescritas. No certificados/grants/media privada tracked.
 
 ### 75. ¿Funciona P2P entre casas diferentes?
 

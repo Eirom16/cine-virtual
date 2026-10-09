@@ -120,11 +120,21 @@ No nueva QA visual ni capturas: [alcance](screenshots/README.md).
 
 **TESTED CI11/11 PASS** para código bb6ec17,
 [run38001263654](https://github.com/Eirom16/cine-virtual/actions/runs/38001263654),
-[recibo](results-ci-code-final.json). Este cierre solo añade documentación;
-su HEAD y run final se verifican aparte en respuesta de cierre.
+[recibo](results-ci-code-final.json). El HEAD y run final, incluyendo la
+sincronización del test descrita abajo, se verifican aparte en respuesta de cierre.
 
 [Timeout WebSocket social](results-ci-social-timeout.json): primer Linux Elapsed,
 cinco repeticiones locales del test intacto PASS, reejecución mismo HEAD PASS.
 Causa NOT DETERMINED, no cambio de SyncEngine ni timeouts/test para ocultarlo.
 Una reejecución interrumpió descarga Ubuntu que avanzaba lentamente; nuevo
 runner completó SDK y suite. Los logs Actions mantienen todos los intentos.
+
+El cierre documental 5c49be2, con código idéntico a bb6ec17, encontró otro fallo
+del test social en macOS ARM64: `OUT_OF_SEQUENCE`. La revisión detectó que el
+test esperaba el snapshot social del Participant, pero seleccionaba el medio
+sin esperar que el Host aplicara el join. Se añade `wait_state` antes de esa
+selección, como ya hace el test de control básico. Es una barrera de estado del
+test; no cambia código de producto, autoridad, timeouts ni SyncEngine.
+La relación con ese fallo concreto es INFERRED: el log no identifica el intent
+rechazado. No se afirma que esto resuelva el timeout Linux anterior.
+[Recibo y repeticiones](results-ci-social-sequence.json).

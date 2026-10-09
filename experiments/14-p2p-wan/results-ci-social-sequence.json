@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "failed_head_sha": "5c49be28ad9e2644a26ffc7cf7fc0e4216ced829",
+  "failed_run_id": 38004533146,
+  "failed_job_id": 114070917235,
+  "platform": "macos-15 arm64",
+  "test": "social_two_clients_chat_reactions_resume_and_player_regression",
+  "observed_error": "OUT_OF_SEQUENCE",
+  "relay_tests_status": "PASS in same job",
+  "finding": "Test selected media after Participant social snapshot without waiting for Host room state to apply join.",
+  "connection_to_observed_failure": "INFERRED: failure log does not identify the rejected intent.",
+  "change": "Await Host wait_state(Participant room sequence) before media selection in test only.",
+  "product_code_changed": false,
+  "sync_engine_changed": false,
+  "timeouts_changed": false,
+  "previous_linux_timeout_resolved": "NOT DETERMINED",
+  "local_full_websocket_suite_repetitions": [
+    {
+      "trial": 1,
+      "status": "PASS",
+      "seconds": 5.807
+    },
+    {
+      "trial": 2,
+      "status": "PASS",
+      "seconds": 5.87
+    },
+    {
+      "trial": 3,
+      "status": "PASS",
+      "seconds": 5.589
+    },
+    {
+      "trial": 4,
+      "status": "PASS",
+      "seconds": 5.703
+    },
+    {
+      "trial": 5,
+      "status": "PASS",
+      "seconds": 5.645
+    }
+  ],
+  "final_head_ci": "Exact final HEAD and CI run are verified and linked in the delivery; not inferred from previous run."
+}

@@ -213,6 +213,8 @@ async fn social_two_clients_chat_reactions_resume_and_player_regression() -> Res
     )
     .await?;
     wait_social(&b, |v| v["social_sequence"] == 1).await;
+    // The social snapshot does not guarantee the Host has applied the join.
+    a.wait_state(b.state().unwrap().sequence).await?;
     a.media_demo().await?;
     b.wait_state(a.state().unwrap().sequence).await?;
     a.ready().await?;
