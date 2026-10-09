@@ -119,6 +119,20 @@ pub struct Stats {
     /// A relay session ending never asserts file completion or integrity.
     pub termination: &'static str,
 }
+fn io_error(stage: &str, error: std::io::Error) -> Error {
+    // Debug diagnostics contain only static stage and error categories, never
+    // endpoint, ticket, certificate, TLS error text or media metadata.
+    #[cfg(debug_assertions)]
+    eprintln!(
+        "relay_io stage={stage} kind={:?} os={:?} tls={}",
+        error.kind(),
+        error.raw_os_error(),
+        error.get_ref().is_some_and(|e| e.is::<rustls::Error>())
+    );
+    #[cfg(not(debug_assertions))]
+    let _ = (stage, error);
+    Error::Io
+}
 fn disconnected(error: &std::io::Error) -> bool {
     matches!(
         error.kind(),
@@ -240,7 +254,8 @@ pub fn serve_pair(
             source
                 .sock
                 .socket
-                .set_read_timeout(Some(Duration::from_millis(1)))?;
+                .set_read_timeout(Some(Duration::from_millis(1)))
+                .map_err(|e| io_error("poll_config", e))?;
             match source.read(&mut buffer) {
                 Ok(0) => {
                     return Ok(Stats {
@@ -271,7 +286,7 @@ pub fn serve_pair(
                                 termination: "peer_disconnected",
                             });
                         }
-                        return Err(Error::Io);
+                        return Err(io_error("forward", error));
                     }
                     bytes = next;
                     last = Instant::now();
@@ -307,7 +322,7 @@ pub fn serve_pair(
                         termination: "peer_disconnected",
                     });
                 }
-                Err(_) => return Err(Error::Io),
+                Err(e) => return Err(io_error("read", e)),
             }
         }
     }
