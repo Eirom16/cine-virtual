@@ -4,7 +4,6 @@ pub mod tls;
 pub mod transport;
 pub use cine_transfer_model::*;
 use serde::Serialize;
-use sha2::{Digest, Sha256};
 use std::{
     sync::{
         Arc,
@@ -12,6 +11,7 @@ use std::{
     },
     time::Instant,
 };
+use subtle::ConstantTimeEq;
 
 pub struct Authorization {
     credential: Credential,
@@ -38,7 +38,7 @@ impl Authorization {
         Ok(())
     }
     pub fn consume(&self, candidate: &Credential) -> Result<(), Error> {
-        self.check()?; // Hash comparison avoids an early-exit comparison on the bearer secret.
+        self.check()?;
         if candidate.grant_id != self.credential.grant_id
             || candidate.transfer_id != self.credential.transfer_id
             || candidate.room_id != self.credential.room_id
@@ -50,10 +50,7 @@ impl Authorization {
         {
             return Err(Error::Unauthorized);
         }
-        let a = Sha256::digest(candidate.secret);
-        let b = Sha256::digest(self.credential.secret);
-        let difference = a.iter().zip(b.iter()).fold(0u8, |v, (x, y)| v | (x ^ y));
-        if difference != 0 {
+        if candidate.secret.ct_eq(&self.credential.secret).unwrap_u8() != 1 {
             return Err(Error::Unauthorized);
         }
         if self.consumed.swap(true, Ordering::AcqRel) {
