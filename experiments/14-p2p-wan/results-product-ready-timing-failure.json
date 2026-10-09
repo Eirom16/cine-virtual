@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "scenario": "linux-real-control-and-transfer-lifecycle",
-  "status": "PASS",
+  "status": "FAIL",
   "network": "loopback WSS and separate direct TCP/TLS1.3",
   "build": "debug",
   "steps": [
@@ -14,11 +14,23 @@
     "receiver_requested_fresh_grant",
     "fresh_grant_request_observed",
     "host_granted_again",
-    "host_resume_new_grant_final_sha_complete",
-    "verified_download_loaded_into_libmpv_and_ready",
-    "new_media_revision_invalidates_old_manifest_partial_and_ready"
+    "host_resume_new_grant_final_sha_complete"
   ],
-  "source_bytes": 24300725,
-  "disconnect_verified_bytes": 1048576,
-  "host_disconnect_verified_bytes": 1048576
+  "safe_progress": {
+    "bytes_per_second": null,
+    "error": null,
+    "eta_seconds": null,
+    "received_bytes": 22203573,
+    "state": "completed",
+    "total_bytes": 24300725,
+    "verified_bytes": 24300725
+  },
+  "safe_receivers": [
+    {
+      "state": "completed",
+      "authorized": false,
+      "verified_bytes": 24300725
+    }
+  ],
+  "failure": "AssertionError:ready"
 }

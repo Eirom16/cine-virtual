@@ -30,6 +30,7 @@ keep key readable only by its service, certificate/public pin shareable. Example
 for an explicitly pinned self-signed identity with a real configured DNS SAN:
 
 ```sh
+umask 077
 # Replace example.invalid BEFORE provisioning; private output stays outside Git.
 install -d -m 0700 /etc/cine
 openssl req -x509 -newkey ec -pkeyopt ec_paramgen_curve:prime256v1 -nodes \

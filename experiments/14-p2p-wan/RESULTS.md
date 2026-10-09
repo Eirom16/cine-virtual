@@ -15,7 +15,7 @@ HEAD publicado; rendimiento/estabilidad física LAN necesitan seguimiento.
 | Dos NAT IPv4 rootless, sin netem, Linux debug | 8MiB, pausa tras1MiB | directo bloqueado; relay+resume SHA PASS | muestra inicial resume7MiB 2.446MiB/s |
 | Dos NAT +40ms±10ms/0.5% loss/10Mbit por enlace externo | 8MiB | relay+pause+nuevo grant+resume SHA PASS | resume7MiB 13.914s, 0.503MiB/s |
 | Dos NAT + corte TCP crudo tras1MiB, sin netem | 8MiB | error I/O esperado, nuevo grant, SHA PASS | resume7MiB 7.876s, 0.889MiB/s |
-| ARMv7 release, SM-J701M, relay en loopback del dispositivo | 8KiB +8MiB | SHA PASS, pausa/nuevo grant/resume | resume7MiB 9.841s, 0.711MiB/s |
+| ARMv7 release, SM-J701M, relay en loopback del dispositivo | 8KiB +8MiB | SHA PASS, pausa/nuevo grant/resume | resume7MiB 10.034s, 0.698MiB/s |
 | Redes físicas independientes / CGNAT / IPv6 Internet | — | **NOT TESTED / BLOCKED** | ninguna |
 | Relay público autorizado | — | **NOT TESTED / BLOCKED** | ninguna |
 | ARM64 físico / Windows/macOS/iOS runtime | — | **NOT TESTED** | CI comprueba build, no runtime multimedia |
@@ -30,7 +30,7 @@ HEAD publicado; rendimiento/estabilidad física LAN necesitan seguimiento.
 Datos sintéticos, bloques1MiB, SHA por bloque/final, mismo manifest/Partial,
 Rustls/ring y Cargo.lock conservados. Host toolchain en
 [checks](results-local-checks.json). ARMv7 release NDK28.2.13676358 API21;
-binario completo1,959,108B, **no incremento atribuible al carrier** ni comparación
+binario completo1,959,080B, **no incremento atribuible al carrier** ni comparación
 con builds WebRTC/Quinn. Android9 API28; Android15 ARM64 no disponible.
 
 Rates son bytes útiles NUEVOS divididos por tiempo de intento incluido admisión,
@@ -62,7 +62,7 @@ Netem: CPU2.732s, peak RSS getrusage17,016KiB; son **todo el proceso laboratorio
 Muestreo /proc100ms: máximos observados11FD/4threads/12,704KiB RSS (no pico absoluto).
 Corte: CPU2.808s, peak RSS16,924KiB, máximos muestreados11FD/4threads/12,704KiB.
 Tras join:5FD/1thread en ambos; no prueba de fuga de largo plazo.
-ARMv7 8MiB: CPU4.77s, peak RSS10,964KiB,5FD/1thread al terminar;8KiB0.17s/3736KiB.
+ARMv7 8MiB: CPU4.70s, peak RSS10,844KiB,5FD/1thread al terminar;8KiB0.17s/3716KiB.
 Player/Flutter no corrieron dentro de estos procesos, impacto WAN **NOT MEASURED**.
 
 Netem resume:7,352,682B ciphertext interior retransmitido para7,340,032B útiles
@@ -75,6 +75,14 @@ contenido en claro: su buffer contiene registros de TLS interior.
 - Resume de producto fallaba: sender escogía autorización revocada antes de que
   WSS entregara nueva. Corrige espera por autorización disponible; consumo TLS
   sigue validando secreto/scope. Test socket real + baseline producto PASS.
+- Baseline heredado esperaba clock del receiver pero no el Host tras room
+  resume: descargó/SHA PASS, ready command falló bajo compilación concurrente.
+  Ahora aguarda clock/player prepared de ambos hasta15s antes de Ready; no
+  modifica SyncEngine ni requisitos. [Fallo](results-product-ready-timing-failure.json).
+- Revisión final: el wrapper TCP revalida checkpoint ANTES de conectar, como
+  Phase1; evita agotar handshake mientras lee un parcial grande. Carrier ya
+  establecido revalida en receive_on: limitación del spike pequeño, producto
+  futuro debe preparar checkpoint antes de asignar/conectar el relay.
 - Lectura del config de laboratorio antes de finalizar JSON: espera por parse
   completo con5s. [Fallo preservado](results-lan-config-race-failure.json).
 - nft nombres reservados en primer lab: cadenas lab_post/lab_forward/lab_input;

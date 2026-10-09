@@ -8,7 +8,10 @@ antes de código: [decision](TRANSPORT-DECISION.md). No migración QUIC/WebRTC.
 `cine-transfer::carrier::Carrier` = Read+Write+bounded I/O configuration+graceful
 close. TCP implementation and an outer Rustls client stream; the exact existing
 peer TLS/grant/chunks/SHA/Partial implementation runs inside either. Existing
-TCP wrapper and `receive_observed` API preserved. Peer auth observer measures
+TCP wrapper and `receive_observed` API preserved, including checkpoint validation
+BEFORE opening TCP. Already-connected receive_on validates after route setup;
+the small spike does not demonstrate large-checkpoint admission timing. Future
+product must prepare checkpoint before relay allocation/handshake. Peer auth observer measures
 TLS+credential+ACK, not just cryptographic handshake. No parallel chunk workers.
 
 `relay::serve_pair` finite local session accepts two OUTBOUND peer connections,

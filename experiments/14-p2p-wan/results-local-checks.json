@@ -30,7 +30,7 @@
     "adapters/transfer/src/relay.rs": "328f0f91f77216d8838bafad8be34eebcf14b9d71b25f7ed97b8e5cb32d08c7a",
     "adapters/transfer/src/storage.rs": "4cda3c2554775f41a16eb16948e157bdece694c5f12e759b20d8a7672ca7b43c",
     "adapters/transfer/src/tls.rs": "7d0f1fb86e2c8a923bb7a688a7c069763ea096bef71a8775b5a6760d0170989e",
-    "adapters/transfer/src/transport.rs": "31445e325069a43b7437b3a6ac053118c33dd4e96469fa4678450aee8d385b0b",
+    "adapters/transfer/src/transport.rs": "6618f4baef53ed41c76826ecec681b1b4110571771e888b3fdf3b63164c976b3",
     "client/src/fake_player.rs": "dee404e102157327188aeab5d3dfce89a3957a0774f51a5c9667e2bf0fe6a3ec",
     "client/src/lib.rs": "8506882f930d0be6a475f6f4b809a095b8822171c02f54b9b6ccf47e86131587",
     "client/src/main.rs": "093696a5cfad90c0ff5729af9b6a5bfb057d2f6f07624679bc126f0e839ab9de",

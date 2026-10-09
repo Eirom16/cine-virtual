@@ -180,14 +180,19 @@ pub fn receive_observed(
     mut connected: impl FnMut(&TcpStream),
     progress: impl FnMut(Progress),
 ) -> Result<std::path::PathBuf, Error> {
-    control.check()?;
-    if credential.manifest_hash != partial.manifest.fingerprint() {
-        return Err(Error::Unauthorized);
-    }
+    revalidate(credential, partial, control)?;
     let stream = TcpStream::connect_timeout(&address, Duration::from_secs(5))?;
     socket(&stream)?;
     connected(&stream);
-    receive_on(stream, certificate, credential, partial, control, progress)
+    receive_prevalidated(
+        stream,
+        certificate,
+        credential,
+        partial,
+        control,
+        |_| {},
+        progress,
+    )
 }
 
 /// Reuse the exact peer TLS, authentication, chunks and checkpoint over a pipe.
@@ -211,8 +216,41 @@ pub fn receive_on<C: Carrier>(
     )
 }
 
+fn revalidate(
+    credential: &Credential,
+    partial: &mut Partial,
+    control: &Control,
+) -> Result<(), Error> {
+    control.check()?;
+    if credential.manifest_hash != partial.manifest.fingerprint() {
+        return Err(Error::Unauthorized);
+    }
+    partial.revalidate(|| control.check())
+}
+
 /// Reports peer TLS plus grant/ACK time, excluding checkpoint revalidation.
 pub fn receive_on_observed<C: Carrier>(
+    stream: C,
+    certificate: &[u8],
+    credential: &Credential,
+    partial: &mut Partial,
+    control: &Control,
+    authenticated: impl FnOnce(Duration),
+    progress: impl FnMut(Progress),
+) -> Result<std::path::PathBuf, Error> {
+    revalidate(credential, partial, control)?;
+    receive_prevalidated(
+        stream,
+        certificate,
+        credential,
+        partial,
+        control,
+        authenticated,
+        progress,
+    )
+}
+
+fn receive_prevalidated<C: Carrier>(
     stream: C,
     certificate: &[u8],
     credential: &Credential,
@@ -222,11 +260,6 @@ pub fn receive_on_observed<C: Carrier>(
     mut progress: impl FnMut(Progress),
 ) -> Result<std::path::PathBuf, Error> {
     control.check()?;
-    if credential.manifest_hash != partial.manifest.fingerprint() {
-        return Err(Error::Unauthorized);
-    }
-    // Even a separately established route must revalidate retained blocks.
-    partial.revalidate(|| control.check())?;
     socket(&stream)?;
     let handshake_start = Instant::now();
     let mut conn = ClientConnection::new(

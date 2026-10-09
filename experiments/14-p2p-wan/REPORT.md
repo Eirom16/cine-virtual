@@ -228,15 +228,15 @@ TESTED [corte](results-recovery.json): socket TCP crudo corta tras1MiB, error I/
 
 ### 56. Throughput
 
-MEASURED resume netem0.503MiB/s, ARMv7 loopback0.711MiB/s y LAN física0.277MiB/s muestra. Entornos/compilación/hostload distintos, no ranking ni regresión demostrada; [RESULTS](RESULTS.md) limita interpretación/overhead.
+MEASURED resume netem0.503MiB/s, ARMv7 loopback0.698MiB/s y LAN física0.277MiB/s muestra. Entornos/compilación/hostload distintos, no ranking ni regresión demostrada; [RESULTS](RESULTS.md) limita interpretación/overhead.
 
 ### 57. CPU
 
-MEASURED lab todosroles+fixture+hash:netem2.732s CPU, corte2.808s; ARMv7 8MiB4.77s. No CPU incremental WebRTC/QUIC ni durante Player WAN, NOT MEASURED.
+MEASURED lab todosroles+fixture+hash:netem2.732s CPU, corte2.808s; ARMv7 8MiB4.70s. No CPU incremental WebRTC/QUIC ni durante Player WAN, NOT MEASURED.
 
 ### 58. Memory/resources
 
-MEASURED netem peakgetrusage17,016KiB; muestreo100ms max11FD/4threads/12,704KiB RSS. ARMv7 peak10,964KiB; al finalizar5FD/1thread. No leaktest largo ni coste marginal3rolesaislado inferido.
+MEASURED netem peakgetrusage17,016KiB; muestreo100ms max11FD/4threads/12,704KiB RSS. ARMv7 peak10,844KiB; al finalizar5FD/1thread. No leaktest largo ni coste marginal3rolesaislado inferido.
 
 ### 59. Impacto en Player
 
@@ -276,7 +276,7 @@ TESTED reproducibles: grantrevocado race bloqueaba resume, configJSON parcialmen
 
 ### 68. Bugs corregidos
 
-IMPLEMENTED espera authavailable con consume obligado, bounded configparse, nft cadenas seguras y namespaceguard, advertise valida puerto, TLS close_notify explicit inner/outer. Unit/integration/product finales PASS; no atribuir Io Android solo al cierre.
+IMPLEMENTED espera authavailable con consume obligado, bounded configparse, nft cadenas seguras y namespaceguard, advertise valida puerto, TLS close_notify explicit inner/outer. Revisión final restaura revalidación antes del connect TCP para parciales grandes. Unit/integration/product finales PASS; no atribuir Io Android solo al cierre.
 
 ### 69. Limitaciones
 
